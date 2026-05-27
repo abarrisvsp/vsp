@@ -9,6 +9,28 @@ import { uploadImage } from '@/lib/actions/upload';
 import { toast } from 'sonner';
 import type { BlogPost } from '@/lib/types';
 
+type BroadcastSummary = {
+  sent: number;
+  scheduled: number;
+  lastScheduledFor: string | null;
+};
+
+function showBroadcastToast(b: BroadcastSummary | undefined) {
+  if (!b) return;
+  const { sent, scheduled, lastScheduledFor } = b;
+  if (!sent && !scheduled) return;
+  const parts: string[] = [];
+  if (sent) parts.push(`${sent} sent now`);
+  if (scheduled && lastScheduledFor) {
+    const last = new Date(lastScheduledFor);
+    const dateStr = last.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    parts.push(`${scheduled} scheduled through ${dateStr} (Resend daily limit)`);
+  } else if (scheduled) {
+    parts.push(`${scheduled} scheduled`);
+  }
+  toast.success(`Emailing subscribers: ${parts.join(' · ')}`);
+}
+
 export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title || '');
@@ -64,9 +86,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
           published: publish, email_subscribers: emailSubs,
         });
         toast.success(publish ? 'Published' : 'Saved');
-        if (result.emailedCount && result.emailedCount > 0) {
-          toast.success(`Emailed ${result.emailedCount} subscriber${result.emailedCount === 1 ? '' : 's'}`);
-        }
+        showBroadcastToast(result.broadcast);
       } else {
         const result = await createBlogPost({
           title, date, category_tag: category, excerpt, read_time_minutes: readTime,
@@ -74,9 +94,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
           published: publish, email_subscribers: emailSubs,
         });
         toast.success(publish ? 'Published' : 'Draft saved');
-        if (result.emailedCount && result.emailedCount > 0) {
-          toast.success(`Emailed ${result.emailedCount} subscriber${result.emailedCount === 1 ? '' : 's'}`);
-        }
+        showBroadcastToast(result.broadcast);
         router.push(`/admin/blog/${result.id}`);
       }
     } catch (e) {
