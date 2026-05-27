@@ -20,20 +20,21 @@ export async function Header({ active }: { active?: string }) {
   return (
     <header className="border-b border-line bg-bg/95 backdrop-blur sticky top-0 z-40">
       <div className="max-w-container mx-auto px-10 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 font-serif italic text-xl tracking-tight">
-          {logoUrl && (
+        <Link href="/" className="flex items-center" aria-label="Visionary Sound Productions — Home">
+          {logoUrl ? (
             <Image
               src={logoUrl}
               alt="Visionary Sound Productions"
-              width={36}
-              height={36}
-              className="h-9 w-9 object-contain"
+              width={160}
+              height={56}
+              className="h-12 w-auto object-contain"
               priority
             />
+          ) : (
+            <span className="font-serif italic text-xl tracking-tight">
+              Visionary Sound <span className="text-amber">Productions</span>
+            </span>
           )}
-          <span>
-            Visionary Sound <span className="text-amber">Productions</span>
-          </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {NAV.map((n) => (
