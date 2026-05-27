@@ -19,22 +19,21 @@ export async function Header({ active }: { active?: string }) {
 
   return (
     <header className="border-b border-line bg-bg/95 backdrop-blur sticky top-0 z-40">
-      <div className="max-w-container mx-auto px-10 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center" aria-label="Visionary Sound Productions — Home">
-          {logoUrl ? (
+      <div className="max-w-container mx-auto px-10 h-20 flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-3" aria-label="Visionary Sound Productions — Home">
+          {logoUrl && (
             <Image
               src={logoUrl}
-              alt="Visionary Sound Productions"
-              width={160}
-              height={56}
-              className="h-12 w-auto object-contain"
+              alt=""
+              width={64}
+              height={64}
+              className="h-14 w-14 object-contain shrink-0"
               priority
             />
-          ) : (
-            <span className="font-serif italic text-xl tracking-tight">
-              Visionary Sound <span className="text-amber">Productions</span>
-            </span>
           )}
+          <span className="font-serif italic text-xl md:text-2xl tracking-tight leading-tight">
+            Visionary Sound <span className="text-amber">Productions</span>
+          </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {NAV.map((n) => (
