@@ -11,6 +11,8 @@ import { getTestimonials } from '@/lib/actions/testimonials';
 import { getPressLogos } from '@/lib/actions/press';
 import { getRecentPublishedPosts } from '@/lib/actions/blog';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   const [services, testimonials, pressLogos, recentPosts] = await Promise.all([
     getServices(),
