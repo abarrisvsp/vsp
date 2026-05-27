@@ -82,13 +82,49 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
   }
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
     @apply font-sans;
   }
+  body {
+    @apply bg-bg text-ink font-sans;
+    font-feature-settings: "ss01", "cv11";
+    overflow-x: hidden;
+  }
+  ::selection {
+    @apply bg-amber text-white;
+  }
+}
+
+/* Edit mode pulse — applied to InlineText when body has .edit-mode-active */
+body.edit-mode-active [data-inline-text]:not([data-editing="true"]) {
+  outline: 2px dashed rgba(240, 192, 64, 0.5);
+  outline-offset: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  animation: editPulse 2s ease-in-out infinite;
+}
+
+body.edit-mode-active [data-inline-text]:not([data-editing="true"]):hover {
+  outline-color: rgba(240, 192, 64, 1);
+  background: rgba(240, 192, 64, 0.08);
+}
+
+body.edit-mode-active [data-inline-text][data-editing="true"] {
+  outline: 2px solid #f0c040;
+  outline-offset: 4px;
+  background: rgba(240, 192, 64, 0.12);
+  border-radius: 4px;
+  cursor: text;
+}
+
+@keyframes editPulse {
+  0%, 100% { outline-color: rgba(240, 192, 64, 0.3); }
+  50% { outline-color: rgba(240, 192, 64, 0.9); }
+}
+
+/* Push content below the EditToolbar when present */
+body.has-edit-toolbar {
+  padding-top: 48px;
 }
