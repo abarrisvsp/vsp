@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { AuthProvider } from '@/components/auth/AuthProvider';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Visionary Sound Productions — Event Production, Lighting & Sound · Detroit',
@@ -18,7 +20,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+          <Toaster theme="dark" position="bottom-right" />
+        </AuthProvider>
+      </body>
     </html>
   );
 }
