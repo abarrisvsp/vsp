@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/components/auth/AuthProvider';
+import { EditModeProvider } from '@/components/edit-mode/EditModeProvider';
+import { EditToolbar } from '@/components/edit-mode/EditToolbar';
 import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
@@ -22,8 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <AuthProvider>
-          {children}
-          <Toaster theme="dark" position="bottom-right" />
+          <EditModeProvider>
+            <EditToolbar />
+            {children}
+            <Toaster theme="dark" position="bottom-right" />
+          </EditModeProvider>
         </AuthProvider>
       </body>
     </html>
