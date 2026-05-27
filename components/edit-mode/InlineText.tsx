@@ -109,11 +109,11 @@ export function InlineText({
     return <Tag className={className}>{value}</Tag>;
   }
 
-  const Tag = tag as keyof JSX.IntrinsicElements;
+  const Tag = tag as unknown as React.ComponentType<React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement>; contentEditable?: boolean; suppressContentEditableWarning?: boolean }>;
   return (
     <span className="relative inline">
       <Tag
-        ref={ref as never}
+        ref={ref}
         data-inline-text=""
         data-editing={editing ? 'true' : 'false'}
         contentEditable={editing}
