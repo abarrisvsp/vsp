@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import { getSiteContent } from '@/lib/actions/content';
 
 const NAV = [
   { href: '/', label: 'Home' },
@@ -11,12 +13,27 @@ const NAV = [
   { href: '/contact', label: 'Contact' },
 ];
 
-export function Header({ active }: { active?: string }) {
+export async function Header({ active }: { active?: string }) {
+  const c = await getSiteContent(['vsp_logo_url']);
+  const logoUrl = c.vsp_logo_url;
+
   return (
     <header className="border-b border-line bg-bg/95 backdrop-blur sticky top-0 z-40">
       <div className="max-w-container mx-auto px-10 h-16 flex items-center justify-between">
-        <Link href="/" className="font-serif italic text-xl tracking-tight">
-          Visionary Sound <span className="text-amber">Productions</span>
+        <Link href="/" className="flex items-center gap-3 font-serif italic text-xl tracking-tight">
+          {logoUrl && (
+            <Image
+              src={logoUrl}
+              alt="Visionary Sound Productions"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-contain"
+              priority
+            />
+          )}
+          <span>
+            Visionary Sound <span className="text-amber">Productions</span>
+          </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {NAV.map((n) => (
