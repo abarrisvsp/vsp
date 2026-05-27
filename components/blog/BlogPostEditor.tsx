@@ -1,9 +1,10 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { TiptapEditor } from './TiptapEditor';
 import { createBlogPost, updateBlogPost, deleteBlogPost } from '@/lib/actions/blog';
+import { getSubscriberCount } from '@/lib/actions/subscribers';
 import { uploadImage } from '@/lib/actions/upload';
 import { toast } from 'sonner';
 import type { BlogPost } from '@/lib/types';
@@ -18,7 +19,17 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   const [coverUrl, setCoverUrl] = useState(initial?.cover_image_url || '');
   const [coverPath, setCoverPath] = useState(initial?.cover_storage_path || '');
   const [body, setBody] = useState(initial?.body_html || '');
+  const [emailSubs, setEmailSubs] = useState(initial?.email_subscribers ?? true);
+  const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const alreadyEmailed = !!initial?.subscribers_emailed_at;
+
+  useEffect(() => {
+    getSubscriberCount()
+      .then(setSubscriberCount)
+      .catch(() => setSubscriberCount(null));
+  }, []);
 
   const onCoverDrop = useCallback(async (files: File[]) => {
     const file = files[0];
@@ -47,20 +58,26 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
     setSaving(true);
     try {
       if (initial) {
-        await updateBlogPost(initial.id, {
+        const result = await updateBlogPost(initial.id, {
           title, date, category_tag: category, excerpt, read_time_minutes: readTime,
           cover_image_url: coverUrl, cover_storage_path: coverPath, body_html: body,
-          published: publish,
+          published: publish, email_subscribers: emailSubs,
         });
         toast.success(publish ? 'Published' : 'Saved');
+        if (result.emailedCount && result.emailedCount > 0) {
+          toast.success(`Emailed ${result.emailedCount} subscriber${result.emailedCount === 1 ? '' : 's'}`);
+        }
       } else {
-        const id = await createBlogPost({
+        const result = await createBlogPost({
           title, date, category_tag: category, excerpt, read_time_minutes: readTime,
           cover_image_url: coverUrl, cover_storage_path: coverPath, body_html: body,
-          published: publish,
+          published: publish, email_subscribers: emailSubs,
         });
         toast.success(publish ? 'Published' : 'Draft saved');
-        router.push(`/admin/blog/${id}`);
+        if (result.emailedCount && result.emailedCount > 0) {
+          toast.success(`Emailed ${result.emailedCount} subscriber${result.emailedCount === 1 ? '' : 's'}`);
+        }
+        router.push(`/admin/blog/${result.id}`);
       }
     } catch (e) {
       console.error(e);
@@ -124,6 +141,29 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
       <div>
         <label className={label}>Body</label>
         <TiptapEditor initialHtml={body} onChange={setBody} />
+      </div>
+
+      <div className="pt-4 border-t border-line">
+        <label className="flex items-start gap-2 cursor-pointer text-sm text-ink-dim">
+          <input
+            type="checkbox"
+            checked={emailSubs}
+            disabled={alreadyEmailed}
+            onChange={(e) => setEmailSubs(e.target.checked)}
+            className="mt-1"
+          />
+          <span>
+            📧 Email subscribers when published
+            {subscriberCount !== null && (
+              <span className="text-ink-mute"> ({subscriberCount} active)</span>
+            )}
+            {alreadyEmailed && (
+              <span className="block text-xs text-ink-mute mt-0.5">
+                Already sent on {new Date(initial!.subscribers_emailed_at!).toLocaleDateString()} — won&apos;t re-send.
+              </span>
+            )}
+          </span>
+        </label>
       </div>
 
       <div className="flex items-center justify-between pt-4 border-t border-line">

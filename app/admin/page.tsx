@@ -3,13 +3,15 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getUnreadSubmissionCount } from '@/lib/actions/submissions';
 import { getAllPostsForAdmin } from '@/lib/actions/blog';
+import { getSubscriberCount } from '@/lib/actions/subscribers';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminHome() {
-  const [unread, posts] = await Promise.all([
+  const [unread, posts, subscriberCount] = await Promise.all([
     getUnreadSubmissionCount(),
     getAllPostsForAdmin().catch(() => []),
+    getSubscriberCount().catch(() => 0),
   ]);
   const drafts = posts.filter((p) => !p.published).length;
   const published = posts.length - drafts;
@@ -35,7 +37,7 @@ export default async function AdminHome() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <Link href="/admin/inbox" className={card}>
             <div className={label}>Inbox</div>
             <div className={num}>{unread}</div>
@@ -58,6 +60,14 @@ export default async function AdminHome() {
               Published posts. Click to view all and write a new one.
             </div>
           </Link>
+
+          <div className={card}>
+            <div className={label}>Subscribers</div>
+            <div className={num}>{subscriberCount}</div>
+            <div className={desc}>
+              Active email subscribers — auto-notified on every new published post.
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 border-t border-line pt-8 text-sm text-ink-dim space-y-2">

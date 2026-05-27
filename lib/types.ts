@@ -50,8 +50,22 @@ export type BlogPost = {
   excerpt: string | null;
   read_time_minutes: number | null;
   published: boolean;
+  email_subscribers: boolean;
+  subscribers_emailed_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type Subscriber = {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  active: boolean;
+  source: string | null;
+  unsubscribe_token: string;
+  subscribed_at: string;
+  unsubscribed_at: string | null;
 };
 
 export type ContactSubmission = {

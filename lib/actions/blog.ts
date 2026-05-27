@@ -2,7 +2,21 @@
 import { createServiceClient, createAnonClient } from '@/lib/supabase';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-import type { BlogPost } from '@/lib/types';
+import type { BlogPost, Subscriber } from '@/lib/types';
+
+async function broadcastPostToSubscribers(id: string): Promise<number> {
+  const supabase = createServiceClient();
+  const { data: post } = await supabase.from('blog_posts').select('*').eq('id', id).maybeSingle();
+  const { data: subs } = await supabase.from('subscribers').select('*').eq('active', true);
+  if (!post || !subs || subs.length === 0) return 0;
+  const { sendPostBroadcast } = await import('@/lib/email/post-broadcast');
+  const result = await sendPostBroadcast(post as BlogPost, subs as Subscriber[]);
+  await supabase
+    .from('blog_posts')
+    .update({ subscribers_emailed_at: new Date().toISOString() })
+    .eq('id', id);
+  return result.sent;
+}
 
 async function requireAdmin() {
   const session = await auth();
@@ -71,10 +85,13 @@ export async function getAllPostsForAdmin(): Promise<BlogPost[]> {
   return (data as BlogPost[]) ?? [];
 }
 
-export async function createBlogPost(fields: Partial<BlogPost>): Promise<string> {
+export async function createBlogPost(
+  fields: Partial<BlogPost>
+): Promise<{ id: string; emailedCount?: number }> {
   await requireAdmin();
   const supabase = createServiceClient();
   const slug = fields.slug || slugify(fields.title || 'untitled-' + Date.now());
+  const emailSubscribers = fields.email_subscribers ?? true;
   const { data, error } = await supabase
     .from('blog_posts')
     .insert({
@@ -88,24 +105,63 @@ export async function createBlogPost(fields: Partial<BlogPost>): Promise<string>
       excerpt: fields.excerpt ?? null,
       read_time_minutes: fields.read_time_minutes ?? null,
       published: fields.published ?? false,
+      email_subscribers: emailSubscribers,
     })
     .select('id')
     .single();
   if (error) throw error;
   revalidatePath('/blog');
-  return data.id;
+
+  let emailedCount: number | undefined;
+  if (fields.published === true && emailSubscribers) {
+    try {
+      emailedCount = await broadcastPostToSubscribers(data.id);
+    } catch (e) {
+      console.error('Subscriber broadcast failed on create (post saved anyway)', e);
+    }
+  }
+
+  return { id: data.id, emailedCount };
 }
 
-export async function updateBlogPost(id: string, fields: Partial<BlogPost>): Promise<void> {
+export async function updateBlogPost(
+  id: string,
+  fields: Partial<BlogPost>
+): Promise<{ updated: boolean; emailedCount?: number }> {
   await requireAdmin();
   const supabase = createServiceClient();
+
+  // Get current state to detect publish transition
+  const { data: current } = await supabase
+    .from('blog_posts')
+    .select('published, subscribers_emailed_at')
+    .eq('id', id)
+    .maybeSingle();
+  const wasPublished = current?.published === true;
+  const willBePublished = fields.published === true;
+  const isFirstPublish = !wasPublished && willBePublished && !current?.subscribers_emailed_at;
+
   const { error } = await supabase
     .from('blog_posts')
     .update({ ...fields, updated_at: new Date().toISOString() })
     .eq('id', id);
   if (error) throw error;
+
   revalidatePath('/blog');
   if (fields.slug) revalidatePath(`/blog/${fields.slug}`);
+
+  // Auto-send on first publish (unless email_subscribers is explicitly false)
+  let emailedCount: number | undefined;
+  const shouldEmail = isFirstPublish && (fields.email_subscribers ?? true);
+  if (shouldEmail) {
+    try {
+      emailedCount = await broadcastPostToSubscribers(id);
+    } catch (e) {
+      console.error('Subscriber broadcast failed (post saved anyway)', e);
+    }
+  }
+
+  return { updated: true, emailedCount };
 }
 
 export async function deleteBlogPost(id: string): Promise<void> {
