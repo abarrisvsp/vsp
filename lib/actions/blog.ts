@@ -110,6 +110,7 @@ export async function createBlogPost(
       excerpt: fields.excerpt ?? null,
       read_time_minutes: fields.read_time_minutes ?? null,
       published: fields.published ?? false,
+      published_at: fields.published_at ?? null,
       email_subscribers: emailSubscribers,
     })
     .select('id')

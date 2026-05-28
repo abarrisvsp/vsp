@@ -15,6 +15,8 @@ type BroadcastSummary = {
   lastScheduledFor: string | null;
 };
 
+type PublishStatus = 'draft' | 'published' | 'scheduled';
+
 function showBroadcastToast(b: BroadcastSummary | undefined) {
   if (!b) return;
   const { sent, scheduled, lastScheduledFor } = b;
@@ -44,6 +46,21 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   const [emailSubs, setEmailSubs] = useState(initial?.email_subscribers ?? true);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [publishStatus, setPublishStatus] = useState<PublishStatus>(
+    initial?.published ? 'published'
+    : initial?.published_at ? 'scheduled'
+    : 'draft'
+  );
+  const [scheduleDate, setScheduleDate] = useState(
+    initial?.published_at
+      ? new Date(initial.published_at).toISOString().slice(0, 10)
+      : new Date(Date.now() + 86400000).toISOString().slice(0, 10)
+  );
+  const [scheduleTime, setScheduleTime] = useState(
+    initial?.published_at
+      ? new Date(initial.published_at).toTimeString().slice(0, 5)
+      : '09:00'
+  );
 
   const alreadyEmailed = !!initial?.subscribers_emailed_at;
 
@@ -76,24 +93,36 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
     multiple: false,
   });
 
-  async function save(publish: boolean) {
+  async function save() {
     setSaving(true);
     try {
+      const isPublished = publishStatus === 'published';
+      const isScheduled = publishStatus === 'scheduled';
+
+      const publishedAt = isScheduled
+        ? new Date(`${scheduleDate}T${scheduleTime}:00`).toISOString()
+        : null;
+
+      const fields = {
+        title,
+        date,
+        category_tag: category || null,
+        cover_image_url: coverUrl || null,
+        cover_storage_path: coverPath || null,
+        body_html: body,
+        excerpt: excerpt || null,
+        read_time_minutes: readTime || null,
+        published: isPublished,
+        published_at: publishedAt,
+        email_subscribers: emailSubs,
+      };
+
       if (initial) {
-        const result = await updateBlogPost(initial.id, {
-          title, date, category_tag: category, excerpt, read_time_minutes: readTime,
-          cover_image_url: coverUrl, cover_storage_path: coverPath, body_html: body,
-          published: publish, email_subscribers: emailSubs,
-        });
-        toast.success(publish ? 'Published' : 'Saved');
+        const result = await updateBlogPost(initial.id, fields);
         showBroadcastToast(result.broadcast);
+        toast.success(isPublished ? 'Published' : isScheduled ? 'Scheduled' : 'Draft saved');
       } else {
-        const result = await createBlogPost({
-          title, date, category_tag: category, excerpt, read_time_minutes: readTime,
-          cover_image_url: coverUrl, cover_storage_path: coverPath, body_html: body,
-          published: publish, email_subscribers: emailSubs,
-        });
-        toast.success(publish ? 'Published' : 'Draft saved');
+        const result = await createBlogPost(fields);
         showBroadcastToast(result.broadcast);
         router.push(`/admin/blog/${result.id}`);
       }
@@ -184,13 +213,75 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
         </label>
       </div>
 
-      <div className="flex items-center justify-between pt-4 border-t border-line">
-        {initial ? (
-          <button onClick={handleDelete} className="text-red-400 text-sm hover:text-red-300">Delete post</button>
-        ) : <span />}
-        <div className="flex gap-2">
-          <button onClick={() => save(false)} disabled={saving} className="px-4 py-2 bg-neutral-700 text-white rounded text-sm">{saving ? '…' : 'Save draft'}</button>
-          <button onClick={() => save(true)} disabled={saving} className="px-4 py-2 bg-green-600 text-white rounded text-sm">{saving ? '…' : 'Publish'}</button>
+      <div className="pt-4 border-t border-line space-y-3">
+        {/* Status dropdown */}
+        <div>
+          <label className={label}>Publish Status</label>
+          <select
+            value={publishStatus}
+            onChange={(e) => setPublishStatus(e.target.value as PublishStatus)}
+            className={input}
+          >
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="scheduled">Scheduled</option>
+          </select>
+        </div>
+
+        {/* Schedule date/time pickers — only shown when status = scheduled */}
+        {publishStatus === 'scheduled' && (
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={label}>Publish Date</label>
+                <input
+                  type="date"
+                  value={scheduleDate}
+                  onChange={(e) => setScheduleDate(e.target.value)}
+                  className={input}
+                />
+              </div>
+              <div>
+                <label className={label}>Publish Time</label>
+                <input
+                  type="time"
+                  value={scheduleTime}
+                  onChange={(e) => setScheduleTime(e.target.value)}
+                  className={input}
+                />
+              </div>
+            </div>
+            {scheduleDate && scheduleTime && (
+              <div className="bg-green-900/20 border border-green-900/40 rounded p-2 text-xs text-green-400">
+                🗓 Will go live on{' '}
+                {new Date(`${scheduleDate}T${scheduleTime}:00`).toLocaleString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-center justify-between">
+          {initial ? (
+            <button onClick={handleDelete} className="text-red-400 text-sm hover:text-red-300">Delete post</button>
+          ) : <span />}
+          <button
+            onClick={save}
+            disabled={saving}
+            className="px-5 py-2 bg-amber text-bg text-sm font-medium rounded hover:opacity-90 disabled:opacity-50"
+          >
+            {saving
+              ? 'Saving…'
+              : publishStatus === 'published'
+              ? 'Publish'
+              : publishStatus === 'scheduled'
+              ? 'Schedule Post'
+              : 'Save Draft'}
+          </button>
         </div>
       </div>
     </div>
