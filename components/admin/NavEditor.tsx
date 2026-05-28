@@ -51,7 +51,7 @@ export function NavEditor({ initialItems }: Props) {
     });
   }
 
-  async function addCustom() {
+  function addCustom() {
     if (!newLabel.trim() || !newUrl.trim()) return;
     startTransition(async () => {
       try {

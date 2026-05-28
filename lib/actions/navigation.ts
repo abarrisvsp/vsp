@@ -35,17 +35,21 @@ export async function getAllNavItems(): Promise<NavItem[]> {
 }
 
 /** Save the full ordered set atomically.
- *  Deletes all rows, then inserts the new set.
+ *  Snapshots current rows, deletes all, then inserts the new set.
+ *  Restores the snapshot if insert fails to avoid leaving the table empty.
  */
 export async function saveNavigation(items: NavItem[]): Promise<void> {
   await requireAdmin();
   const supabase = createServiceClient();
 
-  // Delete all existing rows
+  // Snapshot current state for rollback
+  const { data: backup } = await supabase.from('nav_items').select('*').order('sort_order');
+
+  // Delete all existing rows (always-true filter — no real UUID equals the nil UUID)
   const { error: delError } = await supabase
     .from('nav_items')
     .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000'); // always-false condition = delete all
+    .neq('id', '00000000-0000-0000-0000-000000000000');
   if (delError) throw delError;
 
   // Insert new ordered set
@@ -58,13 +62,22 @@ export async function saveNavigation(items: NavItem[]): Promise<void> {
     is_custom: item.is_custom,
   }));
   const { error: insError } = await supabase.from('nav_items').insert(rows);
-  if (insError) throw insError;
+  if (insError) {
+    // Attempt to restore backup to avoid leaving the table empty
+    if (backup?.length) {
+      await Promise.resolve(supabase.from('nav_items').insert(backup)).catch(() => null);
+    }
+    throw insError;
+  }
 
-  revalidatePath('/', 'layout'); // re-render header everywhere
+  revalidatePath('/', 'layout');
 }
 
 export async function addCustomNavItem(label: string, href: string): Promise<void> {
   await requireAdmin();
+  if (!href.startsWith('/') && !href.startsWith('https://') && !href.startsWith('http://')) {
+    throw new Error('Invalid href: must start with /, https://, or http://');
+  }
   const supabase = createServiceClient();
   const { data: last } = await supabase
     .from('nav_items')
@@ -72,7 +85,7 @@ export async function addCustomNavItem(label: string, href: string): Promise<voi
     .order('sort_order', { ascending: false })
     .limit(1)
     .maybeSingle();
-  const sort_order = ((last as any)?.sort_order ?? 0) + 1;
+  const sort_order = ((last as { sort_order: number } | null)?.sort_order ?? 0) + 1;
   const { error } = await supabase
     .from('nav_items')
     .insert({ label, href, sort_order, visible: true, is_custom: true });
