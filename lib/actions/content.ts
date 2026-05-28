@@ -30,10 +30,10 @@ export async function updateSiteContent(key: string, value: string, path?: strin
   const supabase = createServiceClient();
   const { error } = await supabase
     .from('site_content')
-    .upsert({ key, value, updated_at: new Date().toISOString() });
+    .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
   if (error) throw error;
 
   if (path) revalidatePath(path);
-  // Always revalidate root since content keys may be used on any page
-  revalidatePath('/');
+  // Always revalidate root layout since content keys may be used on any page
+  revalidatePath('/', 'layout');
 }

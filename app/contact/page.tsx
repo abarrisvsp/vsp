@@ -3,8 +3,21 @@ import { Footer } from '@/components/layout/Footer';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
+import type { Metadata } from 'next';
+import { getSeoSettings } from '@/lib/actions/seo';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const row = await getSeoSettings('/contact').catch(() => null);
+  return {
+    title: row?.meta_title ?? 'Contact | Visionary Sound Productions',
+    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    openGraph: {
+      images: row?.og_image_url ? [row.og_image_url] : [],
+    },
+  };
+}
 
 const KEYS = [
   'footer_phone', 'footer_email', 'footer_address', 'footer_service_area',

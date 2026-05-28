@@ -56,3 +56,17 @@ export async function updateSubmissionNotes(id: string, notes: string): Promise<
   if (error) throw error;
   revalidatePath('/admin/inbox');
 }
+
+export async function getRecentSubmissions(limit = 3): Promise<
+  Pick<ContactSubmission, 'id' | 'full_name' | 'event_type' | 'read' | 'submitted_at'>[]
+> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('contact_submissions')
+    .select('id, full_name, event_type, read, submitted_at')
+    .order('submitted_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}

@@ -3,6 +3,7 @@ import { createServiceClient, createAnonClient } from '@/lib/supabase';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import type { BlogPost, Subscriber } from '@/lib/types';
+import { slugify } from '@/lib/slugify';
 
 export type BroadcastSummary = {
   sent: number;
@@ -35,14 +36,6 @@ async function requireAdmin() {
   if (!session?.user?.isAdmin) throw new Error('Unauthorized');
 }
 
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
   const supabase = createAnonClient();
@@ -117,6 +110,7 @@ export async function createBlogPost(
       excerpt: fields.excerpt ?? null,
       read_time_minutes: fields.read_time_minutes ?? null,
       published: fields.published ?? false,
+      published_at: fields.published_at ?? null,
       email_subscribers: emailSubscribers,
     })
     .select('id')
@@ -182,4 +176,32 @@ export async function deleteBlogPost(id: string): Promise<void> {
   const { error } = await supabase.from('blog_posts').delete().eq('id', id);
   if (error) throw error;
   revalidatePath('/blog');
+}
+
+export async function getScheduledPostsCount(): Promise<number> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const { count } = await supabase
+    .from('blog_posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('published', false)
+    .not('published_at', 'is', null);
+  return count ?? 0;
+}
+
+/**
+ * Called by the cron handler for posts that went live via scheduled publish.
+ * Only broadcasts if the post has email_subscribers=true and hasn't been emailed yet.
+ */
+export async function broadcastScheduledPostIfNeeded(id: string): Promise<void> {
+  const supabase = createServiceClient();
+  const { data: post } = await supabase
+    .from('blog_posts')
+    .select('id, email_subscribers, subscribers_emailed_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (!post) return;
+  if (!post.email_subscribers) return;
+  if (post.subscribers_emailed_at) return; // already sent
+  await broadcastPostToSubscribers(id);
 }

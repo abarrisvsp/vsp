@@ -85,3 +85,94 @@ export async function getActiveSubscribers(): Promise<Subscriber[]> {
   if (error) throw error;
   return (data as Subscriber[]) ?? [];
 }
+
+export async function getAllSubscribersForAdmin(
+  page = 1,
+  perPage = 50
+): Promise<{ subscribers: Subscriber[]; total: number }> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+
+  const [{ data, error }, { count }] = await Promise.all([
+    supabase
+      .from('subscribers')
+      .select('*')
+      .eq('active', true)
+      .order('subscribed_at', { ascending: false })
+      .range(from, to),
+    supabase
+      .from('subscribers')
+      .select('*', { count: 'exact', head: true })
+      .eq('active', true),
+  ]);
+  if (error) throw error;
+  return { subscribers: (data as Subscriber[]) ?? [], total: count ?? 0 };
+}
+
+export async function getSubscribersThisMonth(): Promise<number> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+  const { count } = await supabase
+    .from('subscribers')
+    .select('*', { count: 'exact', head: true })
+    .eq('active', true)
+    .gte('subscribed_at', startOfMonth.toISOString());
+  return count ?? 0;
+}
+
+export async function deleteSubscriberByAdmin(id: string): Promise<void> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const { error } = await supabase
+    .from('subscribers')
+    .update({ active: false, unsubscribed_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
+}
+
+export async function exportSubscribersCSV(): Promise<string> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from('subscribers')
+    .select('email, first_name, last_name, subscribed_at, source')
+    .eq('active', true)
+    .order('subscribed_at', { ascending: false });
+  if (error) throw error;
+  const rows = (data ?? []) as Pick<Subscriber, 'email' | 'first_name' | 'last_name' | 'subscribed_at' | 'source'>[];
+  const header = 'email,first_name,last_name,subscribed_at,source';
+  const lines = rows.map((r) =>
+    [r.email, r.first_name ?? '', r.last_name ?? '', r.subscribed_at, r.source ?? '']
+      .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+      .join(',')
+  );
+  return [header, ...lines].join('\n');
+}
+
+export async function saveNewsletterSettings(fields: {
+  headline: string;
+  subtext: string;
+  showHomepage: boolean;
+  showBlog: boolean;
+}): Promise<void> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const updates = [
+    { key: 'newsletter_headline', value: fields.headline },
+    { key: 'newsletter_subtext', value: fields.subtext },
+    { key: 'newsletter_show_homepage', value: fields.showHomepage ? 'true' : 'false' },
+    { key: 'newsletter_show_blog', value: fields.showBlog ? 'true' : 'false' },
+  ];
+  await Promise.all(
+    updates.map(({ key, value }) =>
+      supabase
+        .from('site_content')
+        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
+    )
+  );
+}

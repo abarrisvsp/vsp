@@ -12,8 +12,21 @@ import { getServices } from '@/lib/actions/services';
 import { getTestimonials } from '@/lib/actions/testimonials';
 import { getPressLogos } from '@/lib/actions/press';
 import { getRecentPublishedPosts } from '@/lib/actions/blog';
+import type { Metadata } from 'next';
+import { getSeoSettings } from '@/lib/actions/seo';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const row = await getSeoSettings('/').catch(() => null);
+  return {
+    title: row?.meta_title ?? 'Visionary Sound Productions — Event Production · NYC',
+    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    openGraph: {
+      images: row?.og_image_url ? [row.og_image_url] : [],
+    },
+  };
+}
 
 export default async function HomePage() {
   const [services, testimonials, pressLogos, recentPosts] = await Promise.all([

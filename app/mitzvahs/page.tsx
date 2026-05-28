@@ -4,8 +4,23 @@ import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
+import type { Metadata } from 'next';
+import { getSeoSettings } from '@/lib/actions/seo';
+import { getFaqsByPage } from '@/lib/actions/faqs';
+import { FaqAccordion } from '@/components/public/FaqAccordion';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const row = await getSeoSettings('/mitzvahs').catch(() => null);
+  return {
+    title: row?.meta_title ?? 'Bar & Bat Mitzvah DJ | Visionary Sound Productions',
+    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    openGraph: {
+      images: row?.og_image_url ? [row.og_image_url] : [],
+    },
+  };
+}
 
 const SLUG = 'mitzvahs';
 const PREFIX = 'mitzvahs';
@@ -28,7 +43,10 @@ const DEFAULTS: Record<string, string> = {
 };
 
 export default async function Page() {
-  const c = await getSiteContent(KEYS);
+  const [c, faqs] = await Promise.all([
+    getSiteContent(KEYS),
+    getFaqsByPage('mitzvahs').catch(() => []),
+  ]);
   return (
     <>
       <Header active={`/${SLUG}`} />
@@ -81,6 +99,12 @@ export default async function Page() {
         <section className="max-w-container mx-auto px-10 pb-24">
           <StartProjectButton label="Talk about your project" />
         </section>
+        {faqs.length > 0 && (
+          <section className="max-w-container mx-auto px-10 py-16 border-t border-line">
+            <h2 className="font-serif italic text-3xl mb-8">Frequently asked questions</h2>
+            <FaqAccordion faqs={faqs} />
+          </section>
+        )}
       </main>
       <Footer />
     </>

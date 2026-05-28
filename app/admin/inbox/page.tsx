@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
 import { InboxTable } from '@/components/admin/InboxTable';
 import { getSubmissions } from '@/lib/actions/submissions';
 
@@ -10,19 +9,26 @@ export default async function InboxPage({ searchParams }: { searchParams: { tab?
   const subs = await getSubmissions(archived);
 
   return (
-    <>
-      <Header />
-      <main className="max-w-container mx-auto px-10 py-16">
-        <h1 className="font-serif italic text-4xl mb-2">Inbox</h1>
-        <p className="text-ink-mute text-sm mb-8">Contact form submissions.</p>
+    <div className="max-w-4xl mx-auto px-8 py-10">
+      <h1 className="font-serif italic text-4xl mb-2">Inbox</h1>
+      <p className="text-ink-mute text-sm mb-8">Contact form submissions.</p>
 
-        <div className="flex gap-4 mb-6 border-b border-line">
-          <Link href="/admin/inbox" className={`pb-2 text-sm ${!archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}>Active</Link>
-          <Link href="/admin/inbox?tab=archived" className={`pb-2 text-sm ${archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}>Archived</Link>
-        </div>
+      <div className="flex gap-4 mb-6 border-b border-line">
+        <Link
+          href="/admin/inbox"
+          className={`pb-2 text-sm ${!archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}
+        >
+          Active
+        </Link>
+        <Link
+          href="/admin/inbox?tab=archived"
+          className={`pb-2 text-sm ${archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}
+        >
+          Archived
+        </Link>
+      </div>
 
-        <InboxTable submissions={subs} archived={archived} />
-      </main>
-    </>
+      <InboxTable submissions={subs} archived={archived} />
+    </div>
   );
 }
