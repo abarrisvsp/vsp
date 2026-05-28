@@ -1,5 +1,5 @@
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 
 export async function StatsSection() {
   const c = await getSiteContent([
@@ -20,14 +20,14 @@ export async function StatsSection() {
       <div className="max-w-container mx-auto px-10 grid md:grid-cols-4 gap-8 text-center">
         {stats.map((s) => (
           <div key={s.valueKey}>
-            <InlineText
+            <InlineRichText inline
               contentKey={s.valueKey}
               defaultValue={s.value}
               tag="div"
               className="font-serif italic text-[clamp(56px,7vw,96px)] leading-none mb-3 text-amber"
               revalidate="/"
             />
-            <InlineText
+            <InlineRichText inline
               contentKey={s.labelKey}
               defaultValue={s.label}
               tag="div"

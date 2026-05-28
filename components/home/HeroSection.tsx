@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
 
@@ -31,28 +31,26 @@ export async function HeroSection() {
       </div>
 
       <div className="relative max-w-container mx-auto px-10 pb-16 w-full">
-        <InlineText
+        <InlineRichText inline
           contentKey="hero_location_tag"
           defaultValue={c.hero_location_tag}
           tag="span"
           className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-6"
           revalidate="/"
         />
-        <InlineText
+        <InlineRichText
           contentKey="hero_headline"
           defaultValue={c.hero_headline}
           tag="h1"
           className="font-serif italic font-normal text-[clamp(56px,8.5vw,132px)] leading-[0.92] tracking-tight max-w-5xl"
-          multiline
           revalidate="/"
         />
         <div className="grid md:grid-cols-2 gap-10 mt-12 items-end">
-          <InlineText
+          <InlineRichText
             contentKey="hero_subheadline"
             defaultValue={c.hero_subheadline}
             tag="p"
             className="text-ink-dim text-lg leading-relaxed max-w-xl"
-            multiline
             revalidate="/"
           />
           <div className="flex gap-3 md:justify-end">
@@ -68,7 +66,7 @@ export async function HeroSection() {
       </div>
       <div className="relative max-w-container mx-auto px-10 pb-8 w-full border-t border-line/40 pt-6 mt-6">
         <span className="text-xs uppercase tracking-wider text-ink-mute mr-3">Currently on file</span>
-        <InlineText
+        <InlineRichText inline
           contentKey="hero_spotlight"
           defaultValue={c.hero_spotlight}
           tag="span"

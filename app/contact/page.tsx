@@ -2,7 +2,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ContactForm } from '@/components/contact/ContactForm';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,27 +36,25 @@ export default async function ContactPage() {
           {/* SIDEBAR */}
           <aside className="space-y-10">
             <div>
-              <InlineText
+              <InlineRichText inline
                 contentKey="contact_eyebrow"
                 defaultValue={val('contact_eyebrow')}
                 tag="span"
                 className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-4"
                 revalidate="/contact"
               />
-              <InlineText
+              <InlineRichText
                 contentKey="contact_headline"
                 defaultValue={val('contact_headline')}
                 tag="h1"
                 className="font-serif italic font-normal text-[clamp(40px,5vw,72px)] leading-[1.05] tracking-tight mb-6"
-                multiline
                 revalidate="/contact"
               />
-              <InlineText
+              <InlineRichText
                 contentKey="contact_lede"
                 defaultValue={val('contact_lede')}
                 tag="p"
                 className="text-ink-dim leading-relaxed"
-                multiline
                 revalidate="/contact"
               />
             </div>
@@ -74,7 +72,7 @@ export default async function ContactPage() {
               {[1, 2, 3].map((n) => (
                 <li key={n} className="flex gap-3">
                   <span className="text-amber font-bold">✓</span>
-                  <InlineText
+                  <InlineRichText inline
                     contentKey={`contact_promise_${n}`}
                     defaultValue={val(`contact_promise_${n}`)}
                     tag="span"
@@ -94,15 +92,14 @@ export default async function ContactPage() {
         <section className="border-y border-line bg-bg-elev">
           <div className="max-w-3xl mx-auto px-10 py-20 text-center">
             <span className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-6">In their words</span>
-            <InlineText
+            <InlineRichText
               contentKey="contact_quote"
               defaultValue={val('contact_quote')}
               tag="p"
               className="font-serif italic text-2xl md:text-3xl leading-snug mb-6"
-              multiline
               revalidate="/contact"
             />
-            <InlineText
+            <InlineRichText inline
               contentKey="contact_quote_author"
               defaultValue={val('contact_quote_author')}
               tag="span"

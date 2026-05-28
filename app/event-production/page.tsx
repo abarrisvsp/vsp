@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
 
@@ -46,38 +46,35 @@ export default async function Page() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/40 to-transparent pointer-events-none" />
           <div className="relative max-w-container mx-auto px-10 pb-16 w-full">
-            <InlineText
+            <InlineRichText inline
               contentKey={`${PREFIX}_eyebrow`}
               defaultValue={c[`${PREFIX}_eyebrow`] || DEFAULTS[`${PREFIX}_eyebrow`]}
               tag="span"
               className="text-xs uppercase tracking-[0.2em] text-ink-mute"
               revalidate={`/${SLUG}`}
             />
-            <InlineText
+            <InlineRichText
               contentKey={`${PREFIX}_headline`}
               defaultValue={c[`${PREFIX}_headline`] || DEFAULTS[`${PREFIX}_headline`]}
               tag="h1"
               className="font-serif italic text-6xl mt-4 max-w-3xl leading-tight"
-              multiline
               revalidate={`/${SLUG}`}
             />
           </div>
         </section>
         <section className="max-w-container mx-auto px-10 py-24 grid md:grid-cols-[1fr_2fr] gap-16">
-          <InlineText
+          <InlineRichText
             contentKey={`${PREFIX}_subhead`}
             defaultValue={c[`${PREFIX}_subhead`] || DEFAULTS[`${PREFIX}_subhead`]}
             tag="h2"
             className="font-serif italic text-3xl"
-            multiline
             revalidate={`/${SLUG}`}
           />
-          <InlineText
+          <InlineRichText
             contentKey={`${PREFIX}_body`}
             defaultValue={c[`${PREFIX}_body`] || DEFAULTS[`${PREFIX}_body`]}
             tag="div"
             className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap"
-            multiline
             revalidate={`/${SLUG}`}
           />
         </section>

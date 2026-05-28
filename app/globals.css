@@ -146,6 +146,11 @@ body.has-edit-toolbar {
 .inline-rich-display u { text-decoration: underline; }
 .inline-rich-display blockquote { border-left: 2px solid #d4a64a; padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.9; }
 
+/* Inline-mode rich text: no block-level paragraph margins, no enforced display:block.
+   The parent's tag (h1/h2/span/etc.) controls layout. */
+.inline-rich-display.inline-rich-inline p { margin: 0; }
+.inline-rich-display.inline-rich-inline { display: inline; }
+
 /* Mirror in the Tiptap editor so WYSIWYG matches what gets rendered. */
 .ProseMirror p { margin: 0 0 1em 0; }
 .ProseMirror p:last-child { margin-bottom: 0; }
