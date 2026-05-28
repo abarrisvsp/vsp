@@ -187,8 +187,8 @@ export default async function AboutPage() {
                     className="font-serif italic text-6xl text-amber leading-none mb-4" revalidate="/about" />
                   <InlineText contentKey={n.labelKey} defaultValue={v(n.labelKey)} tag="div"
                     className="text-ink font-medium mb-2" revalidate="/about" />
-                  <InlineText contentKey={n.descKey} defaultValue={v(n.descKey)} tag="p"
-                    className="text-ink-dim text-sm leading-relaxed" multiline revalidate="/about" />
+                  <InlineRichText contentKey={n.descKey} defaultValue={v(n.descKey)}
+                    className="text-ink-dim text-sm leading-relaxed" revalidate="/about" />
                 </div>
               ))}
             </div>
@@ -208,8 +208,8 @@ export default async function AboutPage() {
                   <div>
                     <InlineText contentKey={val_.titleKey} defaultValue={v(val_.titleKey)} tag="h3"
                       className="font-serif italic text-xl mb-2 leading-snug" revalidate="/about" />
-                    <InlineText contentKey={val_.bodyKey} defaultValue={v(val_.bodyKey)} tag="p"
-                      className="text-ink-dim leading-relaxed" multiline revalidate="/about" />
+                    <InlineRichText contentKey={val_.bodyKey} defaultValue={v(val_.bodyKey)}
+                      className="text-ink-dim leading-relaxed" revalidate="/about" />
                   </div>
                 </li>
               ))}
@@ -228,8 +228,8 @@ export default async function AboutPage() {
                 <li key={t.yearKey} className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] gap-6 md:gap-10 py-8 border-b border-line">
                   <InlineText contentKey={t.yearKey} defaultValue={v(t.yearKey)} tag="span"
                     className="font-serif italic text-3xl md:text-4xl text-amber leading-none" revalidate="/about" />
-                  <InlineText contentKey={t.textKey} defaultValue={v(t.textKey)} tag="p"
-                    className="text-ink-dim leading-relaxed self-center" multiline revalidate="/about" />
+                  <InlineRichText contentKey={t.textKey} defaultValue={v(t.textKey)}
+                    className="text-ink-dim leading-relaxed self-center" revalidate="/about" />
                 </li>
               ))}
             </ol>
