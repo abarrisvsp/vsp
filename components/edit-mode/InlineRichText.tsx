@@ -24,8 +24,7 @@ import {
 import { useEditMode } from './EditModeProvider';
 import { updateSiteContent } from '@/lib/actions/content';
 import { toast } from 'sonner';
-
-type DisplayTag = 'div' | 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4';
+import { toHtml, stripOuterParagraph, resolveDisplayHtml, type DisplayTag } from './rich-text';
 
 interface InlineRichTextProps {
   contentKey: string;
@@ -53,55 +52,6 @@ const COLORS: { label: string; value: string | null }[] = [
   { label: 'Success', value: '#22c55e' },
   { label: 'White', value: '#ffffff' },
 ];
-
-function looksLikeHtml(s: string): boolean {
-  return /<(p|br|h[1-6]|ul|ol|li|strong|em|u|span|blockquote)\b/i.test(s);
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-/**
- * Build the HTML the Tiptap editor + display layer consumes.
- * Inline mode emits a single <p>...</p> regardless of input.
- * Block mode splits on blank lines and emits one <p> per paragraph.
- */
-function toHtml(value: string, inline: boolean): string {
-  if (!value) return inline ? '<p></p>' : '';
-  if (looksLikeHtml(value)) {
-    // Already HTML — Tiptap requires a wrapping paragraph in inline mode so
-    // if the saved value was inline-only (e.g. "<strong>foo</strong> bar"), wrap it.
-    if (inline && !/^<(p|h[1-6]|ul|ol|blockquote)\b/i.test(value)) {
-      return `<p>${value}</p>`;
-    }
-    return value;
-  }
-  if (inline) {
-    return `<p>${escapeHtml(value)}</p>`;
-  }
-  return value
-    .split(/\n{2,}/)
-    .map((para) => `<p>${escapeHtml(para).replace(/\n/g, '<br>')}</p>`)
-    .join('');
-}
-
-/**
- * Strip the outer wrapping <p>...</p> from Tiptap's HTML in inline mode so
- * the saved content is pure inline markup ("foo <strong>bar</strong>").
- * That makes the display element ($tag) the layout-controlling wrapper.
- */
-function stripOuterParagraph(html: string): string {
-  const m = html.match(/^\s*<p[^>]*>([\s\S]*)<\/p>\s*$/i);
-  if (!m) return html;
-  // If there are nested block tags inside this paragraph, leave them alone.
-  if (/<(p|h[1-6]|ul|ol|li|blockquote)\b/i.test(m[1])) return html;
-  return m[1];
-}
 
 function ToolbarButton({
   active,
@@ -330,9 +280,12 @@ export function InlineRichText({
     }
   }, [editor, inline, html, contentKey, revalidate, exitEdit]);
 
-  // What HTML to actually paint into the display element (strip outer <p> in inline mode).
-  const displayHtml = inline ? stripOuterParagraph(html) : html;
-  const Wrapper = (tag ?? (inline ? 'span' : 'div')) as keyof JSX.IntrinsicElements;
+  // What HTML to actually paint into the display element. resolveDisplayHtml strips
+  // the wrapping <p> when the wrapper is text-level (p/h1–h4/span) so we never nest
+  // a <p> inside a <p> (which breaks SSR hydration).
+  const wrapperTag = tag ?? (inline ? 'span' : 'div');
+  const displayHtml = resolveDisplayHtml(html, { inline, tag: wrapperTag });
+  const Wrapper = wrapperTag as keyof JSX.IntrinsicElements;
   const wrapperClass = `inline-rich-display ${inline ? 'inline-rich-inline' : ''} ${className}`.trim();
 
   if (!isAdmin || !editMode) {

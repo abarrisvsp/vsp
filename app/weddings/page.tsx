@@ -41,8 +41,14 @@ const DEFAULTS: Record<string, string> = {
   weddings_eyebrow: 'Weddings',
   weddings_headline: 'The warm amber glow our clients keep writing us about.',
   weddings_subhead: 'Lighting and sound that make the room feel like the night you imagined.',
-  weddings_body:
-    'Décor lighting, dance floors, sound systems, special effects. Whether your venue is a barn, a ballroom, or a backyard, we design the lighting to match the vibe — not the other way around.',
+  weddings_body: [
+    "Your wedding happens once, with no rehearsal for the moment that matters. That's the standard we design to.",
+    "Visionary Sound Productions has lit and powered weddings across Michigan since 2004 — from the Shinola Hotel and the Detroit Institute of Arts' Great Hall to country clubs in Grosse Pointe and lakeside tents up north in Bay Harbor. We don't start with a gear list. We start with how you want the room to feel, then build the design backward from there: warm amber uplighting that wraps the walls, a first-dance look that quietly finds just the two of you, pin spots that make every centerpiece glow, a monogram on the floor, and effects timed to the music when you want a moment to land. Sound is tuned to the room so the toasts carry to the back table and your band or DJ fills the floor without burying the conversation at the bar.",
+    "A typical wedding covers both the ceremony and the reception: wireless mics so the officiant and the vows are heard cleanly, a sound system sized to the room instead of blasted at it, full uplighting in your colors, dance-floor lighting with optional haze so the beams actually read, and the moments that matter — first dance, parent dances, the grand exit — lit and cued on purpose. We coordinate directly with your planner and venue so power, load-in, and timeline are settled well before the day.",
+    "From the first call to the last load-out, you work directly with the owner — not a salesperson, not a rotating account rep who has never seen your venue. We walk the space with you, build one fixed-price proposal with every line spelled out, and run the night with our own crew and our own gear. No day-of surprises, no add-ons that appear on the final invoice.",
+    "It's the part clients write to us about afterward: 'Thank you for the beautiful lighting you provided for my daughter's wedding. Absolutely stunning.' — Pamela, Farmington Hills.",
+    "Whether it's an intimate sixty-guest dinner or a three-hundred-person reception, the same owner-designed care goes into every room — and the same direct line to the person designing it.",
+  ].join('\n\n'),
 };
 
 export default async function Page() {
@@ -112,6 +118,21 @@ export default async function Page() {
             className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap"
             revalidate={`/${SLUG}`}
           />
+        </section>
+        <section className="max-w-container mx-auto px-10 pb-12">
+          <p className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6">Selected venues</p>
+          <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-3 text-ink-dim">
+            {[
+              'Shinola Hotel, Detroit',
+              'Detroit Institute of Arts',
+              'Woodward Ballroom, Detroit',
+              'Grosse Pointe country clubs',
+              'Bay Harbor & Northern Michigan',
+              'Private estates & tented weddings',
+            ].map((name) => (
+              <li key={name} className="border-l border-line pl-3 leading-snug">{name}</li>
+            ))}
+          </ul>
         </section>
         <section className="max-w-container mx-auto px-10 pb-24">
           <StartProjectButton label="Talk about your project" />
