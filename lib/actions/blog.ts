@@ -188,3 +188,20 @@ export async function getScheduledPostsCount(): Promise<number> {
     .not('published_at', 'is', null);
   return count ?? 0;
 }
+
+/**
+ * Called by the cron handler for posts that went live via scheduled publish.
+ * Only broadcasts if the post has email_subscribers=true and hasn't been emailed yet.
+ */
+export async function broadcastScheduledPostIfNeeded(id: string): Promise<void> {
+  const supabase = createServiceClient();
+  const { data: post } = await supabase
+    .from('blog_posts')
+    .select('id, email_subscribers, subscribers_emailed_at')
+    .eq('id', id)
+    .maybeSingle();
+  if (!post) return;
+  if (!post.email_subscribers) return;
+  if (post.subscribers_emailed_at) return; // already sent
+  await broadcastPostToSubscribers(id);
+}

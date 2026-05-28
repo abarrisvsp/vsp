@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { broadcastScheduledPostIfNeeded } from '@/lib/actions/blog';
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization');
@@ -31,6 +32,11 @@ export async function GET(req: NextRequest) {
   for (const post of published) {
     if (post.slug) revalidatePath(`/blog/${post.slug}`);
   }
+
+  // Broadcast to subscribers for each newly published post (respects email_subscribers setting)
+  await Promise.all(published.map((post) => broadcastScheduledPostIfNeeded(post.id).catch((e) =>
+    console.error('[cron] broadcast failed for post', post.id, e)
+  )));
 
   return NextResponse.json({ published: published.length, ids: published.map((p: { id: string }) => p.id) });
 }

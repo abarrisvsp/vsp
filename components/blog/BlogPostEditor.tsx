@@ -53,12 +53,12 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   );
   const [scheduleDate, setScheduleDate] = useState(
     initial?.published_at
-      ? new Date(initial.published_at).toISOString().slice(0, 10)
+      ? initial.published_at.slice(0, 10)   // extract YYYY-MM-DD directly from UTC ISO string
       : new Date(Date.now() + 86400000).toISOString().slice(0, 10)
   );
   const [scheduleTime, setScheduleTime] = useState(
     initial?.published_at
-      ? new Date(initial.published_at).toTimeString().slice(0, 5)
+      ? initial.published_at.slice(11, 16)  // extract HH:MM directly from UTC ISO string
       : '09:00'
   );
 
@@ -100,7 +100,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
       const isScheduled = publishStatus === 'scheduled';
 
       const publishedAt = isScheduled
-        ? new Date(`${scheduleDate}T${scheduleTime}:00`).toISOString()
+        ? new Date(`${scheduleDate}T${scheduleTime}:00Z`).toISOString()
         : null;
 
       const fields = {

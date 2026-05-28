@@ -47,7 +47,7 @@ export default async function BlogListPage() {
                   </span>
                 ) : post.published_at ? (
                   <span className="text-xs text-amber border border-amber/30 px-2 py-0.5 rounded">
-                    🗓 {new Date(post.published_at + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    🗓 {new Date(post.published_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 ) : (
                   <span className="text-xs bg-bg-soft text-ink-mute px-2 py-0.5 rounded">Draft</span>
