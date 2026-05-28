@@ -62,6 +62,7 @@ export async function updateFaq(id: string, fields: Partial<Faq>): Promise<void>
     .update({ ...fields, updated_at: new Date().toISOString() })
     .eq('id', id);
   if (error) throw error;
+  revalidatePath('/', 'layout');
 }
 
 export async function deleteFaq(id: string): Promise<void> {
@@ -69,6 +70,7 @@ export async function deleteFaq(id: string): Promise<void> {
   const supabase = createServiceClient();
   const { error } = await supabase.from('faqs').delete().eq('id', id);
   if (error) throw error;
+  revalidatePath('/', 'layout');
 }
 
 export async function reorderFaqs(page: string, orderedIds: string[]): Promise<void> {

@@ -15,6 +15,7 @@ export function FaqAccordion({ faqs }: { faqs: Faq[] }) {
         <div key={faq.id} className="border border-line rounded overflow-hidden">
           <button
             type="button"
+            aria-expanded={openId === faq.id}
             onClick={() => setOpenId(openId === faq.id ? null : faq.id)}
             className="w-full text-left px-5 py-4 flex items-center justify-between gap-4 hover:bg-bg-soft transition-colors"
           >

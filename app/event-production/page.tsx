@@ -45,7 +45,7 @@ const DEFAULTS: Record<string, string> = {
 export default async function Page() {
   const [c, faqs] = await Promise.all([
     getSiteContent(KEYS),
-    getFaqsByPage('corporate').catch(() => []),
+    getFaqsByPage('corporate').catch(() => []), // 'corporate' is the FAQ page key for /event-production
   ]);
   return (
     <>
