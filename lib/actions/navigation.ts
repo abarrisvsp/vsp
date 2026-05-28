@@ -100,4 +100,5 @@ const DEFAULT_NAV: NavItem[] = [
   { id: 'default-4', label: 'Journal', href: '/blog', sort_order: 3, visible: true, is_custom: false },
   { id: 'default-5', label: 'About', href: '/about', sort_order: 4, visible: true, is_custom: false },
   { id: 'default-6', label: 'Contact', href: '/contact', sort_order: 5, visible: true, is_custom: false },
+  { id: 'default-7', label: 'Portfolio', href: '/portfolio', sort_order: 6, visible: true, is_custom: false },
 ];

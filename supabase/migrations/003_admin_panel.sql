@@ -76,8 +76,9 @@ INSERT INTO nav_items (label, href, sort_order, visible, is_custom) VALUES
   ('Services', 'dropdown',  1, TRUE, FALSE),
   ('Gallery',  '/gallery',  2, TRUE, FALSE),
   ('Journal',  '/blog',     3, TRUE, FALSE),
-  ('About',    '/about',    4, TRUE, FALSE),
-  ('Contact',  '/contact',  5, TRUE, FALSE)
+  ('About',     '/about',     4, TRUE, FALSE),
+  ('Contact',   '/contact',   5, TRUE, FALSE),
+  ('Portfolio', '/portfolio', 6, TRUE, FALSE)
 ON CONFLICT (label, href) DO NOTHING;
 
 -- ─── Seed: site_content keys for banner + newsletter ─────────
