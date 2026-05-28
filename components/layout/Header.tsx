@@ -1,18 +1,22 @@
+// components/layout/Header.tsx
 import Link from 'next/link';
 import Image from 'next/image';
 import { getSiteContent } from '@/lib/actions/content';
+import { getVisibleNavItems } from '@/lib/actions/navigation';
 
-const NAV = [
-  { href: '/', label: 'Home' },
-  { href: '/services', label: 'Services' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/blog', label: 'Journal' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' },
+const SERVICES_LINKS = [
+  { href: '/event-production', label: 'Event Production' },
+  { href: '/weddings', label: 'Weddings' },
+  { href: '/mitzvahs', label: 'Mitzvahs' },
+  { href: '/av-installation', label: 'AV Installation' },
+  { href: '/rentals', label: 'Rentals' },
 ];
 
 export async function Header({ active }: { active?: string }) {
-  const c = await getSiteContent(['vsp_logo_url']);
+  const [c, navItems] = await Promise.all([
+    getSiteContent(['vsp_logo_url']),
+    getVisibleNavItems(),
+  ]);
   const logoUrl = c.vsp_logo_url;
 
   return (
@@ -34,18 +38,47 @@ export async function Header({ active }: { active?: string }) {
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
-          {NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              className={`hover:text-amber transition-colors ${
-                active === n.href ? 'text-amber' : 'text-ink-dim'
-              }`}
-            >
-              {n.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            if (item.href === 'dropdown') {
+              return (
+                <div key={item.id} className="relative group">
+                  <button className={`hover:text-amber transition-colors ${active === '/services' ? 'text-amber' : 'text-ink-dim'}`}>
+                    {item.label} ▾
+                  </button>
+                  <div className="absolute top-full left-0 pt-2 hidden group-hover:block z-50">
+                    <div className="bg-bg-elev border border-line rounded shadow-lg py-1 min-w-[180px]">
+                      {SERVICES_LINKS.map((s) => (
+                        <Link
+                          key={s.href}
+                          href={s.href}
+                          className="block px-4 py-2 text-sm text-ink-dim hover:text-amber hover:bg-bg-soft transition-colors"
+                        >
+                          {s.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={`hover:text-amber transition-colors ${active === item.href ? 'text-amber' : 'text-ink-dim'}`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
+        <Link
+          href="/contact"
+          className="hidden md:inline-flex items-center gap-2 border border-amber text-amber text-sm px-5 py-2 rounded hover:bg-amber hover:text-bg transition-colors"
+        >
+          Get a Quote
+        </Link>
+        {/* Mobile contact link — preserved from original */}
         <Link
           href="/contact"
           className="md:hidden text-xs uppercase tracking-wider text-amber"
