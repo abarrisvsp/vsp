@@ -128,7 +128,10 @@ export async function getSubscribersThisMonth(): Promise<number> {
 export async function deleteSubscriberByAdmin(id: string): Promise<void> {
   await requireAdmin();
   const supabase = createServiceClient();
-  const { error } = await supabase.from('subscribers').delete().eq('id', id);
+  const { error } = await supabase
+    .from('subscribers')
+    .update({ active: false, unsubscribed_at: new Date().toISOString() })
+    .eq('id', id);
   if (error) throw error;
 }
 

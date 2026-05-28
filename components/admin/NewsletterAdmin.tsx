@@ -26,6 +26,7 @@ export function NewsletterAdmin({
   initialShowBlog,
 }: Props) {
   const [subscribers, setSubscribers] = useState(initialSubscribers);
+  const [currentTotal, setCurrentTotal] = useState(total);
   const [headline, setHeadline] = useState(initialHeadline);
   const [subtext, setSubtext] = useState(initialSubtext);
   const [showHomepage, setShowHomepage] = useState(initialShowHomepage);
@@ -38,6 +39,7 @@ export function NewsletterAdmin({
       try {
         await deleteSubscriberByAdmin(id);
         setSubscribers((prev) => prev.filter((s) => s.id !== id));
+        setCurrentTotal((prev) => Math.max(0, prev - 1));
         toast.success('Subscriber deleted');
       } catch {
         toast.error('Delete failed');
@@ -78,7 +80,7 @@ export function NewsletterAdmin({
       {/* Stats + actions */}
       <div className="flex items-center gap-8 border border-line bg-bg-elev rounded px-6 py-5">
         <div>
-          <p className="text-3xl font-serif italic text-amber">{total}</p>
+          <p className="text-3xl font-serif italic text-amber">{currentTotal}</p>
           <p className="text-xs text-ink-mute mt-0.5">Subscribers</p>
         </div>
         <div>
@@ -105,7 +107,7 @@ export function NewsletterAdmin({
       {/* Subscriber list */}
       <div>
         <p className="text-xs font-mono uppercase tracking-widest text-ink-mute mb-3">
-          Subscribers ({total})
+          Subscribers ({currentTotal})
         </p>
         <div className="border border-line rounded overflow-hidden">
           <div className="grid grid-cols-[1fr_1fr_auto] gap-4 px-4 py-2 bg-bg-soft text-[10px] uppercase tracking-widest text-ink-mute border-b border-line">
@@ -140,9 +142,9 @@ export function NewsletterAdmin({
             ))
           )}
         </div>
-        {total > subscribers.length && (
+        {currentTotal > subscribers.length && (
           <p className="text-xs text-ink-mute mt-2 text-right">
-            Showing first {subscribers.length} of {total}
+            Showing first {subscribers.length} of {currentTotal}
           </p>
         )}
       </div>
