@@ -128,3 +128,31 @@ body.edit-mode-active [data-inline-text][data-editing="true"] {
 body.has-edit-toolbar {
   padding-top: 48px;
 }
+
+/* Rich-text fields rendered for visitors — inherit color from parent,
+   only add the structural rules contenteditable strips by default. */
+.inline-rich-display p { margin: 0 0 1em 0; }
+.inline-rich-display p:last-child { margin-bottom: 0; }
+.inline-rich-display h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.875rem; line-height: 1.2; margin: 1.25em 0 0.5em; }
+.inline-rich-display h3 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.4rem; line-height: 1.3; margin: 1em 0 0.4em; }
+.inline-rich-display ul,
+.inline-rich-display ol { margin: 0 0 1em 1.4em; padding-left: 0.4em; }
+.inline-rich-display ul { list-style: disc; }
+.inline-rich-display ol { list-style: decimal; }
+.inline-rich-display li { margin-bottom: 0.3em; }
+.inline-rich-display a { color: #d4a64a; text-decoration: underline; text-underline-offset: 2px; }
+.inline-rich-display strong { font-weight: 600; }
+.inline-rich-display em { font-style: italic; }
+.inline-rich-display u { text-decoration: underline; }
+.inline-rich-display blockquote { border-left: 2px solid #d4a64a; padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.9; }
+
+/* Mirror in the Tiptap editor so WYSIWYG matches what gets rendered. */
+.ProseMirror p { margin: 0 0 1em 0; }
+.ProseMirror p:last-child { margin-bottom: 0; }
+.ProseMirror h2 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.875rem; line-height: 1.2; margin: 1.25em 0 0.5em; }
+.ProseMirror h3 { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.4rem; line-height: 1.3; margin: 1em 0 0.4em; }
+.ProseMirror ul,
+.ProseMirror ol { margin: 0 0 1em 1.4em; padding-left: 0.4em; }
+.ProseMirror ul { list-style: disc; }
+.ProseMirror ol { list-style: decimal; }
+.ProseMirror a { color: #d4a64a; text-decoration: underline; text-underline-offset: 2px; }
