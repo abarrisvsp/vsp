@@ -5,6 +5,7 @@ import type { Testimonial } from '@/lib/types';
 import { useEditMode } from '@/components/edit-mode/EditModeProvider';
 import { RecordEditModal, type FieldDef } from '@/components/edit-mode/RecordEditModal';
 import { createTestimonial, updateTestimonial, deleteTestimonial } from '@/lib/actions/testimonials';
+import { SectionHead } from '@/components/shared/SectionHead';
 
 const FIELDS: FieldDef[] = [
   { name: 'quote', label: 'Quote', type: 'textarea' },
@@ -51,10 +52,11 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
 
   return (
     <section className="max-w-container mx-auto px-10 py-24">
-      <div className="mb-10">
-        <span className="text-xs uppercase tracking-[0.2em] text-ink-mute">What clients say</span>
-        <h2 className="font-serif italic text-5xl mt-2">In their words.</h2>
-      </div>
+      <SectionHead
+        eyebrow="03 / In their words"
+        title={<>Twenty years of clients who&rsquo;d rather not call <em>anyone else</em>.</>}
+        className="mb-12"
+      />
       <div className="grid md:grid-cols-2 gap-6">
         {testimonials.map((t) => <Card key={t.id} t={t} />)}
       </div>

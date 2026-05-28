@@ -6,6 +6,8 @@ import { ServicesSection } from '@/components/home/ServicesSection';
 import { StatsSection } from '@/components/home/StatsSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { RecentPostsSection } from '@/components/home/RecentPostsSection';
+import { ProcessSection } from '@/components/home/ProcessSection';
+import { CtaBand } from '@/components/shared/CtaBand';
 import { getServices } from '@/lib/actions/services';
 import { getTestimonials } from '@/lib/actions/testimonials';
 import { getPressLogos } from '@/lib/actions/press';
@@ -18,7 +20,7 @@ export default async function HomePage() {
     getServices(),
     getTestimonials(),
     getPressLogos(),
-    getRecentPublishedPosts(2),
+    getRecentPublishedPosts(3),
   ]);
 
   return (
@@ -29,8 +31,10 @@ export default async function HomePage() {
         <PressSection logos={pressLogos} />
         <ServicesSection services={services} />
         <StatsSection />
-        <TestimonialsSection testimonials={testimonials} />
         <RecentPostsSection posts={recentPosts} />
+        <TestimonialsSection testimonials={testimonials} />
+        <ProcessSection />
+        <CtaBand />
       </main>
       <Footer />
     </>

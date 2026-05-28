@@ -6,6 +6,7 @@ import { useEditMode } from '@/components/edit-mode/EditModeProvider';
 import { RecordEditModal, type FieldDef } from '@/components/edit-mode/RecordEditModal';
 import { createService } from '@/lib/actions/services';
 import { ServiceCard } from './ServiceCard';
+import { SectionHead } from '@/components/shared/SectionHead';
 
 const NEW_FIELDS: FieldDef[] = [
   { name: 'letter', label: 'Letter (A-F)', type: 'text' },
@@ -22,10 +23,16 @@ export function ServicesSection({ services }: { services: Service[] }) {
 
   return (
     <section className="max-w-container mx-auto px-10 py-24">
-      <div className="mb-8">
-        <span className="text-xs uppercase tracking-[0.2em] text-ink-mute">What we do</span>
-        <h2 className="font-serif italic text-5xl mt-2">Six services. One phone call.</h2>
-      </div>
+      <SectionHead
+        eyebrow="01 / What we do"
+        title={
+          <>
+            Production end-to-end &mdash;<br />
+            <em>or</em> a single moving part you need to be perfect.
+          </>
+        }
+        className="mb-12"
+      />
       <div>
         {services.map((s) => <ServiceCard key={s.id} service={s} />)}
       </div>
