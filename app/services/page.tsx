@@ -15,7 +15,7 @@ const HERO_DEFAULTS: Record<string, string> = {
   services_idx_headline:
     'Production from napkin sketch to load-out — and every piece in between.',
   services_idx_lede:
-    "Five core practices. One owner-operated team. Pick a thread, or call us for something we haven't listed — we've almost certainly built it before.",
+    "Six core practices. One owner-operated team. Pick a thread, or call us for something we haven't listed — we've almost certainly built it before.",
 };
 
 type Service = {
@@ -143,6 +143,28 @@ const SERVICES: Service[] = [
     imageKey: 'services_idx_05_image',
     imageCaption: 'Touring-grade rentals · delivered with options',
     imageCaptionKey: 'services_idx_05_image_caption',
+  },
+  {
+    num: '06',
+    slug: 'event-production#design',
+    titleKey: 'services_idx_06_title',
+    titleDefault: 'Design & Advisory',
+    descKey: 'services_idx_06_desc',
+    descDefault:
+      "Design & advisory. Not sure where to start? Free consultation. We'll scope it, sketch it, and tell you what you actually need — and what you don't. No charge to talk it through, ever.",
+    bullets: [
+      'Free initial consultation',
+      'Concept & lighting sketches',
+      'Vendor coordination & spec review',
+      'Budget guidance, no upsells',
+      'Site survey & load planning',
+      "Honest answers about what you don't need",
+    ],
+    bulletsKey: 'services_idx_06_bullets',
+    linkLabel: 'See design & advisory',
+    imageKey: 'services_idx_06_image',
+    imageCaption: 'Design & advisory · scoping the build before a single light goes up',
+    imageCaptionKey: 'services_idx_06_image_caption',
   },
 ];
 
