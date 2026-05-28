@@ -34,6 +34,6 @@ export async function updateSiteContent(key: string, value: string, path?: strin
   if (error) throw error;
 
   if (path) revalidatePath(path);
-  // Always revalidate root since content keys may be used on any page
-  revalidatePath('/');
+  // Always revalidate root layout since content keys may be used on any page
+  revalidatePath('/', 'layout');
 }

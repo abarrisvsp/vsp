@@ -3,6 +3,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateSiteContent } from '@/lib/actions/content';
+import { isLight } from '@/lib/color';
 import { toast } from 'sonner';
 
 const PRESETS = [
@@ -42,13 +43,7 @@ export function BannerEditor({ initialActive, initialMessage, initialColor, init
     });
   }
 
-  const isLightColor = (() => {
-    const c = color.replace('#', '');
-    const r = parseInt(c.substring(0, 2), 16);
-    const g = parseInt(c.substring(2, 4), 16);
-    const b = parseInt(c.substring(4, 6), 16);
-    return (r * 299 + g * 587 + b * 114) / 1000 > 128;
-  })();
+  const isLightColor = isLight(color);
 
   return (
     <div className="space-y-6">
@@ -78,6 +73,9 @@ export function BannerEditor({ initialActive, initialMessage, initialColor, init
           <p className="text-xs text-ink-mute">Visible to all site visitors right now</p>
         </div>
         <button
+          type="button"
+          role="switch"
+          aria-checked={active}
           onClick={() => setActive(!active)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
             active ? 'bg-green-600' : 'bg-bg-soft border border-line'

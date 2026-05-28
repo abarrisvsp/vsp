@@ -2,6 +2,7 @@
 // Async server component — renders on every public page request.
 // Returns null (no HTML) when banner is inactive or expired.
 import { getSiteContent } from '@/lib/actions/content';
+import { isLight } from '@/lib/color';
 
 export async function BannerBar() {
   const c = await getSiteContent([
@@ -31,10 +32,9 @@ export async function BannerBar() {
       style={{ backgroundColor: c.banner_color || '#ef4444' }}
       className="relative flex items-center justify-center px-6 py-2.5 text-sm font-medium"
     >
-      <span
-        style={{ color: isLight(c.banner_color || '#ef4444') ? '#000' : '#fff' }}
-        dangerouslySetInnerHTML={{ __html: c.banner_message }}
-      />
+      <span style={{ color: isLight(c.banner_color || '#ef4444') ? '#000' : '#fff' }}>
+        {c.banner_message}
+      </span>
       <button
         id="vsp-banner-close"
         data-hash={hash}
@@ -63,12 +63,4 @@ export async function BannerBar() {
       />
     </div>
   );
-}
-
-function isLight(hex: string): boolean {
-  const c = hex.replace('#', '');
-  const r = parseInt(c.substring(0, 2), 16);
-  const g = parseInt(c.substring(2, 4), 16);
-  const b = parseInt(c.substring(4, 6), 16);
-  return (r * 299 + g * 587 + b * 114) / 1000 > 128;
 }
