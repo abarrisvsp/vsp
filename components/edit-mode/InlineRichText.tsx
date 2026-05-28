@@ -1,0 +1,323 @@
+'use client';
+import { useState, useEffect, useCallback } from 'react';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
+import { TextStyle, Color } from '@tiptap/extension-text-style';
+import LinkExt from '@tiptap/extension-link';
+import {
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Heading2,
+  Heading3,
+  List,
+  ListOrdered,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Link as LinkIcon,
+  Eraser,
+  Pencil,
+} from 'lucide-react';
+import { useEditMode } from './EditModeProvider';
+import { updateSiteContent } from '@/lib/actions/content';
+import { toast } from 'sonner';
+
+interface InlineRichTextProps {
+  contentKey: string;
+  defaultValue: string;
+  className?: string;
+  revalidate?: string;
+}
+
+// Color swatches available in the picker. First = reset (inherit).
+const COLORS: { label: string; value: string | null }[] = [
+  { label: 'Reset', value: null },
+  { label: 'Ink', value: '#f5f1ea' },
+  { label: 'Ink dim', value: '#b8b1a4' },
+  { label: 'Ink mute', value: '#7a7468' },
+  { label: 'Amber', value: '#ef4444' },
+  { label: 'Gold', value: '#d4a64a' },
+  { label: 'Success', value: '#22c55e' },
+  { label: 'White', value: '#ffffff' },
+];
+
+function looksLikeHtml(s: string): boolean {
+  return /<(p|br|h[1-6]|ul|ol|li|strong|em|u|span|blockquote)\b/i.test(s);
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Convert legacy plain text (\n separators) into paragraph HTML so Tiptap can load it
+// and the rendered view matches what already exists.
+function toHtml(value: string): string {
+  if (!value) return '';
+  if (looksLikeHtml(value)) return value;
+  return value
+    .split(/\n{2,}/)
+    .map((para) => `<p>${escapeHtml(para).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
+function ToolbarButton({
+  active,
+  onClick,
+  title,
+  children,
+}: {
+  active?: boolean;
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      title={title}
+      className={`px-2 py-1.5 rounded text-xs transition-colors ${
+        active ? 'bg-amber text-white' : 'bg-bg-elev hover:bg-line text-ink-dim'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Toolbar({ editor }: { editor: Editor }) {
+  const setColor = (value: string | null) => {
+    if (value === null) editor.chain().focus().unsetColor().run();
+    else editor.chain().focus().setColor(value).run();
+  };
+
+  return (
+    <div className="flex flex-wrap items-center gap-1 p-2 border-b border-line bg-bg-elev rounded-t">
+      <ToolbarButton title="Bold" active={editor.isActive('bold')} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <Bold className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Italic" active={editor.isActive('italic')} onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <Italic className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Underline" active={editor.isActive('underline')} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+        <UnderlineIcon className="w-3.5 h-3.5" />
+      </ToolbarButton>
+
+      <span className="w-px h-5 bg-line mx-1" />
+
+      <ToolbarButton title="Heading 2 (large)" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <Heading2 className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Heading 3 (medium)" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <Heading3 className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Body paragraph" active={editor.isActive('paragraph')} onClick={() => editor.chain().focus().setParagraph().run()}>
+        <span className="text-[10px] font-semibold leading-none">P</span>
+      </ToolbarButton>
+
+      <span className="w-px h-5 bg-line mx-1" />
+
+      <ToolbarButton title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <List className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ListOrdered className="w-3.5 h-3.5" />
+      </ToolbarButton>
+
+      <span className="w-px h-5 bg-line mx-1" />
+
+      <ToolbarButton title="Align left" active={editor.isActive({ textAlign: 'left' })} onClick={() => editor.chain().focus().setTextAlign('left').run()}>
+        <AlignLeft className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Align center" active={editor.isActive({ textAlign: 'center' })} onClick={() => editor.chain().focus().setTextAlign('center').run()}>
+        <AlignCenter className="w-3.5 h-3.5" />
+      </ToolbarButton>
+      <ToolbarButton title="Align right" active={editor.isActive({ textAlign: 'right' })} onClick={() => editor.chain().focus().setTextAlign('right').run()}>
+        <AlignRight className="w-3.5 h-3.5" />
+      </ToolbarButton>
+
+      <span className="w-px h-5 bg-line mx-1" />
+
+      <div className="relative group">
+        <ToolbarButton title="Color" onClick={() => {}}>
+          <span className="inline-flex items-center gap-1">
+            <span className="w-3 h-3 rounded-sm border border-line" style={{ background: editor.getAttributes('textStyle')?.color || 'transparent' }} />
+            <span className="text-[10px]">▾</span>
+          </span>
+        </ToolbarButton>
+        <div className="hidden group-hover:flex group-focus-within:flex absolute z-[10001] top-full left-0 mt-1 flex-wrap gap-1 p-2 bg-bg-elev border border-line rounded shadow-lg w-40">
+          {COLORS.map((c) => (
+            <button
+              key={c.label}
+              type="button"
+              title={c.label}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => setColor(c.value)}
+              className="w-6 h-6 rounded-sm border border-line"
+              style={{
+                background: c.value ?? 'transparent',
+                backgroundImage: c.value ? undefined : 'repeating-linear-gradient(45deg, #555 0 2px, transparent 2px 4px)',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <ToolbarButton
+        title="Link"
+        active={editor.isActive('link')}
+        onClick={() => {
+          const previous = editor.getAttributes('link').href as string | undefined;
+          const url = window.prompt('URL (leave blank to remove):', previous ?? 'https://');
+          if (url === null) return;
+          if (url === '') {
+            editor.chain().focus().unsetLink().run();
+          } else {
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+          }
+        }}
+      >
+        <LinkIcon className="w-3.5 h-3.5" />
+      </ToolbarButton>
+
+      <ToolbarButton title="Clear formatting" onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}>
+        <Eraser className="w-3.5 h-3.5" />
+      </ToolbarButton>
+    </div>
+  );
+}
+
+export function InlineRichText({ contentKey, defaultValue, className = '', revalidate }: InlineRichTextProps) {
+  const { editMode, isAdmin, setIsEditing: setGlobalEditing } = useEditMode();
+  const [html, setHtml] = useState<string>(() => toHtml(defaultValue));
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!editing) setHtml(toHtml(defaultValue));
+  }, [defaultValue, editing]);
+
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit,
+        Underline,
+        TextStyle,
+        Color,
+        LinkExt.configure({ openOnClick: false }),
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      ],
+      content: html || '<p></p>',
+      editable: editing,
+      editorProps: {
+        attributes: { class: `focus:outline-none ${className}` },
+      },
+      immediatelyRender: false,
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(editing);
+    if (!editing) {
+      const current = editor.getHTML();
+      if (current !== html) editor.commands.setContent(html || '<p></p>', false);
+    }
+  }, [editor, editing, html]);
+
+  const enterEdit = useCallback(() => {
+    if (!editMode || editing || !editor) return;
+    setEditing(true);
+    setGlobalEditing(true);
+    setTimeout(() => editor.commands.focus('end'), 0);
+  }, [editMode, editing, editor, setGlobalEditing]);
+
+  const exitEdit = useCallback(() => {
+    setEditing(false);
+    setGlobalEditing(false);
+  }, [setGlobalEditing]);
+
+  const handleCancel = useCallback(() => {
+    if (editor) editor.commands.setContent(html || '<p></p>', false);
+    exitEdit();
+  }, [editor, html, exitEdit]);
+
+  const handleSave = useCallback(async () => {
+    if (!editor) return;
+    const next = editor.getHTML();
+    if (next === html) {
+      exitEdit();
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateSiteContent(contentKey, next, revalidate);
+      setHtml(next);
+      toast.success('Saved');
+      exitEdit();
+    } catch (e) {
+      console.error(e);
+      toast.error('Save failed — try again');
+    } finally {
+      setSaving(false);
+    }
+  }, [editor, html, contentKey, revalidate, exitEdit]);
+
+  if (!isAdmin || !editMode) {
+    return <div className={`inline-rich-display ${className}`} dangerouslySetInnerHTML={{ __html: html }} />;
+  }
+
+  if (!editing) {
+    return (
+      <div className="relative group">
+        <div
+          className={`inline-rich-display ${className} cursor-text rounded outline-1 outline-dashed outline-amber outline-offset-4`}
+          onClick={enterEdit}
+          dangerouslySetInnerHTML={{ __html: html || '<p class="opacity-50">Click to edit…</p>' }}
+        />
+        <button
+          type="button"
+          onClick={enterEdit}
+          className="absolute -top-2 -right-2 bg-amber text-white text-[10px] px-1.5 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+          aria-label="Edit"
+        >
+          <Pencil className="w-3 h-3" /> Edit
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative border border-amber rounded bg-bg shadow-lg">
+      {editor && <Toolbar editor={editor} />}
+      <EditorContent editor={editor} className={`p-3 ${className}`} />
+      <div className="flex items-center justify-end gap-2 border-t border-line p-2 bg-bg-elev rounded-b">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-500 disabled:opacity-50"
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          disabled={saving}
+          className="px-3 py-1 text-xs bg-neutral-600 text-white rounded hover:bg-neutral-500"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
