@@ -28,27 +28,44 @@ export function SettingsForm({ initialValues: iv }: Props) {
   const [youtube, setYoutube] = useState(iv.social_youtube ?? '');
   const [tiktok, setTiktok] = useState(iv.social_tiktok ?? '');
   const [isPending, startTransition] = useTransition();
+  const [isUploading, setIsUploading] = useState(false);
 
-  async function uploadFile(
-    folder: string,
-    onUrl: (url: string) => void,
-    onPath: (path: string) => void
-  ) {
-    return async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', folder);
-      try {
-        const { publicUrl, path } = await uploadImage(fd);
-        onUrl(publicUrl);
-        onPath(path);
-        toast.success('Uploaded');
-      } catch {
-        toast.error('Upload failed');
-      }
-    };
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('folder', 'branding');
+    try {
+      const { publicUrl, path } = await uploadImage(fd);
+      setLogoUrl(publicUrl);
+      setLogoPath(path);
+      toast.success('Uploaded');
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  async function handleFaviconUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploading(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('folder', 'branding');
+    try {
+      const { publicUrl, path } = await uploadImage(fd);
+      setFaviconUrl(publicUrl);
+      setFaviconPath(path);
+      toast.success('Uploaded');
+    } catch {
+      toast.error('Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   function saveAll() {
@@ -76,9 +93,6 @@ export function SettingsForm({ initialValues: iv }: Props) {
     });
   }
 
-  const logoUpload = uploadFile('branding', setLogoUrl, setLogoPath);
-  const faviconUpload = uploadFile('branding', setFaviconUrl, setFaviconPath);
-
   return (
     <div className="space-y-8">
       {/* Branding */}
@@ -96,7 +110,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
             ) : (
               <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-amber cursor-pointer hover:border-amber">
                 Click to upload logo
-                <input type="file" accept="image/*" onChange={async (e) => (await logoUpload)(e)} className="hidden" />
+                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
               </label>
             )}
           </div>
@@ -111,7 +125,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
             ) : (
               <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-amber cursor-pointer hover:border-amber">
                 Click to upload favicon
-                <input type="file" accept="image/*" onChange={async (e) => (await faviconUpload)(e)} className="hidden" />
+                <input type="file" accept="image/*" onChange={handleFaviconUpload} className="hidden" />
               </label>
             )}
           </div>
@@ -143,10 +157,10 @@ export function SettingsForm({ initialValues: iv }: Props) {
       <div className="flex justify-end">
         <button
           onClick={saveAll}
-          disabled={isPending}
+          disabled={isPending || isUploading}
           className="bg-amber text-bg text-sm font-medium px-6 py-2 rounded hover:opacity-90 disabled:opacity-50"
         >
-          {isPending ? 'Saving…' : 'Save Settings'}
+          {isUploading ? 'Uploading…' : isPending ? 'Saving…' : 'Save Settings'}
         </button>
       </div>
     </div>
