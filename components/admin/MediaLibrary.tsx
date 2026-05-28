@@ -39,6 +39,7 @@ export function MediaLibrary({ initialFiles }: Props) {
       fd.append('folder', category === 'All' ? 'misc' : category);
       try {
         const { publicUrl, path } = await uploadImage(fd);
+        if (!publicUrl) throw new Error('Upload succeeded but no public URL returned');
         const newFile: MediaFile = {
           name: path.split('/').pop() ?? file.name,
           path,
