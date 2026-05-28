@@ -13,6 +13,7 @@ import { blogPostingSchema, breadcrumbSchema } from '@/lib/seo/schema';
 import { SITE } from '@/lib/seo/config';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getPostBySlug(params.slug).catch(() => null);

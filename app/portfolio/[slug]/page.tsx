@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { SITE } from '@/lib/seo/config';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const item = await getFeaturedWorkBySlug(params.slug);

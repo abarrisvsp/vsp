@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/blog').catch(() => null);

@@ -12,6 +12,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { serviceSchema, faqSchema, breadcrumbSchema } from '@/lib/seo/schema';
 
 export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/event-production').catch(() => null);
