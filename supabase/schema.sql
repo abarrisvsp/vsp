@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS gallery_photos (
   storage_path TEXT NOT NULL,
   public_url TEXT NOT NULL,
   category TEXT NOT NULL,
+  event_tags TEXT[] NOT NULL DEFAULT '{}',
   title TEXT,
   caption TEXT,
   alt_text TEXT,
