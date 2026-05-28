@@ -4,9 +4,7 @@ import { getSiteContent } from '@/lib/actions/content';
 
 const NAV = [
   { href: '/', label: 'Home' },
-  { href: '/event-production', label: 'Event Production' },
-  { href: '/weddings', label: 'Weddings' },
-  { href: '/mitzvahs', label: 'Mitzvahs' },
+  { href: '/services', label: 'Services' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/blog', label: 'Journal' },
   { href: '/about', label: 'About' },
