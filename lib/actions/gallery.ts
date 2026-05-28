@@ -27,6 +27,7 @@ export async function createGalleryPhoto(fields: Partial<GalleryPhoto>): Promise
     storage_path: fields.storage_path ?? '',
     public_url: fields.public_url ?? '',
     category: fields.category ?? 'general',
+    event_tags: fields.event_tags ?? (fields.category ? [fields.category] : []),
     title: fields.title ?? null,
     caption: fields.caption ?? null,
     alt_text: fields.alt_text ?? null,

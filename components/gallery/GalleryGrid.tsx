@@ -6,6 +6,7 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { GalleryPhoto } from '@/lib/types';
+import { labelForTag } from '@/lib/event-tags';
 import { useEditMode } from '@/components/edit-mode/EditModeProvider';
 import { RecordEditModal, type FieldDef } from '@/components/edit-mode/RecordEditModal';
 import { updateGalleryPhoto, deleteGalleryPhoto, reorderGalleryPhotos } from '@/lib/actions/gallery';
@@ -29,12 +30,20 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
 
   useEffect(() => setPhotos(initial), [initial]);
 
-  const categories = ['All', ...Array.from(new Set(photos.map((p) => p.category)))];
-  const visible = activeCat === 'All' ? photos : photos.filter((p) => p.category === activeCat);
+  // Use event_tags when present; fall back to the legacy single category so the
+  // filter works before the event_tags migration runs and for any untagged photo.
+  const effTags = (p: GalleryPhoto) =>
+    p.event_tags && p.event_tags.length ? p.event_tags : p.category ? [p.category] : [];
+
+  const tagSlugs = Array.from(new Set(photos.flatMap(effTags)));
+  const categories = ['All', ...tagSlugs];
+  const visible = activeCat === 'All' ? photos : photos.filter((p) => effTags(p).includes(activeCat));
 
   const totals: Record<string, number> = { All: photos.length };
   photos.forEach((p) => {
-    totals[p.category] = (totals[p.category] || 0) + 1;
+    effTags(p).forEach((t) => {
+      totals[t] = (totals[t] || 0) + 1;
+    });
   });
 
   async function onDragEnd(result: DropResult) {
@@ -47,7 +56,7 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
     const remaining = [...reordered];
     const newOrderIds = activeCat === 'All'
       ? reordered.map((p) => p.id)
-      : photos.map((p) => p.category === activeCat ? (remaining.shift()!.id) : p.id);
+      : photos.map((p) => effTags(p).includes(activeCat) ? (remaining.shift()!.id) : p.id);
 
     setPhotos((prev) => prev.map((p) => ({ ...p, sort_order: newOrderIds.indexOf(p.id) + 1 })));
     try {
@@ -83,7 +92,7 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
                 activeCat === c ? 'border-amber text-amber bg-amber/5' : 'border-line text-ink-dim hover:border-amber/50'
               }`}
             >
-              {c}
+              {c === 'All' ? 'All' : labelForTag(c)}
               <span className="text-ink-mute text-[10px]">{totals[c] || 0}</span>
             </button>
           ))}
@@ -115,7 +124,7 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
                       {/* Always-visible text overlay */}
                       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
                       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-                        <span className="block text-[10px] uppercase tracking-wider text-amber mb-1">{p.category}</span>
+                        <span className="block text-[10px] uppercase tracking-wider text-amber mb-1">{labelForTag(effTags(p)[0] || p.category)}</span>
                         {p.title && <h3 className="font-serif italic text-sm md:text-base text-white leading-tight line-clamp-1">{p.title}</h3>}
                         {p.caption && <p className="text-xs text-white/80 mt-0.5 line-clamp-1">{p.caption}</p>}
                       </div>
