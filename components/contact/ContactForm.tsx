@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 const SERVICES = ['Lighting design', 'Sound system', 'Staging', 'LED video wall', 'Live streaming', 'Décor lighting', 'Special FX', 'Not sure yet'];
 const EVENT_TYPES = ['Wedding', 'Mitzvah', 'School / prom', 'Corporate / gala', 'Concert / festival', 'AV install', 'Rental only', 'Something else'];
-const HEADCOUNTS = ['Under 50', '50–150', '150–500', '500–1,500', '1,500+', 'Not sure'];
-const BUDGETS = ['Under $5k', '$5k–$15k', '$15k–$40k', '$40k–$100k', '$100k+', 'Not sure'];
+const HEADCOUNTS = ['Under 50', '50-150', '150-500', '500-1,500', '1,500+', 'Not sure'];
+const BUDGETS = ['Under $5k', '$5k-$15k', '$15k-$40k', '$40k-$100k', '$100k+', 'Not sure'];
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);

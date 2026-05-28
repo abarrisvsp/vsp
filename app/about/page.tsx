@@ -62,7 +62,7 @@ const D: Record<string, string> = {
   about_headline: 'One call. One vision. Built by hand for two decades.',
   about_fact_founded_label: 'Founded', about_fact_founded_value: '2004 · Metro Detroit',
   about_fact_owner_label: 'Owner', about_fact_owner_value: 'Aaron Barris',
-  about_fact_crew_label: 'Crew', about_fact_crew_value: '2 – 40+, scaled to event',
+  about_fact_crew_label: 'Crew', about_fact_crew_value: '2 to 40+, scaled to event',
   about_fact_area_label: 'Service area', about_fact_area_value: 'Detroit · Midwest · National',
   about_fact_featured_label: 'Featured', about_fact_featured_value: 'PLSN · Mobile Beat · L&S America',
   about_story_eyebrow: 'Our story',

@@ -27,7 +27,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
         eyebrow="01 / What we do"
         title={
           <>
-            Production end-to-end &mdash;<br />
+            Production end to end,<br />
             <em>or</em> a single moving part you need to be perfect.
           </>
         }
