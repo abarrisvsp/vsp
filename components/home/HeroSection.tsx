@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineText } from '@/components/edit-mode/InlineText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
+import { StartProjectButton } from '@/components/shared/StartProjectButton';
 
 export async function HeroSection() {
   const c = await getSiteContent([
@@ -55,15 +56,10 @@ export async function HeroSection() {
             revalidate="/"
           />
           <div className="flex gap-3 md:justify-end">
-            <Link
-              href="/contact"
-              className="bg-ink text-bg px-6 py-3 text-sm font-medium hover:bg-amber transition-colors"
-            >
-              Start a project →
-            </Link>
+            <StartProjectButton />
             <Link
               href="/gallery"
-              className="border border-line px-6 py-3 text-sm hover:border-amber transition-colors"
+              className="inline-flex items-center px-6 py-3 text-sm text-ink-dim border border-line rounded-full hover:border-amber hover:text-ink transition-colors"
             >
               See the work
             </Link>

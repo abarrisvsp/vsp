@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { getSiteContent } from '@/lib/actions/content';
+import { StartProjectButton } from './StartProjectButton';
 
 export async function CtaBand({
   eyebrow = 'Get started',
@@ -30,12 +30,7 @@ export async function CtaBand({
           </h2>
         </div>
         <div className="space-y-6 md:pt-4">
-          <Link
-            href={buttonHref}
-            className="inline-flex items-center gap-2 bg-ink text-bg px-6 py-3 text-sm font-medium hover:bg-amber transition-colors"
-          >
-            {buttonLabel} <span>→</span>
-          </Link>
+          <StartProjectButton label={buttonLabel} href={buttonHref} />
           <div className="space-y-3 text-sm">
             <div>
               <span className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Direct</span>

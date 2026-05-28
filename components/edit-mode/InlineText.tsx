@@ -6,6 +6,32 @@ import { toast } from 'sonner';
 
 type Tag = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div' | 'em' | 'strong';
 
+// Read a contenteditable element as plain text, preserving paragraph/line breaks.
+// Browsers represent Enter as <br>, <div>, or <p> inside contenteditable depending on
+// the engine — textContent flattens all of them, so a typed-out paragraph break
+// disappears on save. Walk the DOM and emit \n for <br> and block boundaries.
+function extractPlainText(el: HTMLElement): string {
+  const BLOCK = new Set(['DIV', 'P', 'LI', 'BLOCKQUOTE', 'PRE', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6']);
+  let out = '';
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out += (node as Text).data;
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const tag = (node as Element).tagName;
+    if (tag === 'BR') { out += '\n'; return; }
+    const isBlock = BLOCK.has(tag);
+    // Ensure a newline before a block boundary (except at very start).
+    if (isBlock && out.length > 0 && !out.endsWith('\n')) out += '\n';
+    node.childNodes.forEach(walk);
+    if (isBlock && !out.endsWith('\n')) out += '\n';
+  };
+  el.childNodes.forEach(walk);
+  // Collapse 3+ consecutive newlines to 2 (a single blank line).
+  return out.replace(/\n{3,}/g, '\n\n');
+}
+
 interface InlineTextProps {
   contentKey: string;
   defaultValue: string;
@@ -65,7 +91,7 @@ export function InlineText({
   }, [exitEdit]);
 
   const handleSave = useCallback(async () => {
-    const newValue = (ref.current?.textContent ?? value).trim();
+    const newValue = (ref.current ? extractPlainText(ref.current) : value).trim();
     if (newValue === originalRef.current) {
       exitEdit();
       return;

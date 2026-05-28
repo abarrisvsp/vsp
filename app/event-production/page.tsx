@@ -4,6 +4,7 @@ import { getSiteContent } from '@/lib/actions/content';
 import { InlineText } from '@/components/edit-mode/InlineText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import Link from 'next/link';
+import { StartProjectButton } from '@/components/shared/StartProjectButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,12 +83,7 @@ export default async function Page() {
           />
         </section>
         <section className="max-w-container mx-auto px-10 pb-24">
-          <Link
-            href="/contact"
-            className="inline-block bg-ink text-bg px-8 py-4 hover:bg-amber transition-colors"
-          >
-            Talk about your project →
-          </Link>
+          <StartProjectButton label="Talk about your project" />
         </section>
       </main>
       <Footer />
