@@ -6,7 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get('callbackUrl') || '/';
+  // Default landing after login is the admin control room. If middleware
+  // bumped a deeper page through callbackUrl (e.g. /about), respect that.
+  const callbackUrl = params.get('callbackUrl') || '/admin';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
