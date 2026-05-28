@@ -1,6 +1,4 @@
 import Link from 'next/link';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { getUnreadSubmissionCount } from '@/lib/actions/submissions';
 import { getAllPostsForAdmin } from '@/lib/actions/blog';
 import { getSubscriberCount } from '@/lib/actions/subscribers';
@@ -23,9 +21,7 @@ export default async function AdminHome() {
   const desc = 'text-ink-dim text-sm mt-1';
 
   return (
-    <>
-      <Header />
-      <main className="max-w-container mx-auto px-10 py-16">
+    <div className="max-w-container mx-auto px-10 py-16">
         <div className="mb-12">
           <span className={label}>Admin</span>
           <h1 className="font-serif italic text-5xl mt-2">Control room.</h1>
@@ -90,8 +86,6 @@ export default async function AdminHome() {
             </li>
           </ul>
         </div>
-      </main>
-      <Footer />
-    </>
+    </div>
   );
 }
