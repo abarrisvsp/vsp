@@ -92,6 +92,8 @@ export function AdminSidebar() {
         </a>
         <a
           href="/?editMode=1"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 py-2 rounded text-sm text-ink-mute hover:text-ink hover:bg-bg-soft transition-colors"
         >
           <span>✏️</span> Edit Mode
