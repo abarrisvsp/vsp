@@ -138,7 +138,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
     if (!initial || !confirm('Delete this post permanently?')) return;
     await deleteBlogPost(initial.id);
     toast.success('Deleted');
-    router.push('/blog');
+    router.push('/admin/blog');
   }
 
   const input = 'w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber';

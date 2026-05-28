@@ -5,6 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { broadcastScheduledPostIfNeeded } from '@/lib/actions/blog';
 
 export async function GET(req: NextRequest) {
+  if (!process.env.CRON_SECRET) {
+    console.error('[cron] CRON_SECRET is not set — refusing to run');
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
+  }
   const auth = req.headers.get('authorization');
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

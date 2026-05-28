@@ -58,7 +58,8 @@ async function generateUniqueSlug(headline: string, supabase: ReturnType<typeof 
   const base = slugify(headline);
   let candidate = base;
   let suffix = 2;
-  while (true) {
+  const MAX_ATTEMPTS = 100;
+  while (suffix <= MAX_ATTEMPTS) {
     const { data } = await supabase
       .from('featured_work')
       .select('id')
@@ -67,6 +68,7 @@ async function generateUniqueSlug(headline: string, supabase: ReturnType<typeof 
     if (!data) return candidate;
     candidate = `${base}-${suffix++}`;
   }
+  throw new Error(`Could not generate unique slug for "${headline}" after ${MAX_ATTEMPTS} attempts`);
 }
 
 export async function createFeaturedWork(fields: Partial<FeaturedWork>): Promise<FeaturedWork> {

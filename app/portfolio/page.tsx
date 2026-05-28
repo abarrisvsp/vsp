@@ -4,6 +4,8 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Portfolio | Visionary Sound Productions',
   description: 'Case studies from VSP events — weddings, corporate galas, mitzvahs, and more.',
