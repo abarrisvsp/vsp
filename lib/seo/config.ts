@@ -11,9 +11,9 @@ export const SITE = {
   shortName: 'VSP',
   url: SITE_URL,
   // Used as the metadata fallback description across pages.
-  tagline: 'Full-service event production — stage, lighting, sound & video.',
+  tagline: 'Full-service event production. Stage, lighting, sound, and video.',
   description:
-    'Owner-operated event production company. Stage, lighting, sound, and video for weddings, mitzvahs, school dances, and corporate events. Metro Detroit · Midwest · Nationwide. Since 2004.',
+    'Owner-operated event production company. Stage, lighting, sound, and video for weddings, mitzvahs, school dances, and corporate events across Metro Detroit, the Midwest, and nationwide since 2004.',
   founderName: 'Aaron Barris',
   foundingYear: '2004',
   email: 'Aaron@VisionarySoundProductions.com',

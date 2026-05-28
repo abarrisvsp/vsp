@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Portfolio | Visionary Sound Productions',
-  description: 'Case studies from VSP events — weddings, corporate galas, mitzvahs, and more.',
+  description: 'Case studies from VSP events: weddings, corporate galas, mitzvahs, and more.',
   alternates: { canonical: '/portfolio' },
 };
 

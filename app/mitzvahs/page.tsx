@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/mitzvahs').catch(() => null);
   return {
     title: row?.meta_title ?? 'Bar & Bat Mitzvah DJ | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
     alternates: { canonical: '/mitzvahs' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
@@ -40,9 +40,9 @@ const DEFAULTS: Record<string, string> = {
   mitzvahs_hero_image: '',
   mitzvahs_eyebrow: 'Mitzvahs',
   mitzvahs_headline: 'Personalized event design that brings their theme to life.',
-  mitzvahs_subhead: 'From intimate to full production — your child, your concept, our craft.',
+  mitzvahs_subhead: 'From intimate to full production. Your child, your concept, our craft.',
   mitzvahs_body:
-    'We sit down with you and your kid to learn what they actually want. Then we design lighting, sound, staging, FX, and entertainment integration that makes the night unforgettable — without making it about us.',
+    'We sit down with you and your kid to learn what they actually want. Then we design lighting, sound, staging, FX, and entertainment integration that makes the night unforgettable, without making it about us.',
 };
 
 export default async function Page() {

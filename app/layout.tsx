@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   // template would double the brand. No layout-level canonical either: a relative
   // canonical here propagates to every child route and points them all at "/".
   title:
-    'Visionary Sound Productions — Event Production, Lighting & Sound · Detroit',
+    'Visionary Sound Productions · Event Production, Lighting & Sound · Detroit',
   description:
     'Full-service event production company. Stage, lighting, sound, video. Metro Detroit · Nationwide · Since 2004.',
   applicationName: SITE.name,

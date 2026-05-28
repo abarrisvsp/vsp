@@ -13,9 +13,9 @@ const HERO_KEYS = ['services_idx_eyebrow', 'services_idx_headline', 'services_id
 const HERO_DEFAULTS: Record<string, string> = {
   services_idx_eyebrow: 'What we do',
   services_idx_headline:
-    'Production from napkin sketch to load-out — and every piece in between.',
+    'Production from napkin sketch to load-out, and every piece in between.',
   services_idx_lede:
-    "Six core practices. One owner-operated team. Pick a thread, or call us for something we haven't listed — we've almost certainly built it before.",
+    "Six core practices. One owner-operated team. Pick a thread, or call us for something we haven't listed. We've almost certainly built it before.",
 };
 
 type Service = {
@@ -45,7 +45,7 @@ const SERVICES: Service[] = [
     bullets: [
       'Lighting design & programming',
       'Concert-grade sound systems',
-      'Staging — any size, indoor or outdoor',
+      'Staging, any size, indoor or outdoor',
       'LED video walls & image projection',
       'Live event streaming',
       'Crew, rigging, electrical, comms',
@@ -53,7 +53,7 @@ const SERVICES: Service[] = [
     bulletsKey: 'services_idx_01_bullets',
     linkLabel: 'See event production',
     imageKey: 'services_idx_01_image',
-    imageCaption: 'Corporate gala — full LED wall + immersive lighting',
+    imageCaption: 'Corporate gala with full LED wall and immersive lighting',
     imageCaptionKey: 'services_idx_01_image_caption',
   },
   {
@@ -63,7 +63,7 @@ const SERVICES: Service[] = [
     titleDefault: 'Weddings',
     descKey: 'services_idx_02_desc',
     descDefault:
-      'Weddings. The mood lives in the lighting. We design ceilings that glow, dance floors that pull people in, and sound systems that disappear — so the toast lands and the first dance feels like the first dance.',
+      'Weddings. The mood lives in the lighting. We design ceilings that glow, dance floors that pull people in, and sound systems that disappear, so the toast lands and the first dance feels like the first dance.',
     bullets: [
       'Warm uplighting & ceiling washes',
       'Custom monogram gobos',
@@ -85,7 +85,7 @@ const SERVICES: Service[] = [
     titleDefault: 'Mitzvahs',
     descKey: 'services_idx_03_desc',
     descDefault:
-      'Mitzvahs. Personalized event design that brings their theme to life. We design everything — from intimate to full production. Custom invites, signage, dance-floor wraps, centerpieces with brains, monograms, and the kind of energy a 13-year-old remembers forever.',
+      'Mitzvahs. Personalized event design that brings their theme to life. We design everything, from intimate to full production. Custom invites, signage, dance-floor wraps, centerpieces with brains, monograms, and the kind of energy a 13-year-old remembers forever.',
     bullets: [
       'Theme & décor lighting',
       'Custom dance-floor wraps',
@@ -129,7 +129,7 @@ const SERVICES: Service[] = [
     titleDefault: 'Rentals',
     descKey: 'services_idx_05_desc',
     descDefault:
-      "Rentals. Dry-hire of the same gear we use ourselves: LED walls, line arrays, moving lights, staging, and DJ-grade systems. Delivered with options — or with crew if you'd rather not run it yourself.",
+      "Rentals. Dry-hire of the same gear we use ourselves: LED walls, line arrays, moving lights, staging, and DJ-grade systems. Delivered with options, or with crew if you'd rather not run it yourself.",
     bullets: [
       'Absen PL2.5 Plus LED panels',
       'Concert-grade line arrays & monitors',
@@ -151,7 +151,7 @@ const SERVICES: Service[] = [
     titleDefault: 'Design & Advisory',
     descKey: 'services_idx_06_desc',
     descDefault:
-      "Design & advisory. Not sure where to start? Free consultation. We'll scope it, sketch it, and tell you what you actually need — and what you don't. No charge to talk it through, ever.",
+      "Design & advisory. Not sure where to start? Free consultation. We'll scope it, sketch it, and tell you what you actually need, and what you don't. No charge to talk it through, ever.",
     bullets: [
       'Free initial consultation',
       'Concept & lighting sketches',

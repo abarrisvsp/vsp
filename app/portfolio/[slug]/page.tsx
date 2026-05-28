@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (item.venue) parts.push(`at ${item.venue}`);
   if (item.event_date) parts.push(`on ${new Date(item.event_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`);
   const description = parts.length
-    ? `${parts.join(' ')} — produced by Visionary Sound Productions.`
+    ? `${parts.join(' ')}, produced by Visionary Sound Productions.`
     : 'An event produced by Visionary Sound Productions.';
 
   return {

@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/event-production').catch(() => null);
   return {
     title: row?.meta_title ?? 'Event Production | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
     alternates: { canonical: '/event-production' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
@@ -40,14 +40,14 @@ const DEFAULTS: Record<string, string> = {
   event_production_hero_image: '',
   event_production_eyebrow: 'Event Production',
   event_production_headline: 'Full-stack production for the room everyone will remember.',
-  event_production_subhead: 'Stage, lighting, sound, video — all under one design eye.',
+  event_production_subhead: 'Stage, lighting, sound, and video, all under one design lead.',
   event_production_body: [
-    "Corporate galas. School assemblies and homecomings. Nonprofit fundraisers. Concerts, award nights, and brand activations. Visionary Sound Productions scopes, designs, builds, and runs the entire production — stage, lighting, sound, and video — under one design eye, with our own crew and our own trucks.",
-    "We've produced events at every scale since 2004. We design and run Fash Bash — the Detroit Institute of Arts' signature fashion gala — alongside Neiman Marcus; the Grosse Pointe Academy's annual auction; commencements for the University of Michigan–Dearborn; and national brand activations for Mars at Super Bowl LIV through LX. Closer to home, schools like Brighton and Huron Valley bring us back year after year — including Brighton's 1,500-student 'Let's Glow Crazy' homecoming with full lighting, audio, rigging, and effects.",
-    "Our design work has been featured in PLSN's Showtime section twenty-five times, and we've been trusted with high-security rooms — including communications support recognized by the White House Communications Agency for a U.S. Presidential visit to Michigan.",
-    "Every production starts with a site survey and a plot, not a guess. We confirm power, rigging points, sightlines, and load-in access up front, build the lighting and audio design to the actual room, and carry backup on the gear that matters so a single failure never becomes the story. For multi-day or repeat events, the design carries over — so each year builds on the last instead of starting from scratch.",
-    "One owner-direct phone call gets you a fixed-price proposal with every line spelled out — no change-order games, no mystery fees. From there we handle load-in, programming, show-calling, and truck-out. Our team is on site, set, and dialed in before the first guest or student walks through the door, and we stay through the final cue and the strike.",
-    "Because we own our inventory — line arrays, LED walls, moving lights, staging, and control surfaces — we scale a crew of two to forty-plus to fit the event instead of subcontracting it out. That means one accountable team, one consistent look, and one number to call when something has to change at 6 p.m. on show day.",
+    "We handle corporate galas, school assemblies and homecomings, nonprofit fundraisers, concerts, award nights, and brand activations. We scope, design, build, and run the whole production: stage, lighting, sound, and video, with one design lead, our own crew, and our own trucks.",
+    "We've produced events at every scale since 2004. We design and run Fash Bash, the Detroit Institute of Arts' signature fashion gala, alongside Neiman Marcus. We produce the Grosse Pointe Academy's annual auction, commencements for the University of Michigan in Dearborn, and national brand activations for Mars at Super Bowl LIV through LX. Closer to home, schools like Brighton and Huron Valley bring us back year after year, including Brighton's 1,500-student 'Let's Glow Crazy' homecoming with full lighting, audio, rigging, and effects.",
+    "Our design work has been featured in PLSN's Showtime section twenty-five times. We've also been trusted with high-security rooms, including communications support recognized by the White House Communications Agency for a U.S. Presidential visit to Michigan.",
+    "Every production starts with a site survey and a plot, not a guess. We confirm power, rigging points, sightlines, and load-in access up front, build the lighting and audio design to the actual room, and carry backup on the gear that matters so a single failure never becomes the story. For multi-day or repeat events the design carries over, so each year builds on the last instead of starting from scratch.",
+    "One owner-direct phone call gets you a fixed-price proposal with every line spelled out. No change-order games, no mystery fees. From there we handle load-in, programming, show-calling, and truck-out. Our team is on site, set, and dialed in before the first guest or student walks through the door, and we stay through the final cue and the strike.",
+    "We own our inventory: line arrays, LED walls, moving lights, staging, and control surfaces. That lets us scale a crew of two to forty or more to fit the event instead of subcontracting it out. You get one accountable team, one consistent look, and one number to call when something has to change at 6 p.m. on show day.",
   ].join('\n\n'),
 };
 
@@ -123,12 +123,12 @@ export default async function Page() {
           <p className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6">Selected work</p>
           <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-3 text-ink-dim">
             {[
-              'Detroit Institute of Arts — Fash Bash',
+              'Detroit Institute of Arts (Fash Bash)',
               'Neiman Marcus',
-              'Mars — Super Bowl LIV–LX activations',
+              'Mars (Super Bowl LIV through LX)',
               'The Grosse Pointe Academy',
               'Brighton High School',
-              'University of Michigan–Dearborn',
+              'University of Michigan, Dearborn',
               "Detroit Children's Fund",
               'Huron Valley Schools',
             ].map((name) => (

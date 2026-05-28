@@ -23,7 +23,7 @@ export async function Header({ active }: { active?: string }) {
   return (
     <header className="border-b border-line bg-bg/95 backdrop-blur sticky top-0 z-40">
       <div className="max-w-container mx-auto px-10 h-20 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-3" aria-label="Visionary Sound Productions — Home">
+        <Link href="/" className="flex items-center gap-3" aria-label="Visionary Sound Productions, Home">
           {logoUrl && (
             <Image
               src={logoUrl}

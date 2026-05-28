@@ -3,7 +3,7 @@ import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 
 const DEFAULTS = {
-  process_step_1_title: 'Talk it through — free.',
+  process_step_1_title: 'Talk it through, free.',
   process_step_1_body:
     "Tell us about the event. We'll listen, ask questions, and tell you what you actually need (and what you don't). No consultation charge, ever.",
   process_step_2_title: 'Fixed-price proposal.',

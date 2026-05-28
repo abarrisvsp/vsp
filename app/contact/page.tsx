@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/contact').catch(() => null);
   return {
     title: row?.meta_title ?? 'Contact | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
     alternates: { canonical: '/contact' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
@@ -30,9 +30,9 @@ const KEYS = [
 const DEFAULTS: Record<string, string> = {
   contact_eyebrow: 'Get in touch',
   contact_headline: 'Tell us about your event.',
-  contact_lede: "Owner-direct. No call centers, no junior reps. You'll hear back from Aaron within one business day — usually much sooner.",
-  contact_promise_1: 'Free consultation — no charge to talk it through',
-  contact_promise_2: 'Fixed-price proposal — no day-of surprises',
+  contact_lede: "Owner-direct. No call centers, no junior reps. You'll hear back from Aaron within one business day, usually much sooner.",
+  contact_promise_1: 'Free consultation, no charge to talk it through',
+  contact_promise_2: 'Fixed-price proposal, no day-of surprises',
   contact_promise_3: 'One point of contact, start to load-out',
   contact_quote: "We've used VSP at BHS for four years. Reliable, creative, and they make every show better.",
   contact_quote_author: 'Bill M. · Brighton High School',
