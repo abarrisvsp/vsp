@@ -3,6 +3,7 @@ import { createServiceClient, createAnonClient } from '@/lib/supabase';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import type { BlogPost, Subscriber } from '@/lib/types';
+import { slugify } from '@/lib/slugify';
 
 export type BroadcastSummary = {
   sent: number;
@@ -35,14 +36,6 @@ async function requireAdmin() {
   if (!session?.user?.isAdmin) throw new Error('Unauthorized');
 }
 
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
 
 export async function getPublishedPosts(): Promise<BlogPost[]> {
   const supabase = createAnonClient();

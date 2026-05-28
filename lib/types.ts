@@ -50,6 +50,7 @@ export type BlogPost = {
   excerpt: string | null;
   read_time_minutes: number | null;
   published: boolean;
+  published_at: string | null;
   email_subscribers: boolean;
   subscribers_emailed_at: string | null;
   created_at: string;
@@ -96,4 +97,62 @@ export type PressLogo = {
   link_url: string | null;
   sort_order: number;
   active: boolean;
+};
+
+export type SeoSettings = {
+  route: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image_url: string | null;
+  og_storage_path: string | null;
+  updated_at: string;
+};
+
+export type NavItem = {
+  id: string;
+  label: string;
+  href: string;
+  sort_order: number;
+  visible: boolean;
+  is_custom: boolean;
+};
+
+export type Faq = {
+  id: string;
+  page: string;
+  question: string;
+  answer: string;
+  sort_order: number;
+  active: boolean;
+  updated_at: string;
+};
+
+export type FeaturedWork = {
+  id: string;
+  slug: string;
+  headline: string;
+  event_type: string | null;
+  client_name: string | null;
+  venue: string | null;
+  event_date: string | null;
+  guest_count: number | null;
+  cover_image_url: string | null;
+  cover_storage_path: string | null;
+  body_html: string | null;
+  gallery_photo_ids: string[];
+  sort_order: number;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MediaFile = {
+  name: string;
+  path: string;
+  publicUrl: string;
+  size: number;
+  width: number | null;
+  height: number | null;
+  category: string;
+  createdAt: string;
 };
