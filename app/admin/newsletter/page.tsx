@@ -9,7 +9,7 @@ export default async function NewsletterPage() {
   const [{ subscribers, total }, thisMonth, content] = await Promise.all([
     getAllSubscribersForAdmin(1, 50).catch(() => ({ subscribers: [], total: 0 })),
     getSubscribersThisMonth().catch(() => 0),
-    getSiteContent(['newsletter_headline', 'newsletter_subtext', 'newsletter_show_homepage', 'newsletter_show_blog']),
+    getSiteContent(['newsletter_headline', 'newsletter_subtext', 'newsletter_show_homepage', 'newsletter_show_blog']).catch(() => ({} as Record<string, string>)),
   ]);
 
   return (
