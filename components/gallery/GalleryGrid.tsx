@@ -32,6 +32,11 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
   const categories = ['All', ...Array.from(new Set(photos.map((p) => p.category)))];
   const visible = activeCat === 'All' ? photos : photos.filter((p) => p.category === activeCat);
 
+  const totals: Record<string, number> = { All: photos.length };
+  photos.forEach((p) => {
+    totals[p.category] = (totals[p.category] || 0) + 1;
+  });
+
   async function onDragEnd(result: DropResult) {
     if (!result.destination) return;
     const reordered = Array.from(visible);
@@ -68,16 +73,24 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
 
   return (
     <div>
-      <div className="flex gap-2 mb-8 flex-wrap">
-        {categories.map((c) => (
-          <button
-            key={c}
-            onClick={() => setActiveCat(c)}
-            className={`text-xs uppercase tracking-wider px-3 py-1 border ${activeCat === c ? 'border-amber text-amber' : 'border-line text-ink-dim hover:border-amber/50'}`}
-          >
-            {c}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-6 border-b border-line">
+        <div className="flex flex-wrap gap-2" role="tablist">
+          {categories.map((c) => (
+            <button
+              key={c}
+              onClick={() => setActiveCat(c)}
+              className={`inline-flex items-center gap-2 text-xs uppercase tracking-wider px-3 py-1.5 border rounded-full transition-colors ${
+                activeCat === c ? 'border-amber text-amber bg-amber/5' : 'border-line text-ink-dim hover:border-amber/50'
+              }`}
+            >
+              {c}
+              <span className="text-ink-mute text-[10px]">{totals[c] || 0}</span>
+            </button>
+          ))}
+        </div>
+        <span className="text-xs uppercase tracking-wider text-ink-mute">
+          Showing <span className="text-ink">{visible.length}</span> / {photos.length}
+        </span>
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
@@ -95,12 +108,20 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
                       ref={prov.innerRef}
                       {...prov.draggableProps}
                       {...prov.dragHandleProps}
-                      className="relative aspect-square group cursor-pointer"
+                      className="relative aspect-square group cursor-pointer overflow-hidden"
                       onClick={() => !editMode && setLightboxIdx(i)}
                     >
-                      <Image src={p.public_url} alt={p.alt_text || p.title || 'Gallery photo'} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" />
+                      <Image src={p.public_url} alt={p.alt_text || p.title || 'Gallery photo'} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" />
+                      {/* Always-visible text overlay */}
+                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
+                        <span className="block text-[10px] uppercase tracking-wider text-amber mb-1">{p.category}</span>
+                        {p.title && <h3 className="font-serif italic text-sm md:text-base text-white leading-tight line-clamp-1">{p.title}</h3>}
+                        {p.caption && <p className="text-xs text-white/80 mt-0.5 line-clamp-1">{p.caption}</p>}
+                      </div>
+                      {/* Edit-mode controls (kept above overlay) */}
                       {editMode && (
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-end justify-end p-2 gap-2 transition-opacity">
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-start justify-end p-2 gap-2 transition-opacity z-10">
                           <button onClick={(e) => { e.stopPropagation(); setEditPhoto(p); }} className="p-1.5 bg-bg-elev border border-line rounded">
                             <Pencil className="w-3 h-3" />
                           </button>
