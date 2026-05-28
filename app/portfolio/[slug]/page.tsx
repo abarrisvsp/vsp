@@ -1,9 +1,28 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getFeaturedWorkBySlug } from '@/lib/actions/featured-work';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const item = await getFeaturedWorkBySlug(params.slug);
+  if (!item) return {};
+
+  const parts: string[] = [];
+  if (item.event_type) parts.push(item.event_type);
+  if (item.venue) parts.push(`at ${item.venue}`);
+  if (item.event_date) parts.push(`on ${new Date(item.event_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`);
+  const description = parts.length
+    ? `${parts.join(' ')} — produced by Visionary Sound Productions.`
+    : 'An event produced by Visionary Sound Productions.';
+
+  return {
+    title: `${item.headline} | Visionary Sound Productions`,
+    description,
+  };
+}
 
 export default async function PortfolioDetailPage({ params }: { params: { slug: string } }) {
   const item = await getFeaturedWorkBySlug(params.slug);
@@ -18,7 +37,7 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
 
         <div className="flex gap-6 text-sm text-ink-mute mb-10 flex-wrap">
           {item.venue && <span>📍 {item.venue}</span>}
-          {item.event_date && <span>📅 {new Date(item.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
+          {item.event_date && <span>📅 {new Date(item.event_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>}
           {item.guest_count && <span>👥 {item.guest_count} guests</span>}
         </div>
 

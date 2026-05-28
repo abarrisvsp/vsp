@@ -108,7 +108,8 @@ export async function createFeaturedWork(fields: Partial<FeaturedWork>): Promise
 export async function updateFeaturedWork(id: string, fields: Partial<FeaturedWork>): Promise<void> {
   await requireAdmin();
   const supabase = createServiceClient();
-  // Note: slug is NOT updatable after creation
+  // Capture slug before stripping (slug is immutable — not written to DB, but needed for cache revalidation)
+  const existingSlug = fields.slug;
   const { slug: _slug, ...safeFields } = fields;
   const { error } = await supabase
     .from('featured_work')
@@ -116,12 +117,7 @@ export async function updateFeaturedWork(id: string, fields: Partial<FeaturedWor
     .eq('id', id);
   if (error) throw error;
   revalidatePath('/portfolio');
-  const { data } = await supabase
-    .from('featured_work')
-    .select('slug')
-    .eq('id', id)
-    .maybeSingle();
-  if (data?.slug) revalidatePath(`/portfolio/${data.slug}`);
+  if (existingSlug) revalidatePath(`/portfolio/${existingSlug}`);
 }
 
 export async function deleteFeaturedWork(id: string): Promise<void> {
