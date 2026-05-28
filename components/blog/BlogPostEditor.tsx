@@ -141,7 +141,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
     router.push('/admin/blog');
   }
 
-  const input = 'w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber';
+  const input = 'w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand';
   const label = 'block text-xs uppercase tracking-wider text-ink-mute mb-1';
 
   return (
@@ -179,7 +179,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
           /* eslint-disable-next-line @next/next/no-img-element */
           <img src={coverUrl} alt="" className="w-full max-h-60 object-cover rounded mb-2" />
         )}
-        <div {...getRootProps()} className={`border-2 border-dashed rounded p-6 text-center cursor-pointer ${isDragActive ? 'border-amber' : 'border-line'}`}>
+        <div {...getRootProps()} className={`border-2 border-dashed rounded p-6 text-center cursor-pointer ${isDragActive ? 'border-brand' : 'border-line'}`}>
           <input {...getInputProps()} />
           <p className="text-ink-dim text-sm">Drop or click to upload</p>
         </div>
@@ -272,7 +272,7 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
           <button
             onClick={save}
             disabled={saving}
-            className="px-5 py-2 bg-amber text-bg text-sm font-medium rounded hover:opacity-90 disabled:opacity-50"
+            className="px-5 py-2 bg-brand text-bg text-sm font-medium rounded hover:opacity-90 disabled:opacity-50"
           >
             {saving
               ? 'Saving…'

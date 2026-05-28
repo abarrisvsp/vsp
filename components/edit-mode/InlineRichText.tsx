@@ -121,7 +121,7 @@ function ToolbarButton({
       onClick={onClick}
       title={title}
       className={`px-2 py-1.5 rounded text-xs transition-colors ${
-        active ? 'bg-amber text-white' : 'bg-bg-elev hover:bg-line text-ink-dim'
+        active ? 'bg-brand text-white' : 'bg-bg-elev hover:bg-line text-ink-dim'
       }`}
     >
       {children}
@@ -343,14 +343,14 @@ export function InlineRichText({
     return (
       <span className="relative inline-block group max-w-full">
         <Wrapper
-          className={`${wrapperClass} cursor-text rounded outline-1 outline-dashed outline-amber outline-offset-4`}
+          className={`${wrapperClass} cursor-text rounded outline-1 outline-dashed outline-brand outline-offset-4`}
           onClick={enterEdit}
           dangerouslySetInnerHTML={{ __html: displayHtml || (inline ? 'Click to edit…' : '<p class="opacity-50">Click to edit…</p>') }}
         />
         <button
           type="button"
           onClick={enterEdit}
-          className="absolute -top-2 -right-2 bg-amber text-white text-[10px] px-1.5 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 z-10"
+          className="absolute -top-2 -right-2 bg-brand text-white text-[10px] px-1.5 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 z-10"
           aria-label="Edit"
         >
           <Pencil className="w-3 h-3" /> Edit
@@ -360,7 +360,7 @@ export function InlineRichText({
   }
 
   return (
-    <span className="relative inline-block border border-amber rounded bg-bg shadow-lg max-w-full">
+    <span className="relative inline-block border border-brand rounded bg-bg shadow-lg max-w-full">
       {editor && <Toolbar editor={editor} inline={inline} />}
       <EditorContent editor={editor} className={`p-3 ${className}`} />
       <span className="flex items-center justify-end gap-2 border-t border-line p-2 bg-bg-elev rounded-b">

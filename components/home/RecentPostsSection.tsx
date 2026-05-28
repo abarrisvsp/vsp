@@ -16,7 +16,7 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
           eyebrow="02 / In focus"
           title={<>Recent <em>work</em> &amp; gear we just brought online.</>}
         />
-        <Link href="/blog" className="text-amber text-sm hidden md:inline-block whitespace-nowrap">View the journal →</Link>
+        <Link href="/blog" className="text-brand text-sm hidden md:inline-block whitespace-nowrap">View the journal →</Link>
       </div>
       <div className="grid md:grid-cols-2 gap-12">
         {feature && (
@@ -34,7 +34,7 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
               )}
               <div className="flex items-center gap-3 mb-3">
                 {feature.category_tag && (
-                  <span className="text-xs uppercase tracking-wider bg-amber/15 text-amber px-2 py-1">
+                  <span className="text-xs uppercase tracking-wider bg-brand/15 text-brand px-2 py-1">
                     {feature.category_tag}
                   </span>
                 )}
@@ -44,13 +44,13 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
                   </span>
                 )}
               </div>
-              <h3 className="font-serif italic text-3xl mb-3 leading-tight group-hover:text-amber transition-colors">
+              <h3 className="font-serif italic text-3xl mb-3 leading-tight group-hover:text-brand transition-colors">
                 {feature.title}
               </h3>
               {feature.excerpt && (
                 <p className="text-ink-dim leading-relaxed mb-4">{feature.excerpt}</p>
               )}
-              <span className="text-amber text-sm">Read the build notes →</span>
+              <span className="text-brand text-sm">Read the build notes →</span>
             </Link>
           </article>
         )}
@@ -78,7 +78,7 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
                       {p.date ? format(new Date(p.date), 'MMM yyyy') : ''}
                       {p.category_tag ? ` · ${p.category_tag}` : ''}
                     </span>
-                    <h4 className="font-serif italic text-xl group-hover:text-amber transition-colors leading-tight">
+                    <h4 className="font-serif italic text-xl group-hover:text-brand transition-colors leading-tight">
                       {p.title}
                     </h4>
                   </div>
@@ -89,7 +89,7 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
         )}
       </div>
       <div className="mt-10 md:hidden">
-        <Link href="/blog" className="text-amber text-sm">View the journal →</Link>
+        <Link href="/blog" className="text-brand text-sm">View the journal →</Link>
       </div>
     </section>
   );

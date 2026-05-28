@@ -16,7 +16,7 @@ export default async function BlogListPage() {
         </div>
         <Link
           href="/admin/blog/new"
-          className="bg-amber text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
+          className="bg-brand text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
         >
           + New Post
         </Link>
@@ -25,7 +25,7 @@ export default async function BlogListPage() {
       {posts.length === 0 ? (
         <div className="border border-dashed border-line rounded py-12 text-center text-sm text-ink-mute">
           No posts yet.{' '}
-          <Link href="/admin/blog/new" className="text-amber hover:underline">
+          <Link href="/admin/blog/new" className="text-brand hover:underline">
             Write your first post →
           </Link>
         </div>
@@ -46,7 +46,7 @@ export default async function BlogListPage() {
                     Published
                   </span>
                 ) : post.published_at ? (
-                  <span className="text-xs text-amber border border-amber/30 px-2 py-0.5 rounded">
+                  <span className="text-xs text-brand border border-brand/30 px-2 py-0.5 rounded">
                     🗓 {new Date(post.published_at!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                 ) : (

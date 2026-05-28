@@ -18,9 +18,9 @@ export function PostCard({ post }: { post: BlogPost }) {
         )}
         <div className="text-xs uppercase tracking-wider text-ink-mute mb-2">
           {post.category_tag} {post.date && <>· {format(new Date(post.date), 'MMM d, yyyy')}</>}
-          {!post.published && <span className="ml-2 text-amber">DRAFT</span>}
+          {!post.published && <span className="ml-2 text-brand">DRAFT</span>}
         </div>
-        <h3 className="font-serif italic text-2xl mb-2 group-hover:text-amber transition-colors">{post.title}</h3>
+        <h3 className="font-serif italic text-2xl mb-2 group-hover:text-brand transition-colors">{post.title}</h3>
         {post.excerpt && <p className="text-ink-dim text-sm">{post.excerpt}</p>}
       </Link>
       {editMode && (

@@ -65,13 +65,13 @@ export function InboxTable({ submissions, archived }: { submissions: ContactSubm
                     defaultValue={s.notes || ''}
                     onBlur={(e) => e.target.value !== (s.notes || '') && saveNotes(s.id, e.target.value)}
                     rows={5}
-                    className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber"
+                    className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand"
                   />
                   <div className="flex gap-2 mt-3">
-                    <button onClick={() => toggleRead(s)} className="text-xs px-3 py-1 border border-line hover:border-amber">
+                    <button onClick={() => toggleRead(s)} className="text-xs px-3 py-1 border border-line hover:border-brand">
                       Mark {s.read ? 'unread' : 'read'}
                     </button>
-                    <button onClick={() => archive(s)} className="text-xs px-3 py-1 border border-line hover:border-amber">
+                    <button onClick={() => archive(s)} className="text-xs px-3 py-1 border border-line hover:border-brand">
                       {s.archived ? 'Restore' : 'Archive'}
                     </button>
                   </div>

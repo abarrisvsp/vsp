@@ -35,7 +35,7 @@ export async function Header({ active }: { active?: string }) {
             />
           )}
           <span className="font-serif italic text-xl md:text-2xl tracking-tight leading-tight">
-            Visionary Sound <span className="text-amber">Productions</span>
+            Visionary Sound <span className="text-brand">Productions</span>
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
@@ -43,7 +43,7 @@ export async function Header({ active }: { active?: string }) {
             if (item.href === 'dropdown') {
               return (
                 <div key={item.id} className="relative group">
-                  <button className={`hover:text-amber transition-colors ${active === '/services' ? 'text-amber' : 'text-ink-dim'}`}>
+                  <button className={`hover:text-brand transition-colors ${active === '/services' ? 'text-brand' : 'text-ink-dim'}`}>
                     {item.label} ▾
                   </button>
                   <div className="absolute top-full left-0 pt-2 hidden group-hover:block z-50">
@@ -52,7 +52,7 @@ export async function Header({ active }: { active?: string }) {
                         <Link
                           key={s.href}
                           href={s.href}
-                          className="block px-4 py-2 text-sm text-ink-dim hover:text-amber hover:bg-bg-soft transition-colors"
+                          className="block px-4 py-2 text-sm text-ink-dim hover:text-brand hover:bg-bg-soft transition-colors"
                         >
                           {s.label}
                         </Link>
@@ -66,7 +66,7 @@ export async function Header({ active }: { active?: string }) {
               <Link
                 key={item.id}
                 href={item.href}
-                className={`hover:text-amber transition-colors ${active === item.href ? 'text-amber' : 'text-ink-dim'}`}
+                className={`hover:text-brand transition-colors ${active === item.href ? 'text-brand' : 'text-ink-dim'}`}
               >
                 {item.label}
               </Link>
@@ -75,7 +75,7 @@ export async function Header({ active }: { active?: string }) {
         </nav>
         <Link
           href="/contact"
-          className="hidden md:inline-flex items-center gap-2 border border-amber text-amber text-sm px-5 py-2 rounded hover:bg-amber hover:text-bg transition-colors"
+          className="hidden md:inline-flex items-center gap-2 border border-brand text-brand text-sm px-5 py-2 rounded hover:bg-brand hover:text-bg transition-colors"
         >
           Get a Quote
         </Link>

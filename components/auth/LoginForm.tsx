@@ -41,7 +41,7 @@ export function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber"
+          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand"
         />
       </div>
       <div>
@@ -51,14 +51,14 @@ export function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber"
+          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand"
         />
       </div>
-      {error && <p className="text-sm text-amber">{error}</p>}
+      {error && <p className="text-sm text-brand">{error}</p>}
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-ink text-bg font-medium py-2 rounded hover:bg-amber transition-colors disabled:opacity-50"
+        className="w-full bg-ink text-bg font-medium py-2 rounded hover:bg-brand transition-colors disabled:opacity-50"
       >
         {submitting ? 'Signing in…' : 'Sign in'}
       </button>

@@ -7,8 +7,31 @@ import { PublishedToggle } from '@/components/shared/PublishedToggle';
 import Link from 'next/link';
 import { getPostBySlug } from '@/lib/actions/blog';
 import { auth } from '@/lib/auth';
+import type { Metadata } from 'next';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { blogPostingSchema, breadcrumbSchema } from '@/lib/seo/schema';
+import { SITE } from '@/lib/seo/config';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug).catch(() => null);
+  if (!post) return { title: 'Post not found' };
+  const description = post.excerpt ?? SITE.tagline;
+  return {
+    title: post.title,
+    description,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description,
+      url: `${SITE.url}/blog/${post.slug}`,
+      publishedTime: post.date ?? undefined,
+      images: post.cover_image_url ? [post.cover_image_url] : undefined,
+    },
+  };
+}
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug);
@@ -18,12 +41,24 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <>
+      {post.published && (
+        <JsonLd
+          data={[
+            blogPostingSchema(post),
+            breadcrumbSchema([
+              { name: 'Home', path: '/' },
+              { name: 'Blog', path: '/blog' },
+              { name: post.title, path: `/blog/${post.slug}` },
+            ]),
+          ]}
+        />
+      )}
       <Header active="/blog" />
       <main className="max-w-3xl mx-auto px-6 py-16">
         {session?.user?.isAdmin && (
           <div className="mb-6 flex justify-end gap-3">
             <PublishedToggle postId={post.id} initial={post.published} />
-            <Link href={`/admin/blog/${post.id}`} className="text-amber text-sm">Edit full post →</Link>
+            <Link href={`/admin/blog/${post.id}`} className="text-brand text-sm">Edit full post →</Link>
           </div>
         )}
         {post.cover_image_url && (

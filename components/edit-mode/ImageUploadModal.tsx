@@ -93,7 +93,7 @@ export function ImageUploadModal({ open, onClose, onUploaded, folder }: ImageUpl
           <div
             {...getRootProps()}
             className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors ${
-              isDragActive ? 'border-amber bg-amber/10' : 'border-line hover:border-amber/50'
+              isDragActive ? 'border-brand bg-brand/10' : 'border-line hover:border-brand/50'
             }`}
           >
             <input {...getInputProps()} />

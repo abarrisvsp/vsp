@@ -40,7 +40,7 @@ export function ServicesSection({ services }: { services: Service[] }) {
         <>
           <button
             onClick={() => setAddOpen(true)}
-            className="mt-6 flex items-center gap-2 text-sm text-amber hover:text-ink"
+            className="mt-6 flex items-center gap-2 text-sm text-brand hover:text-ink"
           >
             <Plus className="w-4 h-4" /> Add a service
           </button>

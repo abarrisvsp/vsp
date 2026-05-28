@@ -222,7 +222,7 @@ export default async function ServicesIndexPage() {
                   }`}
                 >
                   <div>
-                    <span className="font-serif italic text-6xl md:text-7xl text-amber leading-none block mb-6">
+                    <span className="font-serif italic text-6xl md:text-7xl text-brand leading-none block mb-6">
                       {s.num}
                     </span>
                     <InlineRichText inline
@@ -250,7 +250,7 @@ export default async function ServicesIndexPage() {
                     />
                     <Link
                       href={`/${s.slug}`}
-                      className="text-amber hover:text-ink text-sm border-b border-amber/40 hover:border-ink pb-0.5"
+                      className="text-brand hover:text-ink text-sm border-b border-brand/40 hover:border-ink pb-0.5"
                     >
                       {s.linkLabel} →
                     </Link>

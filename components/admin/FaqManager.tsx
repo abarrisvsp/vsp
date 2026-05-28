@@ -113,7 +113,7 @@ export function FaqManager({ pages, initialData }: Props) {
             onClick={() => { setActiveTab(p.key); setEditId(null); setShowAdd(false); }}
             className={`text-sm px-4 py-1.5 rounded transition-colors ${
               activeTab === p.key
-                ? 'bg-amber text-bg font-medium'
+                ? 'bg-brand text-bg font-medium'
                 : 'bg-bg-elev text-ink-mute hover:text-ink border border-line'
             }`}
           >
@@ -151,7 +151,7 @@ export function FaqManager({ pages, initialData }: Props) {
                             placeholder="Answer"
                           />
                           <div className="flex gap-2">
-                            <button type="button" onClick={saveEdit} disabled={isPending} className="text-xs bg-amber text-bg px-3 py-1.5 rounded hover:opacity-90 disabled:opacity-50">Save</button>
+                            <button type="button" onClick={saveEdit} disabled={isPending} className="text-xs bg-brand text-bg px-3 py-1.5 rounded hover:opacity-90 disabled:opacity-50">Save</button>
                             <button type="button" onClick={() => setEditId(null)} className="text-xs text-ink-mute hover:text-ink px-3 py-1.5">Cancel</button>
                           </div>
                         </div>
@@ -184,7 +184,7 @@ export function FaqManager({ pages, initialData }: Props) {
           <input value={newQ} onChange={(e) => setNewQ(e.target.value)} className={INPUT} placeholder="Question" />
           <textarea value={newA} onChange={(e) => setNewA(e.target.value)} rows={3} className={`${INPUT} resize-none`} placeholder="Answer" />
           <div className="flex gap-2">
-            <button type="button" onClick={addFaq} disabled={isPending || !newQ.trim() || !newA.trim()} className="text-sm bg-amber text-bg px-4 py-2 rounded hover:opacity-90 disabled:opacity-50">Add FAQ</button>
+            <button type="button" onClick={addFaq} disabled={isPending || !newQ.trim() || !newA.trim()} className="text-sm bg-brand text-bg px-4 py-2 rounded hover:opacity-90 disabled:opacity-50">Add FAQ</button>
             <button type="button" onClick={() => setShowAdd(false)} className="text-sm text-ink-mute hover:text-ink px-3 py-2">Cancel</button>
           </div>
         </div>

@@ -30,7 +30,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
   }
 
   if (message) {
-    return <p className="text-amber text-sm">{message}</p>;
+    return <p className="text-brand text-sm">{message}</p>;
   }
 
   return (
@@ -41,7 +41,7 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
           placeholder="First name (optional)"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
-          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink text-sm focus:outline-none focus:border-amber"
+          className="w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink text-sm focus:outline-none focus:border-brand"
         />
       )}
       <div className={compact ? 'flex gap-2 flex-1' : 'flex gap-2'}>
@@ -51,17 +51,17 @@ export function SubscribeForm({ compact = false }: { compact?: boolean }) {
           placeholder="you@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 bg-bg-elev border border-line rounded px-3 py-2 text-ink text-sm focus:outline-none focus:border-amber"
+          className="flex-1 bg-bg-elev border border-line rounded px-3 py-2 text-ink text-sm focus:outline-none focus:border-brand"
         />
         <button
           type="submit"
           disabled={submitting}
-          className="bg-ink text-bg px-4 py-2 text-sm font-medium hover:bg-amber transition-colors disabled:opacity-50 whitespace-nowrap"
+          className="bg-ink text-bg px-4 py-2 text-sm font-medium hover:bg-brand transition-colors disabled:opacity-50 whitespace-nowrap"
         >
           {submitting ? '…' : 'Subscribe'}
         </button>
       </div>
-      {error && <p className="text-amber text-xs">{error}</p>}
+      {error && <p className="text-brand text-xs">{error}</p>}
     </form>
   );
 }

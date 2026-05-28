@@ -13,7 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/blog').catch(() => null);
   return {
     title: row?.meta_title ?? 'Journal | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    alternates: { canonical: '/blog' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
     },
@@ -33,7 +34,7 @@ export default async function BlogIndex() {
             <h1 className="font-serif italic text-6xl mt-2">Field notes.</h1>
           </div>
           {session?.user?.isAdmin && (
-            <Link href="/admin/blog/new" className="bg-amber text-white px-4 py-2 text-sm">Write new post</Link>
+            <Link href="/admin/blog/new" className="bg-brand text-white px-4 py-2 text-sm">Write new post</Link>
           )}
         </div>
         <div className="grid md:grid-cols-2 gap-12">

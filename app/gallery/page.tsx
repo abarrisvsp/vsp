@@ -17,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/gallery').catch(() => null);
   return {
     title: row?.meta_title ?? 'Gallery | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    alternates: { canonical: '/gallery' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
     },

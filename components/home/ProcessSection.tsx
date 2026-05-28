@@ -48,7 +48,7 @@ export async function ProcessSection() {
             key={s.num}
             className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] gap-6 md:gap-10 py-10 border-b border-line"
           >
-            <span className="font-serif italic text-5xl md:text-6xl text-amber leading-none">
+            <span className="font-serif italic text-5xl md:text-6xl text-brand leading-none">
               {s.num}
             </span>
             <div>

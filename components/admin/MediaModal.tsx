@@ -81,7 +81,7 @@ export function MediaModal({ file, onClose, onSaved, onDelete, isDeleting }: Pro
             <button
               type="button"
               onClick={() => setOnSite((v) => !v)}
-              className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${onSite ? 'bg-amber' : 'bg-line'}`}
+              className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${onSite ? 'bg-brand' : 'bg-line'}`}
               role="switch"
               aria-checked={onSite}
             >
@@ -102,7 +102,7 @@ export function MediaModal({ file, onClose, onSaved, onDelete, isDeleting }: Pro
                     type="button"
                     onClick={() => toggleTag(t.slug)}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                      active ? 'bg-amber text-bg border-amber' : 'border-line text-ink-mute hover:text-ink'
+                      active ? 'bg-brand text-bg border-brand' : 'border-line text-ink-mute hover:text-ink'
                     }`}
                   >
                     {t.label}
@@ -117,7 +117,7 @@ export function MediaModal({ file, onClose, onSaved, onDelete, isDeleting }: Pro
             <button
               onClick={save}
               disabled={isSaving}
-              className="bg-amber text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90 disabled:opacity-50"
+              className="bg-brand text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90 disabled:opacity-50"
             >
               {isSaving ? 'Saving…' : 'Save'}
             </button>

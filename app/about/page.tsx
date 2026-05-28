@@ -14,7 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/about').catch(() => null);
   return {
     title: row?.meta_title ?? 'About | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    alternates: { canonical: '/about' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
     },
@@ -195,7 +196,7 @@ export default async function AboutPage() {
               {numbers.map((n) => (
                 <div key={n.valueKey}>
                   <InlineRichText inline contentKey={n.valueKey} defaultValue={v(n.valueKey)} tag="div"
-                    className="font-serif italic text-6xl text-amber leading-none mb-4" revalidate="/about" />
+                    className="font-serif italic text-6xl text-brand leading-none mb-4" revalidate="/about" />
                   <InlineRichText inline contentKey={n.labelKey} defaultValue={v(n.labelKey)} tag="div"
                     className="text-ink font-medium mb-2" revalidate="/about" />
                   <InlineRichText contentKey={n.descKey} defaultValue={v(n.descKey)}
@@ -215,7 +216,7 @@ export default async function AboutPage() {
             <ol className="grid md:grid-cols-2 gap-x-12 gap-y-10">
               {values.map((val_) => (
                 <li key={val_.num} className="grid grid-cols-[50px_1fr] gap-4">
-                  <span className="font-serif italic text-3xl text-amber leading-none">{val_.num}</span>
+                  <span className="font-serif italic text-3xl text-brand leading-none">{val_.num}</span>
                   <div>
                     <InlineRichText inline contentKey={val_.titleKey} defaultValue={v(val_.titleKey)} tag="h3"
                       className="font-serif italic text-xl mb-2 leading-snug" revalidate="/about" />
@@ -238,7 +239,7 @@ export default async function AboutPage() {
               {timeline.map((t) => (
                 <li key={t.yearKey} className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] gap-6 md:gap-10 py-8 border-b border-line">
                   <InlineRichText inline contentKey={t.yearKey} defaultValue={v(t.yearKey)} tag="span"
-                    className="font-serif italic text-3xl md:text-4xl text-amber leading-none" revalidate="/about" />
+                    className="font-serif italic text-3xl md:text-4xl text-brand leading-none" revalidate="/about" />
                   <InlineRichText contentKey={t.textKey} defaultValue={v(t.textKey)}
                     className="text-ink-dim leading-relaxed self-center" revalidate="/about" />
                 </li>

@@ -12,7 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/contact').catch(() => null);
   return {
     title: row?.meta_title ?? 'Contact | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    alternates: { canonical: '/contact' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
     },
@@ -84,7 +85,7 @@ export default async function ContactPage() {
             <ul className="space-y-3 text-sm">
               {[1, 2, 3].map((n) => (
                 <li key={n} className="flex gap-3">
-                  <span className="text-amber font-bold">✓</span>
+                  <span className="text-brand font-bold">✓</span>
                   <InlineRichText inline
                     contentKey={`contact_promise_${n}`}
                     defaultValue={val(`contact_promise_${n}`)}
@@ -132,7 +133,7 @@ function ContactRow({ label, value, href, subtext }: { label: string; value: str
     <div className="grid grid-cols-[100px_1fr] gap-4 px-4 py-3 border-b border-line last:border-b-0">
       <span className="text-xs uppercase tracking-wider text-ink-mute">{label}</span>
       <div>
-        {href ? <a href={href} className="text-ink hover:text-amber break-all">{value}</a> : <span className="text-ink">{value}</span>}
+        {href ? <a href={href} className="text-ink hover:text-brand break-all">{value}</a> : <span className="text-ink">{value}</span>}
         {subtext && <p className="text-xs text-ink-mute mt-1">{subtext}</p>}
       </div>
     </div>

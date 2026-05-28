@@ -16,13 +16,13 @@ export default async function InboxPage({ searchParams }: { searchParams: { tab?
       <div className="flex gap-4 mb-6 border-b border-line">
         <Link
           href="/admin/inbox"
-          className={`pb-2 text-sm ${!archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}
+          className={`pb-2 text-sm ${!archived ? 'border-b-2 border-brand text-brand' : 'text-ink-mute'}`}
         >
           Active
         </Link>
         <Link
           href="/admin/inbox?tab=archived"
-          className={`pb-2 text-sm ${archived ? 'border-b-2 border-amber text-amber' : 'text-ink-mute'}`}
+          className={`pb-2 text-sm ${archived ? 'border-b-2 border-brand text-brand' : 'text-ink-mute'}`}
         >
           Archived
         </Link>

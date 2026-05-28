@@ -89,7 +89,7 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
               key={c}
               onClick={() => setActiveCat(c)}
               className={`inline-flex items-center gap-2 text-xs uppercase tracking-wider px-3 py-1.5 border rounded-full transition-colors ${
-                activeCat === c ? 'border-amber text-amber bg-amber/5' : 'border-line text-ink-dim hover:border-amber/50'
+                activeCat === c ? 'border-brand text-brand bg-brand/5' : 'border-line text-ink-dim hover:border-brand/50'
               }`}
             >
               {c === 'All' ? 'All' : labelForTag(c)}
@@ -124,7 +124,7 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
                       {/* Always-visible text overlay */}
                       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
                       <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-                        <span className="block text-[10px] uppercase tracking-wider text-amber mb-1">{labelForTag(effTags(p)[0] || p.category)}</span>
+                        <span className="block text-[10px] uppercase tracking-wider text-brand mb-1">{labelForTag(effTags(p)[0] || p.category)}</span>
                         {p.title && <h3 className="font-serif italic text-sm md:text-base text-white leading-tight line-clamp-1">{p.title}</h3>}
                         {p.caption && <p className="text-xs text-white/80 mt-0.5 line-clamp-1">{p.caption}</p>}
                       </div>

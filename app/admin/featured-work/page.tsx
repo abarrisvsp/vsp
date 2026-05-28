@@ -15,7 +15,7 @@ export default async function FeaturedWorkPage() {
         </div>
         <Link
           href="/admin/featured-work/new"
-          className="bg-amber text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
+          className="bg-brand text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
         >
           + Add Case Study
         </Link>

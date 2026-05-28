@@ -52,7 +52,7 @@ export function TiptapEditor({ initialHtml, onChange }: { initialHtml: string; o
     else editor!.chain().focus().unsetLink().run();
   }
 
-  const btn = (active: boolean) => `p-2 rounded ${active ? 'bg-amber text-white' : 'bg-bg-elev hover:bg-line text-ink-dim'}`;
+  const btn = (active: boolean) => `p-2 rounded ${active ? 'bg-brand text-white' : 'bg-bg-elev hover:bg-line text-ink-dim'}`;
 
   return (
     <div className="border border-line rounded">

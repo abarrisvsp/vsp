@@ -34,11 +34,11 @@ export async function CtaBand({
           <div className="space-y-3 text-sm">
             <div>
               <span className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Direct</span>
-              <a href={`tel:${c.footer_phone?.replace(/[^\d+]/g, '')}`} className="text-ink hover:text-amber">{c.footer_phone}</a>
+              <a href={`tel:${c.footer_phone?.replace(/[^\d+]/g, '')}`} className="text-ink hover:text-brand">{c.footer_phone}</a>
             </div>
             <div>
               <span className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Email</span>
-              <a href={`mailto:${c.footer_email}`} className="text-ink hover:text-amber break-all">{c.footer_email}</a>
+              <a href={`mailto:${c.footer_email}`} className="text-ink hover:text-brand break-all">{c.footer_email}</a>
             </div>
           </div>
         </div>

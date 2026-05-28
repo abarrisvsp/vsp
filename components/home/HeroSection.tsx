@@ -57,7 +57,7 @@ export async function HeroSection() {
             <StartProjectButton />
             <Link
               href="/gallery"
-              className="inline-flex items-center px-6 py-3 text-sm text-ink-dim border border-line rounded-full hover:border-amber hover:text-ink transition-colors"
+              className="inline-flex items-center px-6 py-3 text-sm text-ink-dim border border-line rounded-full hover:border-brand hover:text-ink transition-colors"
             >
               See the work
             </Link>

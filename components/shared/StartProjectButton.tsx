@@ -28,10 +28,10 @@ export function StartProjectButton({
   return (
     <Link
       href={href}
-      className={`group inline-flex items-center ${sizing} border border-line rounded-full text-ink font-medium hover:border-amber transition-colors ${className}`}
+      className={`group inline-flex items-center ${sizing} border border-line rounded-full text-ink font-medium hover:border-brand transition-colors ${className}`}
     >
       <span
-        className={`${dotSize} rounded-full bg-amber group-hover:scale-125 transition-transform`}
+        className={`${dotSize} rounded-full bg-brand group-hover:scale-125 transition-transform`}
         aria-hidden="true"
       />
       {label}

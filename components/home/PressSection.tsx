@@ -59,7 +59,7 @@ export function PressSection({ logos }: { logos: PressLogo[] }) {
         </div>
         {editMode && (
           <>
-            <button onClick={() => setAddOpen(true)} className="ml-auto text-amber text-sm flex items-center gap-1">
+            <button onClick={() => setAddOpen(true)} className="ml-auto text-brand text-sm flex items-center gap-1">
               <Plus className="w-4 h-4" /> Add publication
             </button>
             <RecordEditModal

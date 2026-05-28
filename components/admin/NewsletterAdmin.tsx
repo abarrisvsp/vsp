@@ -80,11 +80,11 @@ export function NewsletterAdmin({
       {/* Stats + actions */}
       <div className="flex items-center gap-8 border border-line bg-bg-elev rounded px-6 py-5">
         <div>
-          <p className="text-3xl font-serif italic text-amber">{currentTotal}</p>
+          <p className="text-3xl font-serif italic text-brand">{currentTotal}</p>
           <p className="text-xs text-ink-mute mt-0.5">Subscribers</p>
         </div>
         <div>
-          <p className="text-3xl font-serif italic text-amber">{thisMonth}</p>
+          <p className="text-3xl font-serif italic text-brand">{thisMonth}</p>
           <p className="text-xs text-ink-mute mt-0.5">This month</p>
         </div>
         <div className="ml-auto flex gap-3">
@@ -191,7 +191,7 @@ export function NewsletterAdmin({
             <button
               onClick={saveSettings}
               disabled={isPending}
-              className="bg-amber text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
+              className="bg-brand text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Saving…' : 'Save'}
             </button>

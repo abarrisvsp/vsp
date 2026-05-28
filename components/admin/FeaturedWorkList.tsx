@@ -41,7 +41,7 @@ export function FeaturedWorkList({ initialItems }: { initialItems: FeaturedWork[
     return (
       <div className="border border-dashed border-line rounded py-12 text-center text-sm text-ink-mute">
         No case studies yet.{' '}
-        <Link href="/admin/featured-work/new" className="text-amber hover:underline">
+        <Link href="/admin/featured-work/new" className="text-brand hover:underline">
           Add the first one →
         </Link>
       </div>

@@ -91,7 +91,7 @@ export function FeaturedWorkEditor({ initial }: { initial?: FeaturedWork }) {
             value={headline}
             onChange={(e) => setHeadline(e.target.value)}
             className={INPUT}
-            placeholder="Rosenthal Bar Mitzvah — Grand Hyatt NYC"
+            placeholder="Rosenthal Bar Mitzvah — The Townsend, Birmingham"
           />
           {initial && (
             <p className="text-xs text-ink-mute mt-1">
@@ -143,7 +143,7 @@ export function FeaturedWorkEditor({ initial }: { initial?: FeaturedWork }) {
           ) : (
             <div
               {...getRootProps()}
-              className="border border-dashed border-line rounded p-8 text-center text-sm text-ink-mute cursor-pointer hover:border-amber transition-colors"
+              className="border border-dashed border-line rounded p-8 text-center text-sm text-ink-mute cursor-pointer hover:border-brand transition-colors"
             >
               <input {...getInputProps()} />
               Click or drag to upload cover image
@@ -173,7 +173,7 @@ export function FeaturedWorkEditor({ initial }: { initial?: FeaturedWork }) {
             <button
               onClick={() => save(true)}
               disabled={isPending}
-              className="w-full bg-amber text-bg text-sm font-medium py-2 rounded hover:opacity-90 disabled:opacity-50"
+              className="w-full bg-brand text-bg text-sm font-medium py-2 rounded hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Saving…' : 'Publish'}
             </button>

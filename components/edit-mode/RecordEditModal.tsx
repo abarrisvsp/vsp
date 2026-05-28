@@ -88,7 +88,7 @@ export function RecordEditModal<T extends Record<string, unknown>>({
                     value={(v as string) ?? ''}
                     onChange={(e) => set(f.name, e.target.value)}
                     rows={4}
-                    className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber"
+                    className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand"
                   />
                 </div>
               );
@@ -128,7 +128,7 @@ export function RecordEditModal<T extends Record<string, unknown>>({
                   onChange={(e) =>
                     set(f.name, f.type === 'number' ? Number(e.target.value) : e.target.value)
                   }
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand"
                 />
               </div>
             );

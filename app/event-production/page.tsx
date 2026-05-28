@@ -8,6 +8,8 @@ import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 import { getFaqsByPage } from '@/lib/actions/faqs';
 import { FaqAccordion } from '@/components/public/FaqAccordion';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { serviceSchema, faqSchema, breadcrumbSchema } from '@/lib/seo/schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/event-production').catch(() => null);
   return {
     title: row?.meta_title ?? 'Event Production | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    description: row?.meta_description ?? 'Full-service event production — stage, lighting, sound & video. Metro Detroit · Nationwide. Since 2004.',
+    alternates: { canonical: '/event-production' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
     },
@@ -49,6 +52,20 @@ export default async function Page() {
   ]);
   return (
     <>
+      <JsonLd
+        data={[
+          serviceSchema({
+            name: 'Event Production',
+            description: DEFAULTS[`${PREFIX}_body`],
+            path: `/${SLUG}`,
+          }),
+          faqSchema(faqs),
+          breadcrumbSchema([
+            { name: 'Home', path: '/' },
+            { name: 'Event Production', path: `/${SLUG}` },
+          ]),
+        ]}
+      />
       <Header active={`/${SLUG}`} />
       <main>
         <section className="relative h-[60vh] flex items-end">

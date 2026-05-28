@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Portfolio | Visionary Sound Productions',
   description: 'Case studies from VSP events — weddings, corporate galas, mitzvahs, and more.',
+  alternates: { canonical: '/portfolio' },
 };
 
 export default async function PortfolioPage() {
@@ -33,7 +34,7 @@ export default async function PortfolioPage() {
                 <Link
                   key={item.id}
                   href={`/portfolio/${item.slug}`}
-                  className="group border border-line bg-bg-elev rounded overflow-hidden hover:border-amber transition-colors"
+                  className="group border border-line bg-bg-elev rounded overflow-hidden hover:border-brand transition-colors"
                 >
                   {item.cover_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -51,7 +52,7 @@ export default async function PortfolioPage() {
                       {item.event_date ? ` · ${new Date(item.event_date).getFullYear()}` : ''}
                       {item.guest_count ? ` · ${item.guest_count} guests` : ''}
                     </p>
-                    <h2 className="font-serif italic text-lg text-ink group-hover:text-amber transition-colors">
+                    <h2 className="font-serif italic text-lg text-ink group-hover:text-brand transition-colors">
                       {item.headline}
                     </h2>
                     {item.venue && (

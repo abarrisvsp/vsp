@@ -172,7 +172,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
                 </button>
               </div>
             ) : (
-              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-amber cursor-pointer hover:border-amber transition-colors">
+              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-brand cursor-pointer hover:border-brand transition-colors">
                 {uploading ? 'Uploading…' : 'Click to upload OG image'}
                 <input type="file" accept="image/*" onChange={handleOgUpload} className="hidden" />
               </label>
@@ -183,7 +183,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
             <button
               onClick={save}
               disabled={isPending}
-              className="bg-amber text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="bg-brand text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {isPending ? 'Saving…' : 'Save SEO'}
             </button>

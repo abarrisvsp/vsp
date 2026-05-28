@@ -64,8 +64,8 @@ export function ContactForm() {
     );
   }
 
-  const chip = (active: boolean) => `cursor-pointer px-3 py-1.5 text-sm border ${active ? 'border-amber text-amber bg-amber/10' : 'border-line text-ink-dim hover:border-amber/50'}`;
-  const input = 'w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-amber';
+  const chip = (active: boolean) => `cursor-pointer px-3 py-1.5 text-sm border ${active ? 'border-brand text-brand bg-brand/10' : 'border-line text-ink-dim hover:border-brand/50'}`;
+  const input = 'w-full bg-bg-elev border border-line rounded px-3 py-2 text-ink focus:outline-none focus:border-brand';
   const label = 'block text-xs uppercase tracking-wider text-ink-mute mb-2';
 
   return (
@@ -157,9 +157,9 @@ export function ContactForm() {
         <textarea value={form.message} onChange={(e) => set('message', e.target.value)} rows={5} className={input} placeholder="Tell us about the event, the venue, the vibe…" />
       </div>
 
-      {error && <p className="text-amber text-sm">{error}</p>}
+      {error && <p className="text-brand text-sm">{error}</p>}
 
-      <button type="submit" disabled={submitting} className="bg-ink text-bg px-8 py-3 font-medium hover:bg-amber transition-colors disabled:opacity-50">
+      <button type="submit" disabled={submitting} className="bg-ink text-bg px-8 py-3 font-medium hover:bg-brand transition-colors disabled:opacity-50">
         {submitting ? 'Sending…' : 'Send it over →'}
       </button>
     </form>

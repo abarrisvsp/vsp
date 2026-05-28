@@ -60,11 +60,11 @@ export function EditToolbar() {
         )}
         <Link
           href="/admin/inbox"
-          className="relative text-ink hover:text-amber text-xs font-medium"
+          className="relative text-ink hover:text-brand text-xs font-medium"
         >
           Inbox
           {unread > 0 && (
-            <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-amber text-white text-[10px] font-semibold">
+            <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full bg-brand text-white text-[10px] font-semibold">
               {unread}
             </span>
           )}

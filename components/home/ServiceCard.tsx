@@ -23,13 +23,13 @@ export function ServiceCard({ service }: { service: Service }) {
   return (
     <div className="relative border-t border-line py-8 group">
       <div className="grid grid-cols-[60px_1fr_auto] gap-6 items-start">
-        <span className="font-serif italic text-3xl text-amber">{service.letter}</span>
+        <span className="font-serif italic text-3xl text-brand">{service.letter}</span>
         <div>
           <h3 className="font-serif italic text-2xl mb-2">{service.title}</h3>
           <p className="text-ink-dim leading-relaxed">{service.description}</p>
         </div>
         {service.url && (
-          <Link href={service.url} className="text-ink-mute hover:text-amber text-sm">
+          <Link href={service.url} className="text-ink-mute hover:text-brand text-sm">
             Explore →
           </Link>
         )}

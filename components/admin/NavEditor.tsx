@@ -82,7 +82,7 @@ export function NavEditor({ initialItems }: Props) {
     <div>
       {/* Live preview bar */}
       <div className="border border-line bg-bg-elev rounded px-4 py-3 flex items-center gap-4 text-sm mb-6 overflow-x-auto">
-        <span className="font-serif italic text-amber shrink-0">VSP</span>
+        <span className="font-serif italic text-brand shrink-0">VSP</span>
         {items
           .filter((i) => i.visible)
           .map((item) => (
@@ -164,7 +164,7 @@ export function NavEditor({ initialItems }: Props) {
           <button
             onClick={addCustom}
             disabled={isPending}
-            className="text-sm text-amber border border-amber px-3 py-2 rounded hover:bg-amber/10 disabled:opacity-50"
+            className="text-sm text-brand border border-brand px-3 py-2 rounded hover:bg-brand/10 disabled:opacity-50"
           >
             Add
           </button>
@@ -188,7 +188,7 @@ export function NavEditor({ initialItems }: Props) {
         <button
           onClick={save}
           disabled={isPending}
-          className="bg-amber text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
+          className="bg-brand text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : 'Save Navigation'}
         </button>

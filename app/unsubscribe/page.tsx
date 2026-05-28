@@ -27,7 +27,7 @@ export default async function UnsubscribePage({
                 : "We've removed you from our mailing list."}{' '}
               If this was a mistake, just resubscribe from the homepage.
             </p>
-            <Link href="/" className="text-amber hover:text-ink text-sm">
+            <Link href="/" className="text-brand hover:text-ink text-sm">
               ← Back to homepage
             </Link>
           </>
@@ -38,7 +38,7 @@ export default async function UnsubscribePage({
               That unsubscribe link looks invalid or has already been used. If you&apos;re still
               getting emails, reply to one and we&apos;ll remove you manually.
             </p>
-            <Link href="/" className="text-amber hover:text-ink text-sm">
+            <Link href="/" className="text-brand hover:text-ink text-sm">
               ← Back to homepage
             </Link>
           </>

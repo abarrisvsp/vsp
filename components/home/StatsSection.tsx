@@ -24,7 +24,7 @@ export async function StatsSection() {
               contentKey={s.valueKey}
               defaultValue={s.value}
               tag="div"
-              className="font-serif italic text-[clamp(56px,7vw,96px)] leading-none mb-3 text-amber"
+              className="font-serif italic text-[clamp(56px,7vw,96px)] leading-none mb-3 text-brand"
               revalidate="/"
             />
             <InlineRichText inline

@@ -94,7 +94,7 @@ export function MediaLibrary({ initialFiles }: Props) {
       <div className="flex items-center gap-3 mb-4 flex-wrap">
         <button
           onClick={open}
-          className="bg-amber text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
+          className="bg-brand text-bg text-sm font-medium px-4 py-2 rounded hover:opacity-90"
         >
           {uploading ? 'Uploading…' : '+ Upload'}
         </button>
@@ -135,14 +135,14 @@ export function MediaLibrary({ initialFiles }: Props) {
             key={f.path}
             onClick={() => setSelected(f)}
             className={`relative aspect-square rounded overflow-hidden border-2 transition-colors ${
-              selected?.path === f.path ? 'border-amber' : 'border-transparent hover:border-line'
+              selected?.path === f.path ? 'border-brand' : 'border-transparent hover:border-line'
             }`}
             title={f.onSite ? 'On the public gallery' : undefined}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={f.publicUrl} alt={f.name} className="w-full h-full object-cover" />
             {f.onSite && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-amber ring-2 ring-black/50" aria-label="Published" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-brand ring-2 ring-black/50" aria-label="Published" />
             )}
           </button>
         ))}

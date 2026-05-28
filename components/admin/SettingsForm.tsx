@@ -108,7 +108,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
                 <button onClick={() => { setLogoUrl(''); setLogoPath(''); }} className="text-xs text-ink-mute hover:text-ink ml-auto">Remove</button>
               </div>
             ) : (
-              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-amber cursor-pointer hover:border-amber">
+              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-brand cursor-pointer hover:border-brand">
                 Click to upload logo
                 <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
               </label>
@@ -123,7 +123,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
                 <button onClick={() => { setFaviconUrl(''); setFaviconPath(''); }} className="text-xs text-ink-mute hover:text-ink ml-auto">Remove</button>
               </div>
             ) : (
-              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-amber cursor-pointer hover:border-amber">
+              <label className="block border border-dashed border-line rounded p-4 text-center text-xs text-brand cursor-pointer hover:border-brand">
                 Click to upload favicon
                 <input type="file" accept="image/*" onChange={handleFaviconUpload} className="hidden" />
               </label>
@@ -139,7 +139,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
           <div><label className={LABEL}>Phone</label><input value={phone} onChange={(e) => setPhone(e.target.value)} className={INPUT} placeholder="(212) 555-0100" /></div>
           <div><label className={LABEL}>Email</label><input value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT} placeholder="aaron@vsp.com" /></div>
           <div><label className={LABEL}>Address</label><input value={address} onChange={(e) => setAddress(e.target.value)} className={INPUT} placeholder="New York, NY" /></div>
-          <div><label className={LABEL}>Service Area</label><input value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} className={INPUT} placeholder="NYC Tri-State Area" /></div>
+          <div><label className={LABEL}>Service Area</label><input value={serviceArea} onChange={(e) => setServiceArea(e.target.value)} className={INPUT} placeholder="Metro Detroit · Midwest · Nationwide" /></div>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ export function SettingsForm({ initialValues: iv }: Props) {
         <button
           onClick={saveAll}
           disabled={isPending || isUploading}
-          className="bg-amber text-bg text-sm font-medium px-6 py-2 rounded hover:opacity-90 disabled:opacity-50"
+          className="bg-brand text-bg text-sm font-medium px-6 py-2 rounded hover:opacity-90 disabled:opacity-50"
         >
           {isUploading ? 'Uploading…' : isPending ? 'Saving…' : 'Save Settings'}
         </button>

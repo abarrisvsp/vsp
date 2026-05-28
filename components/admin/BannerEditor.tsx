@@ -151,7 +151,7 @@ export function BannerEditor({ initialActive, initialMessage, initialColor, init
         <button
           onClick={save}
           disabled={isPending}
-          className="bg-amber text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
+          className="bg-brand text-bg text-sm font-medium px-5 py-2 rounded hover:opacity-90 disabled:opacity-50"
         >
           {isPending ? 'Saving…' : 'Save Banner'}
         </button>

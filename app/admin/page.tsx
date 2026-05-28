@@ -17,7 +17,7 @@ export default async function AdminDashboard() {
   ]);
   const drafts = posts.filter((p) => !p.published && !p.published_at).length;
 
-  const card = 'border border-line bg-bg-elev p-6 rounded hover:border-amber transition-colors';
+  const card = 'border border-line bg-bg-elev p-6 rounded hover:border-brand transition-colors';
 
   return (
     <div className="px-8 py-10 max-w-5xl">
@@ -27,19 +27,19 @@ export default async function AdminDashboard() {
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <Link href="/admin/inbox" className={card}>
-          <div className="text-4xl font-serif italic text-amber">{unread}</div>
+          <div className="text-4xl font-serif italic text-brand">{unread}</div>
           <div className="text-xs text-ink-mute mt-1 uppercase tracking-wider">Unread Inquiries</div>
         </Link>
         <Link href="/admin/blog" className={card}>
-          <div className="text-4xl font-serif italic text-amber">{drafts}</div>
+          <div className="text-4xl font-serif italic text-brand">{drafts}</div>
           <div className="text-xs text-ink-mute mt-1 uppercase tracking-wider">Draft Posts</div>
         </Link>
         <Link href="/admin/blog" className={card}>
-          <div className="text-4xl font-serif italic text-amber">{scheduled}</div>
+          <div className="text-4xl font-serif italic text-brand">{scheduled}</div>
           <div className="text-xs text-ink-mute mt-1 uppercase tracking-wider">Scheduled Posts</div>
         </Link>
         <Link href="/admin/newsletter" className={card}>
-          <div className="text-4xl font-serif italic text-amber">{subscribers}</div>
+          <div className="text-4xl font-serif italic text-brand">{subscribers}</div>
           <div className="text-xs text-ink-mute mt-1 uppercase tracking-wider">Subscribers</div>
         </Link>
       </div>
@@ -61,7 +61,7 @@ export default async function AdminDashboard() {
                   href="/admin/inbox"
                   className="flex items-center justify-between text-sm px-3 py-2 rounded bg-bg-soft hover:bg-bg transition-colors"
                 >
-                  <span className={s.read ? 'text-ink-dim' : 'text-amber font-medium'}>
+                  <span className={s.read ? 'text-ink-dim' : 'text-brand font-medium'}>
                     {!s.read && '● '}{s.full_name}
                   </span>
                   <span className="text-ink-mute text-xs">
@@ -71,7 +71,7 @@ export default async function AdminDashboard() {
               ))}
             </div>
           )}
-          <Link href="/admin/inbox" className="block mt-3 text-xs text-amber hover:underline">
+          <Link href="/admin/inbox" className="block mt-3 text-xs text-brand hover:underline">
             View all →
           </Link>
         </div>

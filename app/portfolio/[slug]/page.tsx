@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getFeaturedWorkBySlug } from '@/lib/actions/featured-work';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { SITE } from '@/lib/seo/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: `${item.headline} | Visionary Sound Productions`,
     description,
+    alternates: { canonical: `/portfolio/${item.slug}` },
+    openGraph: {
+      type: 'article',
+      title: item.headline,
+      description,
+      url: `${SITE.url}/portfolio/${item.slug}`,
+      images: item.cover_image_url ? [item.cover_image_url] : undefined,
+    },
   };
 }
 

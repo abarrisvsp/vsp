@@ -109,7 +109,7 @@ export function AdminSidebar() {
                     href={href}
                     className={cn(
                       'flex items-center gap-2 px-3 py-2 rounded text-sm transition-colors',
-                      active ? 'bg-amber/10 text-amber' : 'text-ink-dim hover:text-ink hover:bg-bg-soft'
+                      active ? 'bg-brand/10 text-brand' : 'text-ink-dim hover:text-ink hover:bg-bg-soft'
                     )}
                   >
                     <span>{icon}</span>

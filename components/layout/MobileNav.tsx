@@ -72,7 +72,7 @@ export function MobileNav({ navItems, services }: Props) {
                         key={s.href}
                         href={s.href}
                         className={`block px-5 py-2.5 text-sm rounded ${
-                          pathname === s.href ? 'text-amber' : 'text-ink-dim hover:text-ink'
+                          pathname === s.href ? 'text-brand' : 'text-ink-dim hover:text-ink'
                         }`}
                       >
                         {s.label}
@@ -84,7 +84,7 @@ export function MobileNav({ navItems, services }: Props) {
                     key={item.id}
                     href={item.href}
                     className={`block px-3 py-2.5 text-sm rounded ${
-                      pathname === item.href ? 'text-amber' : 'text-ink-dim hover:text-ink'
+                      pathname === item.href ? 'text-brand' : 'text-ink-dim hover:text-ink'
                     }`}
                   >
                     {item.label}
@@ -96,7 +96,7 @@ export function MobileNav({ navItems, services }: Props) {
             <div className="p-4 border-t border-line">
               <Link
                 href="/contact"
-                className="flex items-center justify-center gap-2 border border-amber text-amber text-sm px-5 py-3 rounded hover:bg-amber hover:text-bg transition-colors"
+                className="flex items-center justify-center gap-2 border border-brand text-brand text-sm px-5 py-3 rounded hover:bg-brand hover:text-bg transition-colors"
               >
                 Get a Quote
               </Link>
