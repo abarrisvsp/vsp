@@ -112,6 +112,7 @@ export async function updateFeaturedWork(id: string, fields: Partial<FeaturedWor
   const supabase = createServiceClient();
   // Capture slug before stripping (slug is immutable — not written to DB, but needed for cache revalidation)
   const existingSlug = fields.slug;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { slug: _slug, ...safeFields } = fields;
   const { error } = await supabase
     .from('featured_work')
