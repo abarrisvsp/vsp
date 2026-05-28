@@ -3,7 +3,6 @@ import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineText } from '@/components/edit-mode/InlineText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
-import Link from 'next/link';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
 
 export const dynamic = 'force-dynamic';

@@ -2,6 +2,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineText } from '@/components/edit-mode/InlineText';
+
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { SectionHead } from '@/components/shared/SectionHead';
 import { CtaBand } from '@/components/shared/CtaBand';
@@ -149,8 +150,8 @@ export default async function AboutPage() {
             <div>
               <InlineText contentKey="about_story_title" defaultValue={v('about_story_title')} tag="h2"
                 className="font-serif italic text-3xl md:text-4xl mb-8 leading-tight" multiline revalidate="/about" />
-              <InlineText contentKey="about_story_body" defaultValue={v('about_story_body')} tag="div"
-                className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap space-y-4" multiline revalidate="/about" />
+              <InlineText contentKey="about_story_body" defaultValue={v('about_story_body')}
+                className="text-ink-dim text-lg leading-relaxed" revalidate="/about" />
             </div>
           </div>
         </section>
@@ -167,8 +168,8 @@ export default async function AboutPage() {
                 className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-4" revalidate="/about" />
               <InlineText contentKey="about_portrait_name" defaultValue={v('about_portrait_name')} tag="h2"
                 className="font-serif italic text-4xl md:text-5xl mb-8 leading-tight" revalidate="/about" />
-              <InlineText contentKey="about_portrait_bio" defaultValue={v('about_portrait_bio')} tag="p"
-                className="text-ink-dim text-lg leading-relaxed" multiline revalidate="/about" />
+              <InlineText contentKey="about_portrait_bio" defaultValue={v('about_portrait_bio')}
+                className="text-ink-dim text-lg leading-relaxed" revalidate="/about" />
             </div>
           </div>
         </section>
