@@ -4,6 +4,7 @@ import { AuthProvider } from '@/components/auth/AuthProvider';
 import { EditModeProvider } from '@/components/edit-mode/EditModeProvider';
 import { EditToolbar } from '@/components/edit-mode/EditToolbar';
 import { Toaster } from 'sonner';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Visionary Sound Productions — Event Production, Lighting & Sound · Detroit',
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Toaster theme="dark" position="bottom-right" />
           </EditModeProvider>
         </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
