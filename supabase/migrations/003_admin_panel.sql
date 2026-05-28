@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS nav_items (
   href       TEXT NOT NULL,
   sort_order INT  DEFAULT 0,
   visible    BOOLEAN DEFAULT TRUE,
-  is_custom  BOOLEAN DEFAULT FALSE
+  is_custom  BOOLEAN DEFAULT FALSE,
+  UNIQUE (label, href)
 );
 
 CREATE TABLE IF NOT EXISTS faqs (
@@ -63,10 +64,10 @@ ALTER TABLE faqs          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE featured_work ENABLE ROW LEVEL SECURITY;
 
 -- Public read (anon key)
-CREATE POLICY "public_read" ON seo_settings  FOR SELECT USING (true);
-CREATE POLICY "public_read" ON nav_items     FOR SELECT USING (true);
-CREATE POLICY "public_read" ON faqs          FOR SELECT USING (active = true);
-CREATE POLICY "public_read" ON featured_work FOR SELECT USING (published = true);
+CREATE POLICY IF NOT EXISTS "public_read" ON seo_settings  FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "public_read" ON nav_items     FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "public_read" ON faqs          FOR SELECT USING (active = true);
+CREATE POLICY IF NOT EXISTS "public_read" ON featured_work FOR SELECT USING (published = true);
 
 -- ─── Seed: default nav (so site never shows a blank nav) ─────
 
@@ -77,7 +78,7 @@ INSERT INTO nav_items (label, href, sort_order, visible, is_custom) VALUES
   ('Journal',  '/blog',     3, TRUE, FALSE),
   ('About',    '/about',    4, TRUE, FALSE),
   ('Contact',  '/contact',  5, TRUE, FALSE)
-ON CONFLICT DO NOTHING;
+ON CONFLICT (label, href) DO NOTHING;
 
 -- ─── Seed: site_content keys for banner + newsletter ─────────
 
