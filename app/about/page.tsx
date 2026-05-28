@@ -5,8 +5,21 @@ import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { SectionHead } from '@/components/shared/SectionHead';
 import { CtaBand } from '@/components/shared/CtaBand';
+import type { Metadata } from 'next';
+import { getSeoSettings } from '@/lib/actions/seo';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const row = await getSeoSettings('/about').catch(() => null);
+  return {
+    title: row?.meta_title ?? 'About | Visionary Sound Productions',
+    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    openGraph: {
+      images: row?.og_image_url ? [row.og_image_url] : [],
+    },
+  };
+}
 
 const KEYS = [
   // Hero

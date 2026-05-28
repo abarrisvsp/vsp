@@ -4,8 +4,21 @@ import { Footer } from '@/components/layout/Footer';
 import { PostCard } from '@/components/blog/PostCard';
 import { getPublishedPosts, getAllPostsForAdmin } from '@/lib/actions/blog';
 import { auth } from '@/lib/auth';
+import type { Metadata } from 'next';
+import { getSeoSettings } from '@/lib/actions/seo';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const row = await getSeoSettings('/blog').catch(() => null);
+  return {
+    title: row?.meta_title ?? 'Journal | Visionary Sound Productions',
+    description: row?.meta_description ?? 'Full-service event production — sound, lighting & DJ. NYC tri-state area.',
+    openGraph: {
+      images: row?.og_image_url ? [row.og_image_url] : [],
+    },
+  };
+}
 
 export default async function BlogIndex() {
   const session = await auth();
