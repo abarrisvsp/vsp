@@ -7,6 +7,8 @@ import { deleteMedia } from '@/lib/actions/media';
 import { uploadImage } from '@/lib/actions/upload';
 import { toast } from 'sonner';
 import type { MediaFile } from '@/lib/types';
+import { EVENT_TAGS } from '@/lib/event-tags';
+import { MediaModal } from './MediaModal';
 
 const CATEGORIES = ['All', 'gallery', 'blog', 'services', 'featured-work', 'seo', 'misc'];
 
@@ -19,13 +21,15 @@ export function MediaLibrary({ initialFiles }: Props) {
   const [selected, setSelected] = useState<MediaFile | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [eventTag, setEventTag] = useState('All');
   const [uploading, setUploading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const filtered = files.filter((f) => {
     const matchSearch = f.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === 'All' || f.category === category;
-    return matchSearch && matchCat;
+    const matchTag = eventTag === 'All' || f.eventTags.includes(eventTag);
+    return matchSearch && matchCat && matchTag;
   });
 
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
@@ -49,6 +53,8 @@ export function MediaLibrary({ initialFiles }: Props) {
           height: null,
           category: category === 'All' ? 'misc' : category,
           createdAt: new Date().toISOString(),
+          onSite: false,
+          eventTags: [],
         };
         setFiles((prev) => [newFile, ...prev]);
         toast.success(`Uploaded ${file.name}`);
@@ -66,25 +72,18 @@ export function MediaLibrary({ initialFiles }: Props) {
     noClick: true,
   });
 
-  function handleDelete() {
-    if (!selected) return;
-    if (!confirm(`Delete ${selected.name}?`)) return;
+  function deleteFile(file: MediaFile) {
+    if (!confirm(`Delete ${file.name}?`)) return;
     startTransition(async () => {
       try {
-        await deleteMedia(selected.path);
-        setFiles((prev) => prev.filter((f) => f.path !== selected.path));
+        await deleteMedia(file.path);
+        setFiles((prev) => prev.filter((f) => f.path !== file.path));
         setSelected(null);
         toast.success('Deleted');
       } catch {
         toast.error('Delete failed');
       }
     });
-  }
-
-  function copyUrl() {
-    if (!selected) return;
-    navigator.clipboard.writeText(selected.publicUrl);
-    toast.success('URL copied');
   }
 
   return (
@@ -111,7 +110,17 @@ export function MediaLibrary({ initialFiles }: Props) {
           className="bg-bg-elev border border-line text-ink text-sm rounded px-3 py-2"
         >
           {CATEGORIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{c === 'All' ? 'All folders' : c}</option>
+          ))}
+        </select>
+        <select
+          value={eventTag}
+          onChange={(e) => setEventTag(e.target.value)}
+          className="bg-bg-elev border border-line text-ink text-sm rounded px-3 py-2"
+        >
+          <option value="All">All event types</option>
+          {EVENT_TAGS.map((t) => (
+            <option key={t.slug} value={t.slug}>{t.label}</option>
           ))}
         </select>
         <span className="ml-auto text-xs text-ink-mute">
@@ -125,12 +134,16 @@ export function MediaLibrary({ initialFiles }: Props) {
           <button
             key={f.path}
             onClick={() => setSelected(f)}
-            className={`aspect-square rounded overflow-hidden border-2 transition-colors ${
+            className={`relative aspect-square rounded overflow-hidden border-2 transition-colors ${
               selected?.path === f.path ? 'border-amber' : 'border-transparent hover:border-line'
             }`}
+            title={f.onSite ? 'On the public gallery' : undefined}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={f.publicUrl} alt={f.name} className="w-full h-full object-cover" />
+            {f.onSite && (
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-amber ring-2 ring-black/50" aria-label="Published" />
+            )}
           </button>
         ))}
         {filtered.length === 0 && (
@@ -140,46 +153,18 @@ export function MediaLibrary({ initialFiles }: Props) {
         )}
       </div>
 
-      {/* Selected panel */}
+      {/* Enlarge + tag modal */}
       {selected && (
-        <div className="border-t border-line pt-4 flex gap-4 items-start">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={selected.publicUrl}
-            alt={selected.name}
-            className="w-16 h-16 object-cover rounded flex-shrink-0"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink truncate">{selected.name}</p>
-            <p className="text-xs text-ink-mute mt-0.5">
-              {selected.width && selected.height
-                ? `${selected.width}×${selected.height} · `
-                : ''}
-              {(selected.size / 1024).toFixed(0)} KB
-              {selected.createdAt
-                ? ` · Uploaded ${new Date(selected.createdAt).toLocaleDateString()}`
-                : ''}
-            </p>
-            <p className="text-xs text-ink-mute mt-0.5">
-              Category: <span className="text-amber">{selected.category}</span>
-            </p>
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={copyUrl}
-                className="border border-line text-ink-mute text-xs px-3 py-1.5 rounded hover:text-ink"
-              >
-                Copy URL
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isPending}
-                className="border border-line text-red-400 text-xs px-3 py-1.5 rounded hover:border-red-400 disabled:opacity-50"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+        <MediaModal
+          file={selected}
+          isDeleting={isPending}
+          onClose={() => setSelected(null)}
+          onSaved={(updated) => {
+            setFiles((prev) => prev.map((f) => (f.path === updated.path ? updated : f)));
+            setSelected(updated);
+          }}
+          onDelete={deleteFile}
+        />
       )}
     </div>
   );
