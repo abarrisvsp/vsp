@@ -176,3 +176,14 @@ export async function deleteBlogPost(id: string): Promise<void> {
   if (error) throw error;
   revalidatePath('/blog');
 }
+
+export async function getScheduledPostsCount(): Promise<number> {
+  await requireAdmin();
+  const supabase = createServiceClient();
+  const { count } = await supabase
+    .from('blog_posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('published', false)
+    .not('published_at', 'is', null);
+  return count ?? 0;
+}
