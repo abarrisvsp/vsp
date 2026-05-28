@@ -129,7 +129,7 @@ export function MediaLibrary({ initialFiles }: Props) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-6 gap-2 mb-4">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
         {filtered.map((f) => (
           <button
             key={f.path}
@@ -147,7 +147,7 @@ export function MediaLibrary({ initialFiles }: Props) {
           </button>
         ))}
         {filtered.length === 0 && (
-          <div className="col-span-6 py-16 text-center text-sm text-ink-mute border border-dashed border-line rounded">
+          <div className="col-span-3 sm:col-span-4 md:col-span-6 py-16 text-center text-sm text-ink-mute border border-dashed border-line rounded">
             No images found. Click Upload or drag files here.
           </div>
         )}
