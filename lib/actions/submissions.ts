@@ -57,7 +57,9 @@ export async function updateSubmissionNotes(id: string, notes: string): Promise<
   revalidatePath('/admin/inbox');
 }
 
-export async function getRecentSubmissions(limit = 3) {
+export async function getRecentSubmissions(limit = 3): Promise<
+  Pick<ContactSubmission, 'id' | 'full_name' | 'event_type' | 'read' | 'submitted_at'>[]
+> {
   await requireAdmin();
   const supabase = createServiceClient();
   const { data, error } = await supabase

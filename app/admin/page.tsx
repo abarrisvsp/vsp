@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboard() {
   const [unread, posts, scheduled, subscribers, recent] = await Promise.all([
-    getUnreadSubmissionCount(),
+    getUnreadSubmissionCount().catch(() => 0),
     getAllPostsForAdmin().catch(() => []),
     getScheduledPostsCount().catch(() => 0),
     getSubscriberCount().catch(() => 0),
@@ -65,7 +65,7 @@ export default async function AdminDashboard() {
                     {!s.read && '● '}{s.full_name}
                   </span>
                   <span className="text-ink-mute text-xs">
-                    {s.event_type} · {formatDistanceToNow(new Date(s.submitted_at), { addSuffix: true })}
+                    {s.event_type ?? '—'} · {formatDistanceToNow(new Date(s.submitted_at), { addSuffix: true })}
                   </span>
                 </Link>
               ))}
