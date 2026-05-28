@@ -1,7 +1,6 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { SectionHead } from '@/components/shared/SectionHead';
@@ -124,18 +123,17 @@ export default async function AboutPage() {
         {/* HERO */}
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-24">
-            <InlineText contentKey="about_eyebrow" defaultValue={v('about_eyebrow')} tag="span"
+            <InlineRichText inline contentKey="about_eyebrow" defaultValue={v('about_eyebrow')} tag="span"
               className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-6" revalidate="/about" />
-            <InlineText contentKey="about_headline" defaultValue={v('about_headline')} tag="h1"
-              className="font-serif italic font-normal text-[clamp(48px,7vw,96px)] leading-[0.98] tracking-tight max-w-5xl mb-14"
-              multiline revalidate="/about" />
+            <InlineRichText contentKey="about_headline" defaultValue={v('about_headline')} tag="h1"
+              className="font-serif italic font-normal text-[clamp(48px,7vw,96px)] leading-[0.98] tracking-tight max-w-5xl mb-14" revalidate="/about" />
             <dl className="grid grid-cols-2 md:grid-cols-5 gap-8 border-t border-line pt-10">
               {facts.map((f) => (
                 <div key={f.labelKey}>
-                  <InlineText contentKey={f.labelKey} defaultValue={v(f.labelKey)} tag="span"
+                  <InlineRichText inline contentKey={f.labelKey} defaultValue={v(f.labelKey)} tag="span"
                     className="block text-xs uppercase tracking-wider text-ink-mute mb-2" revalidate="/about" />
-                  <InlineText contentKey={f.valueKey} defaultValue={v(f.valueKey)} tag="div"
-                    className="text-ink text-sm" revalidate="/about" multiline />
+                  <InlineRichText contentKey={f.valueKey} defaultValue={v(f.valueKey)} tag="div"
+                    className="text-ink text-sm" revalidate="/about" />
                 </div>
               ))}
             </dl>
@@ -145,11 +143,11 @@ export default async function AboutPage() {
         {/* STORY */}
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-24 grid md:grid-cols-[1fr_2fr] gap-12">
-            <InlineText contentKey="about_story_eyebrow" defaultValue={v('about_story_eyebrow')} tag="span"
+            <InlineRichText inline contentKey="about_story_eyebrow" defaultValue={v('about_story_eyebrow')} tag="span"
               className="block text-xs uppercase tracking-[0.2em] text-ink-mute" revalidate="/about" />
             <div>
-              <InlineText contentKey="about_story_title" defaultValue={v('about_story_title')} tag="h2"
-                className="font-serif italic text-3xl md:text-4xl mb-8 leading-tight" multiline revalidate="/about" />
+              <InlineRichText contentKey="about_story_title" defaultValue={v('about_story_title')} tag="h2"
+                className="font-serif italic text-3xl md:text-4xl mb-8 leading-tight" revalidate="/about" />
               <InlineRichText contentKey="about_story_body" defaultValue={v('about_story_body')}
                 className="text-ink-dim text-lg leading-relaxed" revalidate="/about" />
             </div>
@@ -164,9 +162,9 @@ export default async function AboutPage() {
                 storageFolder="about" alt="Aaron Barris" fill className="object-cover" revalidate="/about" />
             </div>
             <div>
-              <InlineText contentKey="about_portrait_label" defaultValue={v('about_portrait_label')} tag="span"
+              <InlineRichText inline contentKey="about_portrait_label" defaultValue={v('about_portrait_label')} tag="span"
                 className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-4" revalidate="/about" />
-              <InlineText contentKey="about_portrait_name" defaultValue={v('about_portrait_name')} tag="h2"
+              <InlineRichText inline contentKey="about_portrait_name" defaultValue={v('about_portrait_name')} tag="h2"
                 className="font-serif italic text-4xl md:text-5xl mb-8 leading-tight" revalidate="/about" />
               <InlineRichText contentKey="about_portrait_bio" defaultValue={v('about_portrait_bio')}
                 className="text-ink-dim text-lg leading-relaxed" revalidate="/about" />
@@ -178,14 +176,14 @@ export default async function AboutPage() {
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-24">
             <SectionHead eyebrow="By the numbers" title={
-              <InlineText contentKey="about_numbers_title" defaultValue={v('about_numbers_title')} tag="span" revalidate="/about" />
+              <InlineRichText inline contentKey="about_numbers_title" defaultValue={v('about_numbers_title')} tag="span" revalidate="/about" />
             } className="mb-16" />
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
               {numbers.map((n) => (
                 <div key={n.valueKey}>
-                  <InlineText contentKey={n.valueKey} defaultValue={v(n.valueKey)} tag="div"
+                  <InlineRichText inline contentKey={n.valueKey} defaultValue={v(n.valueKey)} tag="div"
                     className="font-serif italic text-6xl text-amber leading-none mb-4" revalidate="/about" />
-                  <InlineText contentKey={n.labelKey} defaultValue={v(n.labelKey)} tag="div"
+                  <InlineRichText inline contentKey={n.labelKey} defaultValue={v(n.labelKey)} tag="div"
                     className="text-ink font-medium mb-2" revalidate="/about" />
                   <InlineRichText contentKey={n.descKey} defaultValue={v(n.descKey)}
                     className="text-ink-dim text-sm leading-relaxed" revalidate="/about" />
@@ -199,14 +197,14 @@ export default async function AboutPage() {
         <section className="border-b border-line bg-bg-elev">
           <div className="max-w-container mx-auto px-10 py-24">
             <SectionHead eyebrow="What we believe" title={
-              <InlineText contentKey="about_values_title" defaultValue={v('about_values_title')} tag="span" revalidate="/about" />
+              <InlineRichText inline contentKey="about_values_title" defaultValue={v('about_values_title')} tag="span" revalidate="/about" />
             } className="mb-12" />
             <ol className="grid md:grid-cols-2 gap-x-12 gap-y-10">
               {values.map((val_) => (
                 <li key={val_.num} className="grid grid-cols-[50px_1fr] gap-4">
                   <span className="font-serif italic text-3xl text-amber leading-none">{val_.num}</span>
                   <div>
-                    <InlineText contentKey={val_.titleKey} defaultValue={v(val_.titleKey)} tag="h3"
+                    <InlineRichText inline contentKey={val_.titleKey} defaultValue={v(val_.titleKey)} tag="h3"
                       className="font-serif italic text-xl mb-2 leading-snug" revalidate="/about" />
                     <InlineRichText contentKey={val_.bodyKey} defaultValue={v(val_.bodyKey)}
                       className="text-ink-dim leading-relaxed" revalidate="/about" />
@@ -221,12 +219,12 @@ export default async function AboutPage() {
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-24">
             <SectionHead eyebrow="Two decades, abbreviated" title={
-              <InlineText contentKey="about_timeline_title" defaultValue={v('about_timeline_title')} tag="span" revalidate="/about" />
+              <InlineRichText inline contentKey="about_timeline_title" defaultValue={v('about_timeline_title')} tag="span" revalidate="/about" />
             } className="mb-16" />
             <ol className="border-t border-line">
               {timeline.map((t) => (
                 <li key={t.yearKey} className="grid grid-cols-[80px_1fr] md:grid-cols-[120px_1fr] gap-6 md:gap-10 py-8 border-b border-line">
-                  <InlineText contentKey={t.yearKey} defaultValue={v(t.yearKey)} tag="span"
+                  <InlineRichText inline contentKey={t.yearKey} defaultValue={v(t.yearKey)} tag="span"
                     className="font-serif italic text-3xl md:text-4xl text-amber leading-none" revalidate="/about" />
                   <InlineRichText contentKey={t.textKey} defaultValue={v(t.textKey)}
                     className="text-ink-dim leading-relaxed self-center" revalidate="/about" />

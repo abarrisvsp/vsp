@@ -1,5 +1,5 @@
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { SubscribeForm } from '@/components/blog/SubscribeForm';
 import { SocialLinks } from '@/components/layout/SocialLinks';
 
@@ -26,7 +26,7 @@ export async function Footer() {
         <div>
           <h4 className="font-serif italic text-xl mb-3">Visionary Sound Productions</h4>
           <p className="text-ink-mute text-xs uppercase tracking-wider mb-1">Service area</p>
-          <InlineText
+          <InlineRichText inline
             contentKey="footer_service_area"
             defaultValue={c.footer_service_area}
             tag="p"
@@ -36,7 +36,7 @@ export async function Footer() {
         </div>
         <div>
           <p className="text-ink-mute text-xs uppercase tracking-wider mb-1">Phone</p>
-          <InlineText
+          <InlineRichText inline
             contentKey="footer_phone"
             defaultValue={c.footer_phone}
             tag="p"
@@ -46,7 +46,7 @@ export async function Footer() {
         </div>
         <div>
           <p className="text-ink-mute text-xs uppercase tracking-wider mb-1">Email</p>
-          <InlineText
+          <InlineRichText inline
             contentKey="footer_email"
             defaultValue={c.footer_email}
             tag="p"
@@ -56,7 +56,7 @@ export async function Footer() {
         </div>
         <div>
           <p className="text-ink-mute text-xs uppercase tracking-wider mb-1">Studio</p>
-          <InlineText
+          <InlineRichText inline
             contentKey="footer_address"
             defaultValue={c.footer_address}
             tag="p"

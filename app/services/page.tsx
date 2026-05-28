@@ -1,7 +1,7 @@
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { CtaBand } from '@/components/shared/CtaBand';
 import Link from 'next/link';
@@ -185,27 +185,25 @@ export default async function ServicesIndexPage() {
         {/* HERO */}
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-24">
-            <InlineText
+            <InlineRichText inline
               contentKey="services_idx_eyebrow"
               defaultValue={c.services_idx_eyebrow || HERO_DEFAULTS.services_idx_eyebrow}
               tag="span"
               className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-6"
               revalidate="/services"
             />
-            <InlineText
+            <InlineRichText
               contentKey="services_idx_headline"
               defaultValue={c.services_idx_headline || HERO_DEFAULTS.services_idx_headline}
               tag="h1"
               className="font-serif italic font-normal text-[clamp(48px,7vw,96px)] leading-[0.98] tracking-tight max-w-5xl"
-              multiline
               revalidate="/services"
             />
-            <InlineText
+            <InlineRichText
               contentKey="services_idx_lede"
               defaultValue={c.services_idx_lede || HERO_DEFAULTS.services_idx_lede}
               tag="p"
               className="text-ink-dim text-lg leading-relaxed max-w-2xl mt-8"
-              multiline
               revalidate="/services"
             />
           </div>
@@ -227,29 +225,27 @@ export default async function ServicesIndexPage() {
                     <span className="font-serif italic text-6xl md:text-7xl text-amber leading-none block mb-6">
                       {s.num}
                     </span>
-                    <InlineText
+                    <InlineRichText inline
                       contentKey={s.titleKey}
                       defaultValue={c[s.titleKey] || s.titleDefault}
                       tag="h2"
                       className="font-serif italic text-4xl md:text-5xl mb-6 leading-tight"
                       revalidate="/services"
                     />
-                    <InlineText
+                    <InlineRichText
                       contentKey={s.descKey}
                       defaultValue={c[s.descKey] || s.descDefault}
                       tag="p"
                       className="text-ink-dim leading-relaxed mb-6"
-                      multiline
                       revalidate="/services"
                     />
-                    <InlineText
+                    <InlineRichText
                       contentKey={s.bulletsKey}
                       defaultValue={
                         c[s.bulletsKey] || s.bullets.map((b) => `· ${b}`).join('\n')
                       }
                       tag="div"
                       className="text-ink-dim leading-loose whitespace-pre-line mb-8"
-                      multiline
                       revalidate="/services"
                     />
                     <Link
@@ -272,7 +268,7 @@ export default async function ServicesIndexPage() {
                       />
                     </div>
                     <figcaption>
-                      <InlineText
+                      <InlineRichText inline
                         contentKey={s.imageCaptionKey}
                         defaultValue={c[s.imageCaptionKey] || s.imageCaption}
                         tag="span"

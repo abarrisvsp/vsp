@@ -1,6 +1,6 @@
 import { SectionHead } from '@/components/shared/SectionHead';
 import { getSiteContent } from '@/lib/actions/content';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 
 const DEFAULTS = {
   process_step_1_title: 'Talk it through — free.',
@@ -52,19 +52,18 @@ export async function ProcessSection() {
               {s.num}
             </span>
             <div>
-              <InlineText
+              <InlineRichText inline
                 contentKey={s.titleKey}
                 defaultValue={s.title}
                 tag="h3"
                 className="font-serif italic text-2xl md:text-3xl mb-3 leading-tight"
                 revalidate="/"
               />
-              <InlineText
+              <InlineRichText
                 contentKey={s.bodyKey}
                 defaultValue={s.body}
                 tag="p"
                 className="text-ink-dim leading-relaxed max-w-2xl"
-                multiline
                 revalidate="/"
               />
             </div>

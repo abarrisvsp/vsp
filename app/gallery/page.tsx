@@ -6,7 +6,7 @@ import { getGalleryPhotos } from '@/lib/actions/gallery';
 import { auth } from '@/lib/auth';
 import { CtaBand } from '@/components/shared/CtaBand';
 import { MiniStats } from '@/components/shared/MiniStats';
-import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { getSiteContent } from '@/lib/actions/content';
 
 export const dynamic = 'force-dynamic';
@@ -48,27 +48,25 @@ export default async function GalleryPage() {
         {/* HERO */}
         <section className="border-b border-line">
           <div className="max-w-container mx-auto px-10 py-20">
-            <InlineText
+            <InlineRichText inline
               contentKey="gallery_eyebrow"
               defaultValue={c.gallery_eyebrow || HERO_DEFAULTS.gallery_eyebrow}
               tag="span"
               className="block text-xs uppercase tracking-[0.2em] text-ink-mute mb-6"
               revalidate="/gallery"
             />
-            <InlineText
+            <InlineRichText
               contentKey="gallery_headline"
               defaultValue={c.gallery_headline || HERO_DEFAULTS.gallery_headline}
               tag="h1"
               className="font-serif italic font-normal text-[clamp(48px,7vw,96px)] leading-[0.98] tracking-tight max-w-4xl"
-              multiline
               revalidate="/gallery"
             />
-            <InlineText
+            <InlineRichText
               contentKey="gallery_lede"
               defaultValue={c.gallery_lede || HERO_DEFAULTS.gallery_lede}
               tag="p"
               className="text-ink-dim text-lg leading-relaxed max-w-2xl mt-6 mb-10"
-              multiline
               revalidate="/gallery"
             />
             <MiniStats stats={stats} />

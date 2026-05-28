@@ -25,14 +25,24 @@ import { useEditMode } from './EditModeProvider';
 import { updateSiteContent } from '@/lib/actions/content';
 import { toast } from 'sonner';
 
+type DisplayTag = 'div' | 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4';
+
 interface InlineRichTextProps {
   contentKey: string;
   defaultValue: string;
+  /** Element to render in display mode. Defaults to 'span' when inline, 'div' otherwise. */
+  tag?: DisplayTag;
+  /**
+   * Inline mode = no block structure changes (no headings/lists/blockquotes), saved
+   * HTML has the wrapping <p> stripped. Use for headlines, eyebrows, labels, short
+   * single-thought fields where bullet lists or H2 would break the layout.
+   * Block mode (default false) gives the full toolbar.
+   */
+  inline?: boolean;
   className?: string;
   revalidate?: string;
 }
 
-// Color swatches available in the picker. First = reset (inherit).
 const COLORS: { label: string; value: string | null }[] = [
   { label: 'Reset', value: null },
   { label: 'Ink', value: '#f5f1ea' },
@@ -56,15 +66,41 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-// Convert legacy plain text (\n separators) into paragraph HTML so Tiptap can load it
-// and the rendered view matches what already exists.
-function toHtml(value: string): string {
-  if (!value) return '';
-  if (looksLikeHtml(value)) return value;
+/**
+ * Build the HTML the Tiptap editor + display layer consumes.
+ * Inline mode emits a single <p>...</p> regardless of input.
+ * Block mode splits on blank lines and emits one <p> per paragraph.
+ */
+function toHtml(value: string, inline: boolean): string {
+  if (!value) return inline ? '<p></p>' : '';
+  if (looksLikeHtml(value)) {
+    // Already HTML — Tiptap requires a wrapping paragraph in inline mode so
+    // if the saved value was inline-only (e.g. "<strong>foo</strong> bar"), wrap it.
+    if (inline && !/^<(p|h[1-6]|ul|ol|blockquote)\b/i.test(value)) {
+      return `<p>${value}</p>`;
+    }
+    return value;
+  }
+  if (inline) {
+    return `<p>${escapeHtml(value)}</p>`;
+  }
   return value
     .split(/\n{2,}/)
     .map((para) => `<p>${escapeHtml(para).replace(/\n/g, '<br>')}</p>`)
     .join('');
+}
+
+/**
+ * Strip the outer wrapping <p>...</p> from Tiptap's HTML in inline mode so
+ * the saved content is pure inline markup ("foo <strong>bar</strong>").
+ * That makes the display element ($tag) the layout-controlling wrapper.
+ */
+function stripOuterParagraph(html: string): string {
+  const m = html.match(/^\s*<p[^>]*>([\s\S]*)<\/p>\s*$/i);
+  if (!m) return html;
+  // If there are nested block tags inside this paragraph, leave them alone.
+  if (/<(p|h[1-6]|ul|ol|li|blockquote)\b/i.test(m[1])) return html;
+  return m[1];
 }
 
 function ToolbarButton({
@@ -93,7 +129,7 @@ function ToolbarButton({
   );
 }
 
-function Toolbar({ editor }: { editor: Editor }) {
+function Toolbar({ editor, inline }: { editor: Editor; inline: boolean }) {
   const setColor = (value: string | null) => {
     if (value === null) editor.chain().focus().unsetColor().run();
     else editor.chain().focus().setColor(value).run();
@@ -111,26 +147,27 @@ function Toolbar({ editor }: { editor: Editor }) {
         <UnderlineIcon className="w-3.5 h-3.5" />
       </ToolbarButton>
 
-      <span className="w-px h-5 bg-line mx-1" />
-
-      <ToolbarButton title="Heading 2 (large)" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-        <Heading2 className="w-3.5 h-3.5" />
-      </ToolbarButton>
-      <ToolbarButton title="Heading 3 (medium)" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-        <Heading3 className="w-3.5 h-3.5" />
-      </ToolbarButton>
-      <ToolbarButton title="Body paragraph" active={editor.isActive('paragraph')} onClick={() => editor.chain().focus().setParagraph().run()}>
-        <span className="text-[10px] font-semibold leading-none">P</span>
-      </ToolbarButton>
-
-      <span className="w-px h-5 bg-line mx-1" />
-
-      <ToolbarButton title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-        <List className="w-3.5 h-3.5" />
-      </ToolbarButton>
-      <ToolbarButton title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-        <ListOrdered className="w-3.5 h-3.5" />
-      </ToolbarButton>
+      {!inline && (
+        <>
+          <span className="w-px h-5 bg-line mx-1" />
+          <ToolbarButton title="Heading 2 (large)" active={editor.isActive('heading', { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+            <Heading2 className="w-3.5 h-3.5" />
+          </ToolbarButton>
+          <ToolbarButton title="Heading 3 (medium)" active={editor.isActive('heading', { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+            <Heading3 className="w-3.5 h-3.5" />
+          </ToolbarButton>
+          <ToolbarButton title="Body paragraph" active={editor.isActive('paragraph')} onClick={() => editor.chain().focus().setParagraph().run()}>
+            <span className="text-[10px] font-semibold leading-none">P</span>
+          </ToolbarButton>
+          <span className="w-px h-5 bg-line mx-1" />
+          <ToolbarButton title="Bullet list" active={editor.isActive('bulletList')} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+            <List className="w-3.5 h-3.5" />
+          </ToolbarButton>
+          <ToolbarButton title="Numbered list" active={editor.isActive('orderedList')} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+            <ListOrdered className="w-3.5 h-3.5" />
+          </ToolbarButton>
+        </>
+      )}
 
       <span className="w-px h-5 bg-line mx-1" />
 
@@ -195,25 +232,44 @@ function Toolbar({ editor }: { editor: Editor }) {
   );
 }
 
-export function InlineRichText({ contentKey, defaultValue, className = '', revalidate }: InlineRichTextProps) {
+export function InlineRichText({
+  contentKey,
+  defaultValue,
+  tag,
+  inline = false,
+  className = '',
+  revalidate,
+}: InlineRichTextProps) {
   const { editMode, isAdmin, setIsEditing: setGlobalEditing } = useEditMode();
-  const [html, setHtml] = useState<string>(() => toHtml(defaultValue));
+  const [html, setHtml] = useState<string>(() => toHtml(defaultValue, inline));
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!editing) setHtml(toHtml(defaultValue));
-  }, [defaultValue, editing]);
+    if (!editing) setHtml(toHtml(defaultValue, inline));
+  }, [defaultValue, inline, editing]);
 
   const editor = useEditor(
     {
       extensions: [
-        StarterKit,
+        StarterKit.configure(
+          inline
+            ? {
+                heading: false,
+                bulletList: false,
+                orderedList: false,
+                listItem: false,
+                blockquote: false,
+                codeBlock: false,
+                horizontalRule: false,
+              }
+            : {},
+        ),
         Underline,
         TextStyle,
         Color,
         LinkExt.configure({ openOnClick: false }),
-        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        TextAlign.configure({ types: inline ? ['paragraph'] : ['heading', 'paragraph'] }),
       ],
       content: html || '<p></p>',
       editable: editing,
@@ -222,7 +278,7 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
       },
       immediatelyRender: false,
     },
-    [],
+    [inline],
   );
 
   useEffect(() => {
@@ -253,15 +309,17 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
 
   const handleSave = useCallback(async () => {
     if (!editor) return;
-    const next = editor.getHTML();
-    if (next === html) {
+    let next = editor.getHTML();
+    if (inline) next = stripOuterParagraph(next);
+    if (next === html || next === stripOuterParagraph(html)) {
       exitEdit();
       return;
     }
     setSaving(true);
     try {
       await updateSiteContent(contentKey, next, revalidate);
-      setHtml(next);
+      // Re-wrap in inline mode so Tiptap can re-parse if we re-enter editing.
+      setHtml(inline ? toHtml(next, true) : next);
       toast.success('Saved');
       exitEdit();
     } catch (e) {
@@ -270,37 +328,42 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
     } finally {
       setSaving(false);
     }
-  }, [editor, html, contentKey, revalidate, exitEdit]);
+  }, [editor, inline, html, contentKey, revalidate, exitEdit]);
+
+  // What HTML to actually paint into the display element (strip outer <p> in inline mode).
+  const displayHtml = inline ? stripOuterParagraph(html) : html;
+  const Wrapper = (tag ?? (inline ? 'span' : 'div')) as keyof JSX.IntrinsicElements;
+  const wrapperClass = `inline-rich-display ${inline ? 'inline-rich-inline' : ''} ${className}`.trim();
 
   if (!isAdmin || !editMode) {
-    return <div className={`inline-rich-display ${className}`} dangerouslySetInnerHTML={{ __html: html }} />;
+    return <Wrapper className={wrapperClass} dangerouslySetInnerHTML={{ __html: displayHtml }} />;
   }
 
   if (!editing) {
     return (
-      <div className="relative group">
-        <div
-          className={`inline-rich-display ${className} cursor-text rounded outline-1 outline-dashed outline-amber outline-offset-4`}
+      <span className="relative inline-block group max-w-full">
+        <Wrapper
+          className={`${wrapperClass} cursor-text rounded outline-1 outline-dashed outline-amber outline-offset-4`}
           onClick={enterEdit}
-          dangerouslySetInnerHTML={{ __html: html || '<p class="opacity-50">Click to edit…</p>' }}
+          dangerouslySetInnerHTML={{ __html: displayHtml || (inline ? 'Click to edit…' : '<p class="opacity-50">Click to edit…</p>') }}
         />
         <button
           type="button"
           onClick={enterEdit}
-          className="absolute -top-2 -right-2 bg-amber text-white text-[10px] px-1.5 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+          className="absolute -top-2 -right-2 bg-amber text-white text-[10px] px-1.5 py-1 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 z-10"
           aria-label="Edit"
         >
           <Pencil className="w-3 h-3" /> Edit
         </button>
-      </div>
+      </span>
     );
   }
 
   return (
-    <div className="relative border border-amber rounded bg-bg shadow-lg">
-      {editor && <Toolbar editor={editor} />}
+    <span className="relative inline-block border border-amber rounded bg-bg shadow-lg max-w-full">
+      {editor && <Toolbar editor={editor} inline={inline} />}
       <EditorContent editor={editor} className={`p-3 ${className}`} />
-      <div className="flex items-center justify-end gap-2 border-t border-line p-2 bg-bg-elev rounded-b">
+      <span className="flex items-center justify-end gap-2 border-t border-line p-2 bg-bg-elev rounded-b">
         <button
           type="button"
           onClick={handleSave}
@@ -317,7 +380,7 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
         >
           Cancel
         </button>
-      </div>
-    </div>
+      </span>
+    </span>
   );
 }
