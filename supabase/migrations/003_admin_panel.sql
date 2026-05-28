@@ -64,10 +64,10 @@ ALTER TABLE faqs          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE featured_work ENABLE ROW LEVEL SECURITY;
 
 -- Public read (anon key)
-CREATE POLICY IF NOT EXISTS "public_read" ON seo_settings  FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read" ON nav_items     FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read" ON faqs          FOR SELECT USING (active = true);
-CREATE POLICY IF NOT EXISTS "public_read" ON featured_work FOR SELECT USING (published = true);
+CREATE POLICY "public_read" ON seo_settings  FOR SELECT USING (true);
+CREATE POLICY "public_read" ON nav_items     FOR SELECT USING (true);
+CREATE POLICY "public_read" ON faqs          FOR SELECT USING (active = true);
+CREATE POLICY "public_read" ON featured_work FOR SELECT USING (published = true);
 
 -- ─── Seed: default nav (so site never shows a blank nav) ─────
 
