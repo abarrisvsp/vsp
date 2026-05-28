@@ -27,6 +27,10 @@ vi.mock('@/lib/supabase', () => ({
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 
 describe('SEO actions', () => {
+  beforeEach(() => {
+    mockUpsert.mockClear();
+  });
+
   it('updateSeoSettings calls upsert with correct fields', async () => {
     const { updateSeoSettings } = await import('@/lib/actions/seo');
     await updateSeoSettings('/', { meta_title: 'Test Title', meta_description: 'Test desc' });

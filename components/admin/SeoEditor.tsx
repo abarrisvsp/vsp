@@ -18,6 +18,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
   const [selectedRoute, setSelectedRoute] = useState(routes[0].route);
   const current = settingsMap[selectedRoute];
 
+  const [savedMap, setSavedMap] = useState(settingsMap);
   const [title, setTitle] = useState(current?.meta_title ?? '');
   const [desc, setDesc] = useState(current?.meta_description ?? '');
   const [ogUrl, setOgUrl] = useState(current?.og_image_url ?? '');
@@ -27,7 +28,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
 
   function switchRoute(route: string) {
     setSelectedRoute(route);
-    const s = settingsMap[route];
+    const s = savedMap[route];
     setTitle(s?.meta_title ?? '');
     setDesc(s?.meta_description ?? '');
     setOgUrl(s?.og_image_url ?? '');
@@ -67,6 +68,18 @@ export function SeoEditor({ routes, settingsMap }: Props) {
           og_image_url: ogUrl || null,
           og_storage_path: ogPath || null,
         });
+        // Update local savedMap so switching back shows saved values
+        setSavedMap((prev) => ({
+          ...prev,
+          [selectedRoute]: {
+            ...(prev[selectedRoute] ?? { route: selectedRoute, updated_at: '' }),
+            meta_title: title || null,
+            meta_description: desc || null,
+            og_image_url: ogUrl || null,
+            og_storage_path: ogPath || null,
+            updated_at: new Date().toISOString(),
+          },
+        }));
         toast.success('SEO saved');
       } catch {
         toast.error('Save failed');
@@ -123,7 +136,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
               placeholder="Page title for Google…"
             />
             <p className={`text-xs mt-1 ${titleOk ? 'text-green-500' : 'text-ink-mute'}`}>
-              {titleLen} chars {titleOk ? '✓' : titleLen > 60 ? '(too long)' : ''}
+              {titleLen} chars {titleOk ? '✓' : titleLen > 60 ? '(too long)' : titleLen > 0 && titleLen < 50 ? '(too short)' : ''}
             </p>
           </div>
 
@@ -139,7 +152,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
               placeholder="Brief description for Google search results…"
             />
             <p className={`text-xs mt-1 ${descOk ? 'text-green-500' : 'text-ink-mute'}`}>
-              {descLen} chars {descOk ? '✓' : descLen > 160 ? '(too long)' : ''}
+              {descLen} chars {descOk ? '✓' : descLen > 160 ? '(too long)' : descLen > 0 && descLen < 150 ? '(too short)' : ''}
             </p>
           </div>
 
@@ -155,7 +168,7 @@ export function SeoEditor({ routes, settingsMap }: Props) {
                   onClick={() => { setOgUrl(''); setOgPath(''); }}
                   className="absolute top-1 right-1 bg-bg/80 text-ink-mute text-xs px-2 py-0.5 rounded"
                 >
-                  Remove
+                  Remove (save to apply)
                 </button>
               </div>
             ) : (

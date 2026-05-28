@@ -12,11 +12,12 @@ async function requireAdmin() {
 
 export async function getSeoSettings(route: string): Promise<SeoSettings | null> {
   const supabase = createAnonClient();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('seo_settings')
     .select('*')
     .eq('route', route)
     .maybeSingle();
+  if (error) console.error('[seo] getSeoSettings error:', error);
   return (data as SeoSettings | null) ?? null;
 }
 
