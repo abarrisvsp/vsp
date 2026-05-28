@@ -230,7 +230,7 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
     editor.setEditable(editing);
     if (!editing) {
       const current = editor.getHTML();
-      if (current !== html) editor.commands.setContent(html || '<p></p>', false);
+      if (current !== html) editor.commands.setContent(html || '<p></p>', { emitUpdate: false });
     }
   }, [editor, editing, html]);
 
@@ -247,7 +247,7 @@ export function InlineRichText({ contentKey, defaultValue, className = '', reval
   }, [setGlobalEditing]);
 
   const handleCancel = useCallback(() => {
-    if (editor) editor.commands.setContent(html || '<p></p>', false);
+    if (editor) editor.commands.setContent(html || '<p></p>', { emitUpdate: false });
     exitEdit();
   }, [editor, html, exitEdit]);
 
