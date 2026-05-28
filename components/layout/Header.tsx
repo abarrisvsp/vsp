@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getSiteContent } from '@/lib/actions/content';
 import { getVisibleNavItems } from '@/lib/actions/navigation';
+import { MobileNav } from './MobileNav';
 
 const SERVICES_LINKS = [
   { href: '/event-production', label: 'Event Production' },
@@ -78,13 +79,8 @@ export async function Header({ active }: { active?: string }) {
         >
           Get a Quote
         </Link>
-        {/* Mobile contact link — preserved from original */}
-        <Link
-          href="/contact"
-          className="md:hidden text-xs uppercase tracking-wider text-amber"
-        >
-          Contact
-        </Link>
+        {/* Mobile menu (hamburger → drawer) */}
+        <MobileNav navItems={navItems} services={SERVICES_LINKS} />
       </div>
     </header>
   );
