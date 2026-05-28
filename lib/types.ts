@@ -20,6 +20,7 @@ export type GalleryPhoto = {
   storage_path: string;
   public_url: string;
   category: string;
+  event_tags: string[];
   title: string | null;
   caption: string | null;
   alt_text: string | null;
@@ -155,4 +156,8 @@ export type MediaFile = {
   height: number | null;
   category: string;
   createdAt: string;
+  /** Whether this file is published to the public gallery (gallery_photos.active). */
+  onSite: boolean;
+  /** Event-type slugs assigned to this file (drives the public gallery filter). */
+  eventTags: string[];
 };
