@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/').catch(() => null);
   return {
     title: row?.meta_title ?? 'Visionary Sound Productions · Event Production, Lighting & Sound · Detroit',
-    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
+    description: row?.meta_description ?? 'Owner-run event production in Metro Detroit since 2004. Lighting, sound, staging, and video for weddings, mitzvahs, schools, and corporate events.',
     alternates: { canonical: '/' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],

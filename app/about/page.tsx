@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/about').catch(() => null);
   return {
     title: row?.meta_title ?? 'About | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
+    description: row?.meta_description ?? 'Meet Aaron Barris and Visionary Sound Productions, owner-run event production in Commerce Township, MI since 2004. One direct line from first call to load-out.',
     alternates: { canonical: '/about' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],

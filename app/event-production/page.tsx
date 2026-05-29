@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/event-production').catch(() => null);
   return {
     title: row?.meta_title ?? 'Event Production | Visionary Sound Productions',
-    description: row?.meta_description ?? 'Full-service event production for weddings, mitzvahs, and corporate events. Stage, lighting, sound, and video across Metro Detroit and nationwide since 2004.',
+    description: row?.meta_description ?? 'Full-scale event production for galas, concerts, and corporate events. Staging, lighting, sound, and video, owner-run across Metro Detroit since 2004.',
     alternates: { canonical: '/event-production' },
     openGraph: {
       images: row?.og_image_url ? [row.og_image_url] : [],
