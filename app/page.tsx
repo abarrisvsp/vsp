@@ -2,6 +2,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HeroSection } from '@/components/home/HeroSection';
 import { PressSection } from '@/components/home/PressSection';
+import { ClientLogosSection } from '@/components/home/ClientLogosSection';
 import { ServicesSection } from '@/components/home/ServicesSection';
 import { StatsSection } from '@/components/home/StatsSection';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
@@ -11,6 +12,7 @@ import { CtaBand } from '@/components/shared/CtaBand';
 import { getServices } from '@/lib/actions/services';
 import { getTestimonials } from '@/lib/actions/testimonials';
 import { getPressLogos } from '@/lib/actions/press';
+import { getClientLogos } from '@/lib/actions/client-logos';
 import { getRecentPublishedPosts } from '@/lib/actions/blog';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
@@ -31,10 +33,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [services, testimonials, pressLogos, recentPosts] = await Promise.all([
+  const [services, testimonials, pressLogos, clientLogos, recentPosts] = await Promise.all([
     getServices(),
     getTestimonials(),
     getPressLogos(),
+    getClientLogos(),
     getRecentPublishedPosts(3),
   ]);
 
@@ -46,6 +49,7 @@ export default async function HomePage() {
         <PressSection logos={pressLogos} />
         <ServicesSection services={services} />
         <StatsSection />
+        <ClientLogosSection logos={clientLogos} />
         <RecentPostsSection posts={recentPosts} />
         <TestimonialsSection testimonials={testimonials} />
         <ProcessSection />

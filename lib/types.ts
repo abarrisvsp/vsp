@@ -100,6 +100,18 @@ export type PressLogo = {
   active: boolean;
 };
 
+// "Trusted by" client logos for the homepage. Same shape as PressLogo but a
+// distinct entity ("featured in" vs "trusted by").
+export type ClientLogo = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  storage_path: string | null;
+  link_url: string | null;
+  sort_order: number;
+  active: boolean;
+};
+
 export type SeoSettings = {
   route: string;
   meta_title: string | null;
