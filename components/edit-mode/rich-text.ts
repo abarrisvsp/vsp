@@ -9,7 +9,11 @@ export type DisplayTag = 'div' | 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4';
 const TEXT_LEVEL_TAGS = new Set<string>(['p', 'span', 'h1', 'h2', 'h3', 'h4']);
 
 export function looksLikeHtml(s: string): boolean {
-  return /<(p|br|h[1-6]|ul|ol|li|strong|em|u|span|blockquote)\b/i.test(s);
+  // Treat as already-HTML if it contains tags OR HTML entities (&nbsp; &amp; &#x…; etc.)
+  // so values like "&nbsp;Aaron Barris" are passed through as-is instead of being
+  // re-escaped by escapeHtml() into the literal string "&amp;nbsp;Aaron Barris".
+  return /<(p|br|h[1-6]|ul|ol|li|strong|em|u|span|blockquote)\b/i.test(s)
+    || /&(?:[a-z]{2,8}|#\d{1,6}|#x[\da-f]{1,6});/i.test(s);
 }
 
 export function escapeHtml(s: string): string {

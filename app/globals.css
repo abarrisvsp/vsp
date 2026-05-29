@@ -147,9 +147,11 @@ body.has-edit-toolbar {
 .inline-rich-display blockquote { border-left: 2px solid #d4a64a; padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.9; }
 
 /* Inline-mode rich text: no block-level paragraph margins, no enforced display:block.
-   The parent's tag (h1/h2/span/etc.) controls layout. */
+   The parent's tag (h1/h2/span/etc.) controls layout. Only force display:inline on
+   actual span elements — block-level tags (h1-h4, div) must keep their own display so
+   inline labels next to block headings don't collapse onto the same line. */
 .inline-rich-display.inline-rich-inline p { margin: 0; }
-.inline-rich-display.inline-rich-inline { display: inline; }
+span.inline-rich-display.inline-rich-inline { display: inline; }
 
 /* Mirror in the Tiptap editor so WYSIWYG matches what gets rendered. */
 .ProseMirror p { margin: 0 0 1em 0; }
