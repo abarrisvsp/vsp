@@ -61,7 +61,7 @@ export async function sendContactNotification(data: {
     from: FROM,
     to,
     replyTo: data.email,
-    subject: `New inquiry — ${data.full_name}${data.event_type ? ` · ${data.event_type}` : ''}`,
+    subject: `New inquiry: ${data.full_name}${data.event_type ? ` · ${data.event_type}` : ''}`,
     html,
   });
 }

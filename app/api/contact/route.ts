@@ -5,6 +5,12 @@ import { sendContactNotification } from '@/lib/email/notification';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
+    // Honeypot: a filled hidden field means a bot. Pretend success, save nothing.
+    if (typeof body.hp === 'string' && body.hp.trim() !== '') {
+      return NextResponse.json({ success: true });
+    }
+
     const full_name = (body.full_name || '').trim();
     const email = (body.email || '').trim();
     if (!full_name || !email) {

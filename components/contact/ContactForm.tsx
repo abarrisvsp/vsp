@@ -10,6 +10,8 @@ export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ full_name?: string; email?: string }>({});
+  const [hp, setHp] = useState(''); // honeypot: real users never see or fill this
   const [form, setForm] = useState({
     event_type: '',
     services_needed: [] as string[],
@@ -39,27 +41,40 @@ export function ContactForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const errs: { full_name?: string; email?: string } = {};
+    if (!form.full_name.trim()) errs.full_name = 'Please add your name.';
+    if (!form.email.trim()) errs.email = 'Please add your email.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.email = "That email doesn't look right.";
+    setFieldErrors(errs);
+    if (Object.keys(errs).length) return;
+
     setSubmitting(true);
     setError(null);
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    setSubmitting(false);
-    if (!res.ok) {
-      setError(data.error || 'Something went wrong.');
-      return;
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, hp }),
+      });
+      const data = await res.json();
+      setSubmitting(false);
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong.');
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setSubmitting(false);
+      setError('Could not reach the server. Please try again, or call (248) 762-2898.');
     }
-    setSubmitted(true);
   }
 
   if (submitted) {
     return (
       <div className="border border-line p-12 text-center bg-bg-elev">
         <h3 className="font-serif italic text-3xl mb-4">Got it.</h3>
-        <p className="text-ink-dim">Aaron will be in touch within one business day — usually sooner.</p>
+        <p className="text-ink-dim">Aaron will be in touch within one business day, usually sooner.</p>
       </div>
     );
   }
@@ -132,11 +147,26 @@ export function ContactForm() {
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className={label}>Full name *</label>
-          <input required value={form.full_name} onChange={(e) => set('full_name', e.target.value)} className={input} />
+          <input
+            required
+            value={form.full_name}
+            onChange={(e) => { set('full_name', e.target.value); if (fieldErrors.full_name) setFieldErrors((p) => ({ ...p, full_name: undefined })); }}
+            aria-invalid={!!fieldErrors.full_name}
+            className={input}
+          />
+          {fieldErrors.full_name && <p className="text-brand text-xs mt-1">{fieldErrors.full_name}</p>}
         </div>
         <div>
           <label className={label}>Email *</label>
-          <input required type="email" value={form.email} onChange={(e) => set('email', e.target.value)} className={input} />
+          <input
+            required
+            type="email"
+            value={form.email}
+            onChange={(e) => { set('email', e.target.value); if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: undefined })); }}
+            aria-invalid={!!fieldErrors.email}
+            className={input}
+          />
+          {fieldErrors.email && <p className="text-brand text-xs mt-1">{fieldErrors.email}</p>}
         </div>
         <div>
           <label className={label}>Phone</label>
@@ -162,6 +192,14 @@ export function ContactForm() {
       <button type="submit" disabled={submitting} className="bg-ink text-bg px-8 py-3 font-medium hover:bg-brand transition-colors disabled:opacity-50">
         {submitting ? 'Sending…' : 'Send it over →'}
       </button>
+
+      {/* Honeypot: hidden from real users; bots that fill it are rejected server-side. */}
+      <div aria-hidden="true" className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden">
+        <label>
+          Company website
+          <input type="text" name="company_website" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+        </label>
+      </div>
     </form>
   );
 }
