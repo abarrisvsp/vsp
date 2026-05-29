@@ -27,6 +27,22 @@ export function labelForTag(slug: string): string {
   return EVENT_TAGS.find((t) => t.slug === slug)?.label ?? slug;
 }
 
+/**
+ * Canonicalize a tag/category value read from the DB so casing and whitespace
+ * variants collapse into one value. Known event types (matched case-insensitively
+ * by slug or label) fold to their canonical slug; anything else is trimmed,
+ * whitespace-collapsed, and Title-Cased. This is what keeps "corporate" and
+ * "Corporate" from rendering as two separate gallery filter chips.
+ */
+export function canonicalizeTag(value: string): string {
+  const s = value.trim().replace(/\s+/g, ' ');
+  const hit = EVENT_TAGS.find(
+    (t) => t.slug.toLowerCase() === s.toLowerCase() || t.label.toLowerCase() === s.toLowerCase()
+  );
+  if (hit) return hit.slug;
+  return s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function isEventTag(value: string): value is EventTagSlug {
   return VALID.has(value);
 }

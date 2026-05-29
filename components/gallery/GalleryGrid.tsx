@@ -6,7 +6,7 @@ import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { GalleryPhoto } from '@/lib/types';
-import { labelForTag } from '@/lib/event-tags';
+import { labelForTag, canonicalizeTag } from '@/lib/event-tags';
 import { useEditMode } from '@/components/edit-mode/EditModeProvider';
 import { RecordEditModal, type FieldDef } from '@/components/edit-mode/RecordEditModal';
 import { updateGalleryPhoto, deleteGalleryPhoto, reorderGalleryPhotos } from '@/lib/actions/gallery';
@@ -32,8 +32,12 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
 
   // Use event_tags when present; fall back to the legacy single category so the
   // filter works before the event_tags migration runs and for any untagged photo.
-  const effTags = (p: GalleryPhoto) =>
-    p.event_tags && p.event_tags.length ? p.event_tags : p.category ? [p.category] : [];
+  // Canonicalize each value (trim + fold case) and de-dupe so casing variants like
+  // "corporate" vs "Corporate" collapse into a single filter chip.
+  const effTags = (p: GalleryPhoto) => {
+    const raw = p.event_tags && p.event_tags.length ? p.event_tags : p.category ? [p.category] : [];
+    return Array.from(new Set(raw.map(canonicalizeTag)));
+  };
 
   const tagSlugs = Array.from(new Set(photos.flatMap(effTags)));
   const categories = ['All', ...tagSlugs];
