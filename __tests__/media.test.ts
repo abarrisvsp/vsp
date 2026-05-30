@@ -112,17 +112,20 @@ describe('getMediaFiles', () => {
 });
 
 describe('setMediaPublication', () => {
-  it('inserts a new gallery_photos row (normalized tags, active) when none exists and onSite is true', async () => {
+  it('inserts a new gallery_photos row with the chosen categories verbatim when none exists and onSite is true', async () => {
     const { setMediaPublication } = await import('@/lib/actions/media');
     await setMediaPublication(
       { path: 'gallery/test.jpg', publicUrl: 'https://example.com/test.jpg' },
-      { onSite: true, eventTags: ['galas', 'weddings'] },
+      { onSite: true, eventTags: ['Corporate', 'Floor Wrap'] },
     );
     expect(mockInsert).toHaveBeenCalledWith(
       expect.objectContaining({
         storage_path: 'gallery/test.jpg',
         public_url: 'https://example.com/test.jpg',
-        event_tags: ['weddings', 'galas'], // normalized to EVENT_TAGS order
+        // Real category labels preserved, including "Floor Wrap" which is not a fixed slug
+        // (the old slug-filter would have silently dropped it).
+        event_tags: ['Corporate', 'Floor Wrap'],
+        category: 'Corporate',
         active: true,
       }),
     );

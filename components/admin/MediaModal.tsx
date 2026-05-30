@@ -4,28 +4,42 @@
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { setMediaPublication } from '@/lib/actions/media';
-import { EVENT_TAGS, normalizeTags } from '@/lib/event-tags';
 import type { MediaFile } from '@/lib/types';
 
 interface Props {
   file: MediaFile;
+  /** Categories already in use across the library (drives the selectable chips). */
+  categories: string[];
   onClose: () => void;
   onSaved: (updated: MediaFile) => void;
   onDelete: (file: MediaFile) => void;
   isDeleting: boolean;
 }
 
-export function MediaModal({ file, onClose, onSaved, onDelete, isDeleting }: Props) {
+export function MediaModal({ file, categories, onClose, onSaved, onDelete, isDeleting }: Props) {
   const [onSite, setOnSite] = useState(file.onSite);
   const [tags, setTags] = useState<string[]>(file.eventTags);
+  const [newCat, setNewCat] = useState('');
   const [isSaving, startSave] = useTransition();
 
-  function toggleTag(slug: string) {
-    setTags((prev) => (prev.includes(slug) ? prev.filter((t) => t !== slug) : [...prev, slug]));
+  function toggleTag(cat: string) {
+    setTags((prev) => (prev.includes(cat) ? prev.filter((t) => t !== cat) : [...prev, cat]));
+  }
+
+  function addCategory() {
+    const v = newCat.trim();
+    if (!v) return;
+    // Reuse an existing spelling if it differs only by case, to avoid duplicate categories.
+    setTags((prev) => {
+      const existing = [...categories, ...prev].find((t) => t.toLowerCase() === v.toLowerCase());
+      const value = existing ?? v;
+      return prev.includes(value) ? prev : [...prev, value];
+    });
+    setNewCat('');
   }
 
   function save() {
-    const normalized = normalizeTags(tags);
+    const normalized = Array.from(new Set(tags.map((t) => t.trim()).filter(Boolean)));
     startSave(async () => {
       try {
         await setMediaPublication(
@@ -90,25 +104,46 @@ export function MediaModal({ file, onClose, onSaved, onDelete, isDeleting }: Pro
             <span className="text-sm text-ink">Show on public gallery</span>
           </label>
 
-          {/* Event type tags */}
+          {/* Category */}
           <div className={onSite ? '' : 'opacity-40 pointer-events-none'}>
-            <p className="text-xs text-ink-mute mb-2">Event type{onSite ? '' : ' (turn on “Show on public gallery” to tag)'}</p>
+            <p className="text-xs text-ink-mute mb-2">Category{onSite ? '' : ' (turn on “Show on public gallery” to tag)'}</p>
             <div className="flex flex-wrap gap-2">
-              {EVENT_TAGS.map((t) => {
-                const active = tags.includes(t.slug);
+              {Array.from(new Set([...categories, ...tags])).map((cat) => {
+                const active = tags.includes(cat);
                 return (
                   <button
-                    key={t.slug}
+                    key={cat}
                     type="button"
-                    onClick={() => toggleTag(t.slug)}
+                    onClick={() => toggleTag(cat)}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                       active ? 'bg-brand text-bg border-brand' : 'border-line text-ink-mute hover:text-ink'
                     }`}
                   >
-                    {t.label}
+                    {cat}
                   </button>
                 );
               })}
+            </div>
+            <div className="flex gap-2 mt-3">
+              <input
+                value={newCat}
+                onChange={(e) => setNewCat(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addCategory();
+                  }
+                }}
+                placeholder="Add a category…"
+                className="bg-bg border border-line rounded px-3 py-1.5 text-xs text-ink w-48"
+              />
+              <button
+                type="button"
+                onClick={addCategory}
+                className="border border-line text-ink-mute text-xs px-3 py-1.5 rounded hover:text-ink"
+              >
+                + Add
+              </button>
             </div>
           </div>
 

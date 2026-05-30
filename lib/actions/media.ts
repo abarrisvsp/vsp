@@ -3,7 +3,6 @@
 import { createServiceClient } from '@/lib/supabase';
 import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-import { normalizeTags } from '@/lib/event-tags';
 import type { MediaFile } from '@/lib/types';
 
 const BUCKET = 'vsp-media';
@@ -94,7 +93,10 @@ export async function setMediaPublication(
 ): Promise<void> {
   await requireAdmin();
   const supabase = createServiceClient();
-  const tags = normalizeTags(opts.eventTags);
+  // Store the chosen categories verbatim (trimmed + de-duped). These are Aaron's real
+  // category labels (e.g. "Corporate", "Floor Wrap") — not a fixed slug set — so the
+  // Media Library, Edit Mode, and the public gallery all share one vocabulary.
+  const tags = Array.from(new Set(opts.eventTags.map((t) => t.trim()).filter(Boolean)));
 
   const { data: existing } = await supabase
     .from('gallery_photos')

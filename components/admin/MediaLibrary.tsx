@@ -7,7 +7,6 @@ import { deleteMedia } from '@/lib/actions/media';
 import { uploadImage } from '@/lib/actions/upload';
 import { toast } from 'sonner';
 import type { MediaFile } from '@/lib/types';
-import { EVENT_TAGS } from '@/lib/event-tags';
 import { MediaModal } from './MediaModal';
 
 const CATEGORIES = ['All', 'gallery', 'blog', 'services', 'featured-work', 'seo', 'misc'];
@@ -28,12 +27,29 @@ export function MediaLibrary({ initialFiles }: Props) {
   const filtered = files.filter((f) => {
     const matchSearch = f.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === 'All' || f.category === category;
-    const matchTag = eventTag === 'All' || f.eventTags.includes(eventTag);
+    const matchTag = eventTag === 'All' || f.eventTags.some((t) => t.toLowerCase() === eventTag.toLowerCase());
     return matchSearch && matchCat && matchTag;
   });
 
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
   const totalMB = (totalSize / (1024 * 1024)).toFixed(1);
+
+  // The real categories actually in use across the library, de-duped case-insensitively
+  // (keeping the most common spelling). This — not a fixed invented list — drives the
+  // filter dropdown and the chips in the tag modal.
+  const categoriesInUse = (() => {
+    const counts = new Map<string, number>();
+    files.forEach((f) => f.eventTags.forEach((t) => counts.set(t, (counts.get(t) || 0) + 1)));
+    const byLower = new Map<string, { label: string; n: number }>();
+    counts.forEach((n, label) => {
+      const key = label.toLowerCase();
+      const cur = byLower.get(key);
+      if (!cur || n > cur.n) byLower.set(key, { label, n });
+    });
+    return Array.from(byLower.values())
+      .map((v) => v.label)
+      .sort((a, b) => a.localeCompare(b));
+  })();
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setUploading(true);
@@ -118,9 +134,9 @@ export function MediaLibrary({ initialFiles }: Props) {
           onChange={(e) => setEventTag(e.target.value)}
           className="bg-bg-elev border border-line text-ink text-sm rounded px-3 py-2"
         >
-          <option value="All">All event types</option>
-          {EVENT_TAGS.map((t) => (
-            <option key={t.slug} value={t.slug}>{t.label}</option>
+          <option value="All">All categories</option>
+          {categoriesInUse.map((c) => (
+            <option key={c} value={c}>{c}</option>
           ))}
         </select>
         <span className="ml-auto text-xs text-ink-mute">
@@ -157,6 +173,7 @@ export function MediaLibrary({ initialFiles }: Props) {
       {selected && (
         <MediaModal
           file={selected}
+          categories={categoriesInUse}
           isDeleting={isPending}
           onClose={() => setSelected(null)}
           onSaved={(updated) => {
