@@ -95,6 +95,20 @@ describe('getMediaFiles', () => {
     const result = await getMediaFiles();
     expect(result.every((f) => f.name !== '')).toBe(true);
   });
+
+  it('skips sub-folder placeholder entries (id === null) so they do not render as broken images', async () => {
+    mockList.mockResolvedValue({
+      data: [
+        { name: 'real.jpg', id: 'file-uuid', created_at: '2026-01-01T00:00:00Z', metadata: { size: 10 } },
+        { name: 'weddings', id: null, created_at: null, metadata: null }, // Supabase marks folders with id: null
+      ],
+      error: null,
+    });
+    const { getMediaFiles } = await import('@/lib/actions/media');
+    const result = await getMediaFiles();
+    expect(result.some((f) => f.name === 'weddings')).toBe(false);
+    expect(result.some((f) => f.name === 'real.jpg')).toBe(true);
+  });
 });
 
 describe('setMediaPublication', () => {

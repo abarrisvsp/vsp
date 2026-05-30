@@ -32,7 +32,9 @@ export async function getMediaFiles(): Promise<MediaFile[]> {
     if (error || !data) continue;
 
     for (const item of data) {
-      if (!item.name || item.name.endsWith('/')) continue;
+      // Supabase Storage .list() returns sub-folders as entries with id === null and no
+      // metadata. Skip them (and trailing-slash names) so folders don't render as broken images.
+      if (!item.name || item.name.endsWith('/') || item.id === null) continue;
       const path = `${folder}/${item.name}`;
       const { data: pub } = supabase.storage.from(BUCKET).getPublicUrl(path);
       const meta = item.metadata as { size?: number; width?: number; height?: number; category?: string } | undefined;
