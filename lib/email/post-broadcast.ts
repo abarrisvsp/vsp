@@ -2,7 +2,8 @@ import { Resend } from 'resend';
 import type { BlogPost, Subscriber } from '@/lib/types';
 
 const FROM = process.env.RESEND_FROM || 'Visionary Sound Productions <onboarding@resend.dev>';
-const SITE_URL = process.env.NEXTAUTH_URL || 'https://vsp-site-ruddy.vercel.app';
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || 'https://visionarysoundproductions.com';
 
 interface SendResult {
   sent: number;        // queued for immediate delivery (today)

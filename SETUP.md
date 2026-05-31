@@ -3,10 +3,16 @@
 ## Logging in
 
 Go to **https://visionarysoundproductions.com/login**
-(While the site is on a temp Vercel URL, use that URL instead.)
 
-- **Email:** Aaron@VisionarySoundProductions.com
-- **Password:** *(the password set during setup — ask Nick if you forgot)*
+There's no password to remember. Instead:
+
+1. Enter your email: **Aaron@VisionarySoundProductions.com**
+2. Click **Email me a code**.
+3. Open your email — you'll get a **6-digit code** (it arrives within a minute and expires in 10 minutes).
+4. Type the code in, and — if you don't want to log in again for a while — check **"Stay signed in for 14 days."**
+5. Click **Sign in**.
+
+If the code doesn't arrive, check spam, then click **Resend code**. The code can only be used once.
 
 ---
 
@@ -97,7 +103,20 @@ Photos accepted: JPG, PNG, WebP. Max 10 MB each.
 
 Click **Sign out** on the right side of the top bar.
 
-You can also just close the browser tab — your session lasts 7 days, so you stay signed in for a week unless you sign out explicitly.
+You can also just close the browser tab. If you checked **"Stay signed in for 14 days"** when you logged in, you'll stay signed in for two weeks; otherwise your session lasts about 12 hours.
+
+---
+
+## For the developer — break-glass access
+
+Sign-in normally requires a code emailed to Aaron@VisionarySoundProductions.com. If that mailbox is ever unavailable, there is a hidden password fallback:
+
+1. Generate a bcrypt hash of a temporary password (e.g. `npx bcryptjs <password>` or any bcrypt tool).
+2. Set `ADMIN_PASSWORD_HASH` to that hash in the Vercel project's environment variables and redeploy.
+3. On `/login`, open the browser console and submit the credentials callback with a `password` field (the password path is intentionally not shown in the UI), or temporarily add a password input.
+4. Remove/rotate the hash afterward.
+
+This is deliberately inconvenient so it isn't the everyday path — the email code is.
 
 ---
 
