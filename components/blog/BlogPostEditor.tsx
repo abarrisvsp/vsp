@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { TiptapEditor } from './TiptapEditor';
-import { createBlogPost, updateBlogPost, deleteBlogPost } from '@/lib/actions/blog';
+import { createBlogPost, updateBlogPost, deleteBlogPost, sendTestBlogEmail } from '@/lib/actions/blog';
 import { getSubscriberCount } from '@/lib/actions/subscribers';
 import { uploadImage } from '@/lib/actions/upload';
 import { toast } from 'sonner';
@@ -46,6 +46,8 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   const [emailSubs, setEmailSubs] = useState(initial?.email_subscribers ?? true);
   const [subscriberCount, setSubscriberCount] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
+  const [testEmails, setTestEmails] = useState('nbarris11@gmail.com, aaron@visionarysoundproductions.com');
+  const [testSending, setTestSending] = useState(false);
   const [publishStatus, setPublishStatus] = useState<PublishStatus>(
     initial?.published ? 'published'
     : initial?.published_at ? 'scheduled'
@@ -134,6 +136,29 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
     }
   }
 
+  async function sendTest() {
+    if (!initial) return;
+    const list = testEmails.split(',').map((e) => e.trim()).filter(Boolean);
+    if (list.length === 0) {
+      toast.error('Add at least one email address.');
+      return;
+    }
+    setTestSending(true);
+    try {
+      const res = await sendTestBlogEmail(initial.id, list);
+      if (res.sent > 0) {
+        toast.success(`Test email sent to ${res.sent} address${res.sent === 1 ? '' : 'es'}. Sends the saved version.`);
+      } else {
+        toast.error(res.errors[0] || 'Test send failed.');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Test send failed.');
+    } finally {
+      setTestSending(false);
+    }
+  }
+
   async function handleDelete() {
     if (!initial || !confirm('Delete this post permanently?')) return;
     await deleteBlogPost(initial.id);
@@ -212,6 +237,34 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
           </span>
         </label>
       </div>
+
+      {initial ? (
+        <div className="pt-4 border-t border-line">
+          <label className={label}>Send a test email</label>
+          <p className="text-xs text-ink-mute mb-2">
+            Sends the <strong>saved</strong> version of this post to these addresses only. Does not touch
+            your subscriber list and won&apos;t mark the post as emailed. Save first if you&apos;ve made edits.
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={testEmails}
+              onChange={(e) => setTestEmails(e.target.value)}
+              placeholder="you@example.com, someone@example.com"
+              className={input}
+            />
+            <button
+              type="button"
+              onClick={sendTest}
+              disabled={testSending}
+              className="whitespace-nowrap px-4 py-2 border border-line text-sm rounded hover:border-brand hover:text-brand disabled:opacity-50"
+            >
+              {testSending ? 'Sending…' : 'Send test'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-xs text-ink-mute pt-2">Save the post once to enable test emails.</p>
+      )}
 
       <div className="pt-4 border-t border-line space-y-3">
         {/* Status dropdown */}

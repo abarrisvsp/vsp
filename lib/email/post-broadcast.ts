@@ -51,27 +51,7 @@ export async function sendPostBroadcast(
     const emails = batch.map((sub) => {
       const unsubUrl = `${SITE_URL}/unsubscribe?token=${sub.unsubscribe_token}`;
       const greeting = sub.first_name ? `Hi ${sub.first_name},` : 'Hi,';
-      const html = `<!doctype html>
-<html><body style="margin:0;padding:0;background:#f5f1ea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1714;">
-  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
-    <p style="margin:0 0 18px;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#7a7468;">New from VSP · Journal</p>
-    ${post.cover_image_url ? `<a href="${postUrl}" style="text-decoration:none;"><img src="${post.cover_image_url}" alt="" style="width:100%;height:auto;display:block;margin:0 0 24px;border-radius:4px;" /></a>` : ''}
-    <h1 style="font-family:'Times New Roman',serif;font-style:italic;font-weight:normal;font-size:32px;line-height:1.15;margin:0 0 16px;color:#1a1714;">
-      <a href="${postUrl}" style="text-decoration:none;color:#1a1714;">${escapeHtml(post.title)}</a>
-    </h1>
-    ${post.excerpt ? `<p style="font-size:16px;line-height:1.55;color:#3a342b;margin:0 0 24px;">${escapeHtml(post.excerpt)}</p>` : ''}
-    <p style="margin:0 0 32px;">
-      <a href="${postUrl}" style="display:inline-block;background:#1a1714;color:#f5f1ea;padding:12px 22px;text-decoration:none;font-size:14px;font-weight:500;">Read the full post →</a>
-    </p>
-    <p style="font-size:14px;color:#1a1714;margin:24px 0 4px;">${greeting}</p>
-    <p style="font-size:14px;color:#3a342b;margin:0 0 32px;line-height:1.5;">You're getting this because you've subscribed to updates from Visionary Sound Productions.</p>
-    <hr style="border:none;border-top:1px solid #d9d2c5;margin:24px 0;" />
-    <p style="font-size:12px;color:#7a7468;margin:0;line-height:1.6;">
-      Visionary Sound Productions · Commerce Township, MI<br/>
-      <a href="${unsubUrl}" style="color:#7a7468;">Unsubscribe</a> · <a href="${SITE_URL}" style="color:#7a7468;">visionarysoundproductions.com</a>
-    </p>
-  </div>
-</body></html>`;
+      const html = renderPostEmailHtml({ post, postUrl, greeting, unsubUrl });
 
       const email: Record<string, unknown> = {
         from: FROM,
@@ -104,6 +84,77 @@ export async function sendPostBroadcast(
   }
 
   return result;
+}
+
+/** The post-announcement email body. Shared by the real broadcast and test sends. */
+function renderPostEmailHtml({
+  post,
+  postUrl,
+  greeting,
+  unsubUrl,
+}: {
+  post: BlogPost;
+  postUrl: string;
+  greeting: string;
+  unsubUrl: string;
+}): string {
+  return `<!doctype html>
+<html><body style="margin:0;padding:0;background:#f5f1ea;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1a1714;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+    <p style="margin:0 0 18px;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#7a7468;">New from VSP · Journal</p>
+    ${post.cover_image_url ? `<a href="${postUrl}" style="text-decoration:none;"><img src="${post.cover_image_url}" alt="" style="width:100%;height:auto;display:block;margin:0 0 24px;border-radius:4px;" /></a>` : ''}
+    <h1 style="font-family:'Times New Roman',serif;font-style:italic;font-weight:normal;font-size:32px;line-height:1.15;margin:0 0 16px;color:#1a1714;">
+      <a href="${postUrl}" style="text-decoration:none;color:#1a1714;">${escapeHtml(post.title)}</a>
+    </h1>
+    ${post.excerpt ? `<p style="font-size:16px;line-height:1.55;color:#3a342b;margin:0 0 24px;">${escapeHtml(post.excerpt)}</p>` : ''}
+    <p style="margin:0 0 32px;">
+      <a href="${postUrl}" style="display:inline-block;background:#1a1714;color:#f5f1ea;padding:12px 22px;text-decoration:none;font-size:14px;font-weight:500;">Read the full post →</a>
+    </p>
+    <p style="font-size:14px;color:#1a1714;margin:24px 0 4px;">${greeting}</p>
+    <p style="font-size:14px;color:#3a342b;margin:0 0 32px;line-height:1.5;">You're getting this because you've subscribed to updates from Visionary Sound Productions.</p>
+    <hr style="border:none;border-top:1px solid #d9d2c5;margin:24px 0;" />
+    <p style="font-size:12px;color:#7a7468;margin:0;line-height:1.6;">
+      Visionary Sound Productions · Commerce Township, MI<br/>
+      <a href="${unsubUrl}" style="color:#7a7468;">Unsubscribe</a> · <a href="${SITE_URL}" style="color:#7a7468;">visionarysoundproductions.com</a>
+    </p>
+  </div>
+</body></html>`;
+}
+
+/**
+ * Send the post email to a handful of explicit addresses for testing. Does NOT
+ * touch the subscriber list and does NOT mark the post as emailed. Subject is
+ * prefixed with [Test] so it's obvious it isn't the real broadcast.
+ */
+export async function sendTestPostBroadcast(
+  post: BlogPost,
+  emails: string[]
+): Promise<{ sent: number; failed: number; errors: string[] }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return { sent: 0, failed: emails.length, errors: ['RESEND_API_KEY not set'] };
+
+  const resend = new Resend(apiKey);
+  const postUrl = `${SITE_URL}/blog/${post.slug}`;
+  // Test sends have no real subscriber, so there's no per-recipient unsubscribe
+  // token; point the link at the unsubscribe page without one.
+  const unsubUrl = `${SITE_URL}/unsubscribe`;
+  const html = renderPostEmailHtml({ post, postUrl, greeting: 'Hi,', unsubUrl });
+
+  const messages = emails.map((email) => ({
+    from: FROM,
+    to: [email],
+    subject: `[Test] ${post.title} — Visionary Sound Productions`,
+    html,
+  }));
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await resend.batch.send(messages as any);
+    return { sent: emails.length, failed: 0, errors: [] };
+  } catch (e) {
+    console.error('Resend test batch failed', e);
+    return { sent: 0, failed: emails.length, errors: [String(e)] };
+  }
 }
 
 function escapeHtml(s: string): string {

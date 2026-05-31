@@ -170,6 +170,34 @@ export async function updateBlogPost(
   return { updated: true, broadcast };
 }
 
+/**
+ * Send the post's announcement email to a few explicit test addresses only.
+ * Does not touch the subscriber list or mark the post as emailed, so it's safe
+ * to run repeatedly while testing. Sends the SAVED version of the post.
+ */
+export async function sendTestBlogEmail(
+  id: string,
+  emails: string[]
+): Promise<{ sent: number; failed: number; errors: string[] }> {
+  await requireAdmin();
+  const clean = Array.from(
+    new Set(
+      emails
+        .map((e) => e.trim().toLowerCase())
+        .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+    )
+  ).slice(0, 10); // hard cap so this can never be used to blast the world
+  if (clean.length === 0) {
+    return { sent: 0, failed: 0, errors: ['No valid email addresses provided.'] };
+  }
+  const supabase = createServiceClient();
+  const { data: post } = await supabase.from('blog_posts').select('*').eq('id', id).maybeSingle();
+  if (!post) return { sent: 0, failed: clean.length, errors: ['Post not found.'] };
+
+  const { sendTestPostBroadcast } = await import('@/lib/email/post-broadcast');
+  return sendTestPostBroadcast(post as BlogPost, clean);
+}
+
 export async function deleteBlogPost(id: string): Promise<void> {
   await requireAdmin();
   const supabase = createServiceClient();
