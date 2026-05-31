@@ -196,8 +196,8 @@ export function ContactForm() {
       {/* Honeypot: hidden from real users; bots that fill it are rejected server-side. */}
       <div aria-hidden="true" className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden">
         <label>
-          Company website
-          <input type="text" name="company_website" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} />
+          Leave this blank
+          <input type="text" name="vsp_b" tabIndex={-1} autoComplete="new-password" value={hp} onChange={(e) => setHp(e.target.value)} />
         </label>
       </div>
     </form>
