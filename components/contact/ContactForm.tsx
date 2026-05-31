@@ -1,5 +1,20 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+declare global {
+  interface Window {
+    grecaptcha?: {
+      render: (el: HTMLElement, opts: Record<string, unknown>) => number;
+      reset: (id?: number) => void;
+    };
+  }
+}
+
+// reCAPTCHA v2 (checkbox) public site key. Safe to expose — it appears in the
+// rendered page. The env override is optional; the fallback keeps production
+// working without extra config. The SECRET key lives only server-side.
+const RECAPTCHA_SITE_KEY =
+  process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LfADwYtAAAAAOOnGSYVOSruxvz7hZZCkBCmIPlW';
 
 const SERVICES = ['Lighting design', 'Sound system', 'Staging', 'LED video wall', 'Live streaming', 'Décor lighting', 'Special FX', 'Not sure yet'];
 const EVENT_TYPES = ['Wedding', 'Mitzvah', 'School / prom', 'Corporate / gala', 'Concert / festival', 'AV install', 'Rental only', 'Something else'];
@@ -12,6 +27,9 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ full_name?: string; email?: string }>({});
   const [hp, setHp] = useState(''); // honeypot: real users never see or fill this
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<HTMLDivElement | null>(null);
+  const widgetId = useRef<number | null>(null);
   const [form, setForm] = useState({
     event_type: '',
     services_needed: [] as string[],
@@ -39,6 +57,42 @@ export function ContactForm() {
     }));
   }
 
+  // Load reCAPTCHA v2 (checkbox) once and render the widget when the script is ready.
+  useEffect(() => {
+    const SCRIPT_ID = 'recaptcha-v2-script';
+    let cancelled = false;
+    function tryRender() {
+      if (cancelled || widgetId.current !== null) return true;
+      const g = window.grecaptcha;
+      if (!g || !g.render || !recaptchaRef.current) return false;
+      widgetId.current = g.render(recaptchaRef.current, {
+        sitekey: RECAPTCHA_SITE_KEY,
+        theme: 'dark',
+        callback: (token: string) => { setRecaptchaToken(token); setError(null); },
+        'expired-callback': () => setRecaptchaToken(null),
+        'error-callback': () => setRecaptchaToken(null),
+      });
+      return true;
+    }
+    if (!document.getElementById(SCRIPT_ID)) {
+      const s = document.createElement('script');
+      s.id = SCRIPT_ID;
+      s.src = 'https://www.google.com/recaptcha/api.js?render=explicit';
+      s.async = true;
+      s.defer = true;
+      document.body.appendChild(s);
+    }
+    if (!tryRender()) {
+      const iv = setInterval(() => { if (tryRender()) clearInterval(iv); }, 200);
+      return () => { cancelled = true; clearInterval(iv); };
+    }
+  }, []);
+
+  function resetRecaptcha() {
+    if (window.grecaptcha && widgetId.current !== null) window.grecaptcha.reset(widgetId.current);
+    setRecaptchaToken(null);
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -49,24 +103,31 @@ export function ContactForm() {
     setFieldErrors(errs);
     if (Object.keys(errs).length) return;
 
+    if (!recaptchaToken) {
+      setError('Please confirm you are not a robot.');
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, hp }),
+        body: JSON.stringify({ ...form, hp, recaptchaToken }),
       });
       const data = await res.json();
       setSubmitting(false);
       if (!res.ok) {
         setError(data.error || 'Something went wrong.');
+        resetRecaptcha();
         return;
       }
       setSubmitted(true);
     } catch {
       setSubmitting(false);
       setError('Could not reach the server. Please try again, or call (248) 762-2898.');
+      resetRecaptcha();
     }
   }
 
@@ -186,6 +247,8 @@ export function ContactForm() {
         <label className={label}>Anything else?</label>
         <textarea value={form.message} onChange={(e) => set('message', e.target.value)} rows={5} className={input} placeholder="Tell us about the event, the venue, the vibe…" />
       </div>
+
+      <div ref={recaptchaRef} />
 
       {error && <p className="text-brand text-sm">{error}</p>}
 

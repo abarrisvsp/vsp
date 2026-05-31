@@ -20,6 +20,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid email.' }, { status: 400 });
     }
 
+    // reCAPTCHA v2 verification. Enforced only when RECAPTCHA_SECRET_KEY is set, so
+    // the form keeps working before the secret is configured in the environment.
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    if (recaptchaSecret) {
+      const token = typeof body.recaptchaToken === 'string' ? body.recaptchaToken : '';
+      if (!token) {
+        return NextResponse.json({ error: 'Please complete the reCAPTCHA.' }, { status: 400 });
+      }
+      try {
+        const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ secret: recaptchaSecret, response: token }).toString(),
+        });
+        const verify = await verifyRes.json();
+        if (!verify.success) {
+          console.warn('reCAPTCHA failed', verify['error-codes']);
+          return NextResponse.json({ error: 'reCAPTCHA check failed. Please try again.' }, { status: 400 });
+        }
+      } catch (e) {
+        // Google unreachable: fail open so a real lead is never lost to an outage.
+        // The honeypot still provides a layer of bot protection.
+        console.error('reCAPTCHA verify error (allowing submission)', e);
+      }
+    }
+
     const submission = {
       full_name,
       email,
