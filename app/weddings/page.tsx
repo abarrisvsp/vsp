@@ -2,8 +2,11 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
+import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineList } from '@/components/edit-mode/InlineList';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
+import { withStyleKeys } from '@/lib/edit-mode/block-style';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 import { getFaqsByPage } from '@/lib/actions/faqs';
@@ -35,6 +38,8 @@ const KEYS = [
   `${PREFIX}_headline`,
   `${PREFIX}_subhead`,
   `${PREFIX}_body`,
+  `${PREFIX}_selected_venues_title`,
+  `${PREFIX}_selected_venues`,
 ];
 
 const DEFAULTS: Record<string, string> = {
@@ -50,11 +55,20 @@ const DEFAULTS: Record<string, string> = {
     "Clients tend to write us afterward. One put it simply: 'Thank you for the beautiful lighting you provided for my daughter's wedding. Absolutely stunning.' That was Pamela, in Farmington Hills.",
     "Whether it's an intimate sixty-guest dinner or a three-hundred-person reception, the same care goes into every room, and you always have a direct line to the person designing it.",
   ].join('\n\n'),
+  weddings_selected_venues_title: 'Selected venues',
+  weddings_selected_venues: [
+    'Shinola Hotel, Detroit',
+    'Detroit Institute of Arts',
+    'Woodward Ballroom, Detroit',
+    'Grosse Pointe country clubs',
+    'Bay Harbor & Northern Michigan',
+    'Private estates & tented weddings',
+  ].join('\n'),
 };
 
 export default async function Page() {
   const [c, faqs] = await Promise.all([
-    getSiteContent(KEYS),
+    getSiteContent(withStyleKeys(KEYS)),
     getFaqsByPage('weddings').catch(() => []),
   ]);
   return (
@@ -93,6 +107,7 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_eyebrow`] || DEFAULTS[`${PREFIX}_eyebrow`]}
               tag="span"
               className="text-xs uppercase tracking-[0.2em] text-ink-mute"
+              styleValue={c[`${PREFIX}_eyebrow__style`]}
               revalidate={`/${SLUG}`}
             />
             <InlineRichText
@@ -100,6 +115,8 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_headline`] || DEFAULTS[`${PREFIX}_headline`]}
               tag="h1"
               className="font-serif italic text-6xl mt-4 max-w-3xl leading-tight"
+              styleValue={c[`${PREFIX}_headline__style`]}
+              clampMobileSize="text-7xl"
               revalidate={`/${SLUG}`}
             />
           </div>
@@ -110,6 +127,7 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_subhead`] || DEFAULTS[`${PREFIX}_subhead`]}
             tag="h2"
             className="font-serif italic text-3xl"
+            styleValue={c[`${PREFIX}_subhead__style`]}
             revalidate={`/${SLUG}`}
           />
           <InlineRichText
@@ -117,23 +135,23 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_body`] || DEFAULTS[`${PREFIX}_body`]}
             tag="div"
             className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap"
+            styleValue={c[`${PREFIX}_body__style`]}
             revalidate={`/${SLUG}`}
           />
         </section>
         <section className="max-w-container mx-auto px-10 pb-12">
-          <p className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6">Selected venues</p>
-          <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-3 text-ink-dim">
-            {[
-              'Shinola Hotel, Detroit',
-              'Detroit Institute of Arts',
-              'Woodward Ballroom, Detroit',
-              'Grosse Pointe country clubs',
-              'Bay Harbor & Northern Michigan',
-              'Private estates & tented weddings',
-            ].map((name) => (
-              <li key={name} className="border-l border-line pl-3 leading-snug">{name}</li>
-            ))}
-          </ul>
+          <InlineText
+            tag="p"
+            contentKey={`${PREFIX}_selected_venues_title`}
+            defaultValue={c[`${PREFIX}_selected_venues_title`] || DEFAULTS[`${PREFIX}_selected_venues_title`]}
+            className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6"
+            revalidate={`/${SLUG}`}
+          />
+          <InlineList
+            contentKey={`${PREFIX}_selected_venues`}
+            defaultValue={c[`${PREFIX}_selected_venues`] || DEFAULTS[`${PREFIX}_selected_venues`]}
+            revalidate={`/${SLUG}`}
+          />
         </section>
         <section className="max-w-container mx-auto px-10 pb-24">
           <StartProjectButton label="Talk about your project" />
