@@ -4,6 +4,7 @@ import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
+import { withStyleKeys } from '@/lib/edit-mode/block-style';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 import { getFaqsByPage } from '@/lib/actions/faqs';
@@ -48,7 +49,7 @@ const DEFAULTS: Record<string, string> = {
 
 export default async function Page() {
   const [c, faqs] = await Promise.all([
-    getSiteContent(KEYS),
+    getSiteContent(withStyleKeys(KEYS)),
     getFaqsByPage('mitzvahs').catch(() => []),
   ]);
   return (
@@ -87,6 +88,7 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_eyebrow`] || DEFAULTS[`${PREFIX}_eyebrow`]}
               tag="span"
               className="text-xs uppercase tracking-[0.2em] text-ink-mute"
+              styleValue={c[`${PREFIX}_eyebrow__style`]}
               revalidate={`/${SLUG}`}
             />
             <InlineRichText
@@ -94,6 +96,8 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_headline`] || DEFAULTS[`${PREFIX}_headline`]}
               tag="h1"
               className="font-serif italic text-6xl mt-4 max-w-3xl leading-tight"
+              styleValue={c[`${PREFIX}_headline__style`]}
+              clampMobileSize="text-7xl"
               revalidate={`/${SLUG}`}
             />
           </div>
@@ -104,6 +108,7 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_subhead`] || DEFAULTS[`${PREFIX}_subhead`]}
             tag="h2"
             className="font-serif italic text-3xl"
+            styleValue={c[`${PREFIX}_subhead__style`]}
             revalidate={`/${SLUG}`}
           />
           <InlineRichText
@@ -111,6 +116,7 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_body`] || DEFAULTS[`${PREFIX}_body`]}
             tag="div"
             className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap"
+            styleValue={c[`${PREFIX}_body__style`]}
             revalidate={`/${SLUG}`}
           />
         </section>
