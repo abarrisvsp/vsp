@@ -2,8 +2,11 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { getSiteContent } from '@/lib/actions/content';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
+import { InlineText } from '@/components/edit-mode/InlineText';
+import { InlineList } from '@/components/edit-mode/InlineList';
 import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { StartProjectButton } from '@/components/shared/StartProjectButton';
+import { withStyleKeys } from '@/lib/edit-mode/block-style';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 import { getFaqsByPage } from '@/lib/actions/faqs';
@@ -35,6 +38,8 @@ const KEYS = [
   `${PREFIX}_headline`,
   `${PREFIX}_subhead`,
   `${PREFIX}_body`,
+  `${PREFIX}_selected_work_title`,
+  `${PREFIX}_selected_work`,
 ];
 
 const DEFAULTS: Record<string, string> = {
@@ -50,11 +55,22 @@ const DEFAULTS: Record<string, string> = {
     "One owner-direct phone call gets you a fixed-price proposal with every line spelled out. No change-order games, no mystery fees. From there we handle load-in, programming, show-calling, and truck-out. Our team is on site, set, and dialed in before the first guest or student walks through the door, and we stay through the final cue and the strike.",
     "We own our inventory: line arrays, LED walls, moving lights, staging, and control surfaces. That lets us scale a crew of two to forty or more to fit the event instead of subcontracting it out. You get one accountable team, one consistent look, and one number to call when something has to change at 6 p.m. on show day.",
   ].join('\n\n'),
+  event_production_selected_work_title: 'Selected work',
+  event_production_selected_work: [
+    'Detroit Institute of Arts (Fash Bash)',
+    'Neiman Marcus',
+    'Mars (Super Bowl LIV through LX)',
+    'The Grosse Pointe Academy',
+    'Brighton High School',
+    'University of Michigan, Dearborn',
+    "Detroit Children's Fund",
+    'Huron Valley Schools',
+  ].join('\n'),
 };
 
 export default async function Page() {
   const [c, faqs] = await Promise.all([
-    getSiteContent(KEYS),
+    getSiteContent(withStyleKeys(KEYS)),
     getFaqsByPage('corporate').catch(() => []), // 'corporate' is the FAQ page key for /event-production
   ]);
   return (
@@ -93,6 +109,7 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_eyebrow`] || DEFAULTS[`${PREFIX}_eyebrow`]}
               tag="span"
               className="text-xs uppercase tracking-[0.2em] text-ink-mute"
+              styleValue={c[`${PREFIX}_eyebrow__style`]}
               revalidate={`/${SLUG}`}
             />
             <InlineRichText
@@ -100,6 +117,8 @@ export default async function Page() {
               defaultValue={c[`${PREFIX}_headline`] || DEFAULTS[`${PREFIX}_headline`]}
               tag="h1"
               className="font-serif italic text-6xl mt-4 max-w-3xl leading-tight"
+              styleValue={c[`${PREFIX}_headline__style`]}
+              clampMobileSize="text-7xl"
               revalidate={`/${SLUG}`}
             />
           </div>
@@ -110,6 +129,7 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_subhead`] || DEFAULTS[`${PREFIX}_subhead`]}
             tag="h2"
             className="font-serif italic text-3xl"
+            styleValue={c[`${PREFIX}_subhead__style`]}
             revalidate={`/${SLUG}`}
           />
           <InlineRichText
@@ -117,25 +137,23 @@ export default async function Page() {
             defaultValue={c[`${PREFIX}_body`] || DEFAULTS[`${PREFIX}_body`]}
             tag="div"
             className="text-ink-dim text-lg leading-relaxed whitespace-pre-wrap"
+            styleValue={c[`${PREFIX}_body__style`]}
             revalidate={`/${SLUG}`}
           />
         </section>
         <section className="max-w-container mx-auto px-10 pb-12">
-          <p className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6">Selected work</p>
-          <ul className="grid sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-3 text-ink-dim">
-            {[
-              'Detroit Institute of Arts (Fash Bash)',
-              'Neiman Marcus',
-              'Mars (Super Bowl LIV through LX)',
-              'The Grosse Pointe Academy',
-              'Brighton High School',
-              'University of Michigan, Dearborn',
-              "Detroit Children's Fund",
-              'Huron Valley Schools',
-            ].map((name) => (
-              <li key={name} className="border-l border-line pl-3 leading-snug">{name}</li>
-            ))}
-          </ul>
+          <InlineText
+            tag="p"
+            contentKey={`${PREFIX}_selected_work_title`}
+            defaultValue={c[`${PREFIX}_selected_work_title`] || DEFAULTS[`${PREFIX}_selected_work_title`]}
+            className="text-xs uppercase tracking-[0.2em] text-ink-mute mb-6"
+            revalidate={`/${SLUG}`}
+          />
+          <InlineList
+            contentKey={`${PREFIX}_selected_work`}
+            defaultValue={c[`${PREFIX}_selected_work`] || DEFAULTS[`${PREFIX}_selected_work`]}
+            revalidate={`/${SLUG}`}
+          />
         </section>
         <section className="max-w-container mx-auto px-10 pb-24">
           <StartProjectButton label="Talk about your project" />

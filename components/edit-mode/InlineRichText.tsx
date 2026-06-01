@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -25,6 +25,13 @@ import { useEditMode } from './EditModeProvider';
 import { updateSiteContent } from '@/lib/actions/content';
 import { toast } from 'sonner';
 import { toHtml, stripOuterParagraph, resolveDisplayHtml, type DisplayTag } from './rich-text';
+import {
+  parseBlockStyle,
+  serializeBlockStyle,
+  applyBlockStyle,
+  type BlockStyle,
+} from '@/lib/edit-mode/block-style';
+import { BlockControls } from './BlockControls';
 
 interface InlineRichTextProps {
   contentKey: string;
@@ -40,6 +47,10 @@ interface InlineRichTextProps {
   inline?: boolean;
   className?: string;
   revalidate?: string;
+  /** JSON from `${contentKey}__style`; controls size/spacing/width. */
+  styleValue?: string;
+  /** Cap the rendered size on small screens (e.g. 'text-7xl' for hero headlines). */
+  clampMobileSize?: string;
 }
 
 const COLORS: { label: string; value: string | null }[] = [
@@ -189,6 +200,8 @@ export function InlineRichText({
   inline = false,
   className = '',
   revalidate,
+  styleValue,
+  clampMobileSize,
 }: InlineRichTextProps) {
   const { editMode, isAdmin, setIsEditing: setGlobalEditing } = useEditMode();
   const [html, setHtml] = useState<string>(() => toHtml(defaultValue, inline));
@@ -198,6 +211,16 @@ export function InlineRichText({
   useEffect(() => {
     if (!editing) setHtml(toHtml(defaultValue, inline));
   }, [defaultValue, inline, editing]);
+
+  const [style, setStyle] = useState<BlockStyle>(() => parseBlockStyle(styleValue));
+  useEffect(() => {
+    if (!editing) setStyle(parseBlockStyle(styleValue));
+  }, [styleValue, editing]);
+
+  const styledClassName = useMemo(
+    () => applyBlockStyle(className, style, { heroClampMax: clampMobileSize }),
+    [className, style, clampMobileSize],
+  );
 
   const editor = useEditor(
     {
@@ -254,22 +277,30 @@ export function InlineRichText({
 
   const handleCancel = useCallback(() => {
     if (editor) editor.commands.setContent(html || '<p></p>', { emitUpdate: false });
+    setStyle(parseBlockStyle(styleValue));
     exitEdit();
-  }, [editor, html, exitEdit]);
+  }, [editor, html, exitEdit, styleValue]);
 
   const handleSave = useCallback(async () => {
     if (!editor) return;
     let next = editor.getHTML();
     if (inline) next = stripOuterParagraph(next);
-    if (next === html || next === stripOuterParagraph(html)) {
+    const contentChanged = !(next === html || next === stripOuterParagraph(html));
+    const savedStyle = parseBlockStyle(styleValue);
+    const styleChanged = serializeBlockStyle(style) !== serializeBlockStyle(savedStyle);
+    if (!contentChanged && !styleChanged) {
       exitEdit();
       return;
     }
     setSaving(true);
     try {
-      await updateSiteContent(contentKey, next, revalidate);
-      // Re-wrap in inline mode so Tiptap can re-parse if we re-enter editing.
-      setHtml(inline ? toHtml(next, true) : next);
+      if (contentChanged) {
+        await updateSiteContent(contentKey, next, revalidate);
+        setHtml(inline ? toHtml(next, true) : next);
+      }
+      if (styleChanged) {
+        await updateSiteContent(`${contentKey}__style`, serializeBlockStyle(style), revalidate);
+      }
       toast.success('Saved');
       exitEdit();
     } catch (e) {
@@ -278,7 +309,7 @@ export function InlineRichText({
     } finally {
       setSaving(false);
     }
-  }, [editor, inline, html, contentKey, revalidate, exitEdit]);
+  }, [editor, inline, html, contentKey, revalidate, exitEdit, style, styleValue]);
 
   // What HTML to actually paint into the display element. resolveDisplayHtml strips
   // the wrapping <p> when the wrapper is text-level (p/h1–h4/span) so we never nest
@@ -286,7 +317,7 @@ export function InlineRichText({
   const wrapperTag = tag ?? (inline ? 'span' : 'div');
   const displayHtml = resolveDisplayHtml(html, { inline, tag: wrapperTag });
   const Wrapper = wrapperTag as keyof JSX.IntrinsicElements;
-  const wrapperClass = `inline-rich-display ${inline ? 'inline-rich-inline' : ''} ${className}`.trim();
+  const wrapperClass = `inline-rich-display ${inline ? 'inline-rich-inline' : ''} ${styledClassName}`.trim();
 
   if (!isAdmin || !editMode) {
     return <Wrapper className={wrapperClass} dangerouslySetInnerHTML={{ __html: displayHtml }} />;
@@ -316,6 +347,7 @@ export function InlineRichText({
     <span className="relative inline-block border border-brand rounded bg-bg shadow-lg max-w-full">
       {editor && <Toolbar editor={editor} inline={inline} />}
       <EditorContent editor={editor} className={`p-3 ${className}`} />
+      <BlockControls style={style} onChange={setStyle} />
       <span className="flex items-center justify-end gap-2 border-t border-line p-2 bg-bg-elev rounded-b">
         <button
           type="button"
