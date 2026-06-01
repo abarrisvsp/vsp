@@ -173,7 +173,7 @@ export function ContactForm() {
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className={label}>Event date</label>
-          <input type="date" value={form.event_date} onChange={(e) => set('event_date', e.target.value)} className={input} />
+          <input type="date" value={form.event_date} onChange={(e) => set('event_date', e.target.value)} className={`${input} [color-scheme:dark]`} />
           <label className="flex items-center gap-2 text-xs mt-2 text-ink-dim">
             <input type="checkbox" checked={form.date_flexible} onChange={(e) => set('date_flexible', e.target.checked)} />
             Date is flexible
