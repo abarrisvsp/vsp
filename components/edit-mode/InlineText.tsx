@@ -1,8 +1,15 @@
 'use client';
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { useEditMode } from './EditModeProvider';
 import { updateSiteContent } from '@/lib/actions/content';
 import { toast } from 'sonner';
+import {
+  parseBlockStyle,
+  serializeBlockStyle,
+  applyBlockStyle,
+  type BlockStyle,
+} from '@/lib/edit-mode/block-style';
+import { BlockControls } from './BlockControls';
 
 type Tag = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span' | 'div' | 'em' | 'strong';
 
@@ -39,6 +46,8 @@ interface InlineTextProps {
   className?: string;
   multiline?: boolean;
   revalidate?: string;
+  styleValue?: string;
+  clampMobileSize?: string;
 }
 
 export function InlineText({
@@ -48,11 +57,21 @@ export function InlineText({
   className = '',
   multiline = false,
   revalidate,
+  styleValue,
+  clampMobileSize,
 }: InlineTextProps) {
   const { editMode, isAdmin, setIsEditing: setGlobalEditing } = useEditMode();
   const [value, setValue] = useState(defaultValue);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [style, setStyle] = useState<BlockStyle>(() => parseBlockStyle(styleValue));
+  useEffect(() => {
+    if (!editing) setStyle(parseBlockStyle(styleValue));
+  }, [styleValue, editing]);
+  const styledClassName = useMemo(
+    () => applyBlockStyle(className, style, { heroClampMax: clampMobileSize }),
+    [className, style, clampMobileSize],
+  );
   const ref = useRef<HTMLElement | null>(null);
   const originalRef = useRef(defaultValue);
 
@@ -87,20 +106,29 @@ export function InlineText({
   const handleCancel = useCallback(() => {
     if (ref.current) ref.current.textContent = originalRef.current;
     setValue(originalRef.current);
+    setStyle(parseBlockStyle(styleValue));
     exitEdit();
-  }, [exitEdit]);
+  }, [exitEdit, styleValue]);
 
   const handleSave = useCallback(async () => {
     const newValue = (ref.current ? extractPlainText(ref.current) : value).trim();
-    if (newValue === originalRef.current) {
+    const contentChanged = newValue !== originalRef.current;
+    const savedStyle = parseBlockStyle(styleValue);
+    const styleChanged = serializeBlockStyle(style) !== serializeBlockStyle(savedStyle);
+    if (!contentChanged && !styleChanged) {
       exitEdit();
       return;
     }
     setSaving(true);
     try {
-      await updateSiteContent(contentKey, newValue, revalidate);
-      setValue(newValue);
-      originalRef.current = newValue;
+      if (contentChanged) {
+        await updateSiteContent(contentKey, newValue, revalidate);
+        setValue(newValue);
+        originalRef.current = newValue;
+      }
+      if (styleChanged) {
+        await updateSiteContent(`${contentKey}__style`, serializeBlockStyle(style), revalidate);
+      }
       toast.success('Saved');
       exitEdit();
     } catch (e) {
@@ -109,7 +137,7 @@ export function InlineText({
     } finally {
       setSaving(false);
     }
-  }, [contentKey, value, revalidate, exitEdit]);
+  }, [contentKey, value, revalidate, exitEdit, style, styleValue]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -132,7 +160,7 @@ export function InlineText({
   // Render plain element when not admin or not in edit mode
   if (!isAdmin || !editMode) {
     const Tag = tag as keyof JSX.IntrinsicElements;
-    return <Tag className={className}>{value}</Tag>;
+    return <Tag className={styledClassName}>{value}</Tag>;
   }
 
   const Tag = tag as unknown as React.ComponentType<React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement>; contentEditable?: boolean; suppressContentEditableWarning?: boolean }>;
@@ -158,27 +186,30 @@ export function InlineText({
       {editing && (
         <span
           data-inline-text-actions
-          className="absolute left-0 top-full mt-1 flex gap-1 z-[10000] bg-bg-elev border border-line rounded shadow-lg p-1 max-md:fixed max-md:left-0 max-md:right-0 max-md:bottom-0 max-md:top-auto max-md:rounded-none max-md:mt-0 max-md:p-3 max-md:justify-center"
+          className="absolute left-0 top-full mt-1 flex flex-col gap-1 z-[10000] bg-bg-elev border border-line rounded shadow-lg p-1 max-md:fixed max-md:left-0 max-md:right-0 max-md:bottom-0 max-md:top-auto max-md:rounded-none max-md:mt-0 max-md:p-3 max-md:justify-center"
           contentEditable={false}
         >
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleSave}
-            disabled={saving}
-            className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-500 disabled:opacity-50"
-          >
-            {saving ? 'Saving…' : 'Save'}
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={handleCancel}
-            disabled={saving}
-            className="px-3 py-1 text-xs bg-neutral-600 text-white rounded hover:bg-neutral-500"
-          >
-            Cancel
-          </button>
+          <BlockControls style={style} onChange={setStyle} />
+          <span className="flex gap-1 justify-end">
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleSave}
+              disabled={saving}
+              className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-500 disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleCancel}
+              disabled={saving}
+              className="px-3 py-1 text-xs bg-neutral-600 text-white rounded hover:bg-neutral-500"
+            >
+              Cancel
+            </button>
+          </span>
         </span>
       )}
     </span>
