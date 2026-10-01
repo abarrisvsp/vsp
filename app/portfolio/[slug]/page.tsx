@@ -56,7 +56,7 @@ export default async function PortfolioDetailPage({ params }: { params: { slug: 
           <img
             src={item.cover_image_url}
             alt={item.headline}
-            className="w-full max-h-[500px] object-cover rounded mb-12"
+            className="block w-full h-auto max-h-[75vh] object-contain bg-bg-elev rounded mb-12"
           />
         )}
 

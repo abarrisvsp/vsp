@@ -42,10 +42,10 @@ export default async function PortfolioPage() {
                     <img
                       src={item.cover_image_url}
                       alt={item.headline}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-56 object-contain bg-bg-soft group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-bg-soft" />
+                    <div className="w-full h-56 bg-bg-soft" />
                   )}
                   <div className="p-5">
                     <p className="text-xs text-ink-mute mb-1">

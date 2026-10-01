@@ -21,6 +21,26 @@ const FIELDS: FieldDef[] = [
   { name: 'active', label: 'Active', type: 'checkbox' },
 ];
 
+// One masonry layout per breakpoint, toggled with CSS. Doing it in CSS rather
+// than measuring the window keeps server and browser renders identical, and
+// lazy images inside the hidden layouts are never fetched.
+const MASONRY_LAYOUTS = [
+  { cols: 2, className: 'flex md:hidden' },
+  { cols: 3, className: 'hidden md:flex lg:hidden' },
+  { cols: 4, className: 'hidden lg:flex' },
+];
+
+/**
+ * Deals photos into columns left to right (1 2 3 4 / 5 6 7 8 ...), so the
+ * admin's chosen order still reads across the top. CSS columns would instead
+ * stack 1, 2, 3... down the first column.
+ */
+function intoColumns<T>(items: T[], cols: number): { item: T; index: number }[][] {
+  const columns = Array.from({ length: cols }, () => [] as { item: T; index: number }[]);
+  items.forEach((item, index) => columns[index % cols].push({ item, index }));
+  return columns;
+}
+
 export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
   const { editMode } = useEditMode();
   const [photos, setPhotos] = useState(initial);
@@ -49,6 +69,17 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
       totals[t] = (totals[t] || 0) + 1;
     });
   });
+
+  const overlay = (p: GalleryPhoto) => (
+    <>
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
+        <span className="block text-[10px] uppercase tracking-wider text-brand mb-1">{labelForTag(effTags(p)[0] || p.category)}</span>
+        {p.title && <h3 className="font-serif italic text-sm md:text-base text-white leading-tight line-clamp-1">{p.title}</h3>}
+        {p.caption && <p className="text-xs text-white/80 mt-0.5 line-clamp-1">{p.caption}</p>}
+      </div>
+    </>
+  );
 
   async function onDragEnd(result: DropResult) {
     if (!result.destination) return;
@@ -106,34 +137,28 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
         </span>
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="gallery" direction="horizontal" isDropDisabled={!editMode}>
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
-            >
-              {visible.map((p, i) => (
-                <Draggable key={p.id} draggableId={p.id} index={i} isDragDisabled={!editMode}>
-                  {(prov) => (
-                    <div
-                      ref={prov.innerRef}
-                      {...prov.draggableProps}
-                      {...prov.dragHandleProps}
-                      className="relative aspect-square group cursor-pointer overflow-hidden"
-                      onClick={() => !editMode && setLightboxIdx(i)}
-                    >
-                      <Image src={p.public_url} alt={p.alt_text || p.title || 'Gallery photo'} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" />
-                      {/* Always-visible text overlay */}
-                      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-                        <span className="block text-[10px] uppercase tracking-wider text-brand mb-1">{labelForTag(effTags(p)[0] || p.category)}</span>
-                        {p.title && <h3 className="font-serif italic text-sm md:text-base text-white leading-tight line-clamp-1">{p.title}</h3>}
-                        {p.caption && <p className="text-xs text-white/80 mt-0.5 line-clamp-1">{p.caption}</p>}
-                      </div>
-                      {/* Edit-mode controls (kept above overlay) */}
-                      {editMode && (
+      {editMode ? (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="gallery" direction="horizontal">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2"
+              >
+                {visible.map((p, i) => (
+                  <Draggable key={p.id} draggableId={p.id} index={i}>
+                    {(prov) => (
+                      <div
+                        ref={prov.innerRef}
+                        {...prov.draggableProps}
+                        {...prov.dragHandleProps}
+                        className="relative aspect-square group cursor-pointer overflow-hidden"
+                      >
+                        {/* Square tiles keep drag-and-drop predictable; contain shows the whole photo. */}
+                        <Image src={p.public_url} alt={p.alt_text || p.title || 'Gallery photo'} fill className="object-contain bg-bg-elev transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 768px) 50vw, 25vw" loading="lazy" />
+                        {overlay(p)}
+                        {/* Edit controls (kept above overlay) */}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-start justify-end p-2 gap-2 transition-opacity z-10">
                           <button onClick={(e) => { e.stopPropagation(); setEditPhoto(p); }} className="p-1.5 bg-bg-elev border border-line rounded">
                             <Pencil className="w-3 h-3" />
@@ -142,16 +167,45 @@ export function GalleryGrid({ initial }: { initial: GalleryPhoto[] }) {
                             <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      ) : (
+        MASONRY_LAYOUTS.map(({ cols, className }) => (
+          <div key={cols} className={`${className} items-start gap-2`}>
+            {intoColumns(visible, cols).map((column, c) => (
+              <div key={c} className="flex-1 min-w-0 flex flex-col gap-2">
+                {column.map(({ item: p, index }) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setLightboxIdx(index)}
+                    className="relative group block w-full overflow-hidden text-left"
+                  >
+                    {/* width/height 0 + h-auto: each photo keeps its own shape. */}
+                    <Image
+                      src={p.public_url}
+                      alt={p.alt_text || p.title || 'Gallery photo'}
+                      width={0}
+                      height={0}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      loading="lazy"
+                      className="block w-full h-auto max-h-[85vh] object-contain bg-bg-elev transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {overlay(p)}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))
+      )}
 
       <Lightbox
         open={lightboxIdx >= 0}
