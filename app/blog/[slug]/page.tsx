@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
+import { CoverImage } from '@/components/shared/CoverImage';
 import { format } from 'date-fns';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -63,8 +63,14 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
         )}
         {post.cover_image_url && (
-          <div className="relative aspect-[16/9] mb-8">
-            <Image src={post.cover_image_url} alt={post.title} fill className="object-cover" priority />
+          <div className="mb-8">
+            <CoverImage
+              src={post.cover_image_url}
+              alt={post.title}
+              sizes="(max-width: 768px) 100vw, 768px"
+              maxHeightClass="max-h-[75vh]"
+              priority
+            />
           </div>
         )}
         <div className="text-xs uppercase tracking-wider text-ink-mute mb-3">

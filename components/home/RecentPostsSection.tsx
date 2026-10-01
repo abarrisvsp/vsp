@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { format } from 'date-fns';
 import type { BlogPost } from '@/lib/types';
 import { SectionHead } from '@/components/shared/SectionHead';
+import { CoverImage } from '@/components/shared/CoverImage';
 
 export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
   if (posts.length === 0) return null;
@@ -23,12 +24,13 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
           <article className="group">
             <Link href={`/blog/${feature.slug}`}>
               {feature.cover_image_url && (
-                <div className="relative aspect-[3/2] mb-6 overflow-hidden">
-                  <Image
+                <div className="mb-6 overflow-hidden">
+                  <CoverImage
                     src={feature.cover_image_url}
                     alt={feature.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    maxHeightClass="max-h-[560px]"
+                    className="group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
               )}
@@ -66,7 +68,7 @@ export function RecentPostsSection({ posts }: { posts: BlogPost[] }) {
                         src={p.cover_image_url}
                         alt={p.title}
                         fill
-                        className="object-cover"
+                        className="object-cover object-top"
                         sizes="180px"
                       />
                     </div>
