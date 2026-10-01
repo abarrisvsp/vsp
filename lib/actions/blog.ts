@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import type { BlogPost, Subscriber } from '@/lib/types';
 import { slugify } from '@/lib/slugify';
+import { fetchAllActiveSubscribers } from '@/lib/subscribers';
 
 export type BroadcastSummary = {
   sent: number;
@@ -14,8 +15,8 @@ export type BroadcastSummary = {
 async function broadcastPostToSubscribers(id: string): Promise<BroadcastSummary> {
   const supabase = createServiceClient();
   const { data: post } = await supabase.from('blog_posts').select('*').eq('id', id).maybeSingle();
-  const { data: subs } = await supabase.from('subscribers').select('*').eq('active', true);
-  if (!post || !subs || subs.length === 0) {
+  const subs = await fetchAllActiveSubscribers();
+  if (!post || subs.length === 0) {
     return { sent: 0, scheduled: 0, lastScheduledFor: null };
   }
   const { sendPostBroadcast } = await import('@/lib/email/post-broadcast');

@@ -2,6 +2,7 @@
 import { createServiceClient } from '@/lib/supabase';
 import { auth } from '@/lib/auth';
 import type { Subscriber } from '@/lib/types';
+import { fetchAllActiveSubscribers } from '@/lib/subscribers';
 
 async function requireAdmin() {
   const session = await auth();
@@ -86,29 +87,94 @@ export async function getActiveSubscribers(): Promise<Subscriber[]> {
   return (data as Subscriber[]) ?? [];
 }
 
-export async function getAllSubscribersForAdmin(
-  page = 1,
-  perPage = 50
-): Promise<{ subscribers: Subscriber[]; total: number }> {
+export async function getAllActiveSubscribersForAdmin(): Promise<Subscriber[]> {
   await requireAdmin();
-  const supabase = createServiceClient();
-  const from = (page - 1) * perPage;
-  const to = from + perPage - 1;
+  return fetchAllActiveSubscribers();
+}
 
-  const [{ data, error }, { count }] = await Promise.all([
-    supabase
-      .from('subscribers')
-      .select('*')
-      .eq('active', true)
-      .order('subscribed_at', { ascending: false })
-      .range(from, to),
-    supabase
-      .from('subscribers')
-      .select('*', { count: 'exact', head: true })
-      .eq('active', true),
-  ]);
-  if (error) throw error;
-  return { subscribers: (data as Subscriber[]) ?? [], total: count ?? 0 };
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const clean = (v: string | undefined) => (v ?? '').trim() || null;
+
+export type AddSubscriberResult =
+  | { status: 'added'; subscriber: Subscriber }
+  | { status: 'exists' }
+  | { status: 'unsubscribed'; unsubscribedAt: string | null }
+  | { status: 'error'; message: string };
+
+/**
+ * Adds someone to the list by hand. A person who previously unsubscribed is
+ * only re-added when `resubscribe` is set, so the admin has to confirm they
+ * actually asked to rejoin. Errors are returned, not thrown, because thrown
+ * server action messages are hidden in production.
+ */
+export async function addSubscriberByAdmin(input: {
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  resubscribe?: boolean;
+}): Promise<AddSubscriberResult> {
+  await requireAdmin();
+  const email = (input.email || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) return { status: 'error', message: 'That email address doesn\'t look valid.' };
+  const firstName = clean(input.firstName);
+  const lastName = clean(input.lastName);
+
+  const supabase = createServiceClient();
+  const { data: existing } = await supabase
+    .from('subscribers')
+    .select('id, active, unsubscribed_at')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (existing?.active) return { status: 'exists' };
+  if (existing && !input.resubscribe) {
+    return { status: 'unsubscribed', unsubscribedAt: existing.unsubscribed_at ?? null };
+  }
+
+  const query = existing
+    ? supabase
+        .from('subscribers')
+        .update({ active: true, unsubscribed_at: null, first_name: firstName, last_name: lastName })
+        .eq('id', existing.id)
+    : supabase
+        .from('subscribers')
+        .insert({ email, first_name: firstName, last_name: lastName, active: true, source: 'admin' });
+  const { data, error } = await query.select('*').single();
+  if (error || !data) {
+    console.error('addSubscriberByAdmin failed', error);
+    return { status: 'error', message: 'Could not save that subscriber. Try again?' };
+  }
+  return { status: 'added', subscriber: data as Subscriber };
+}
+
+export async function updateSubscriberByAdmin(
+  id: string,
+  input: { email: string; firstName?: string; lastName?: string },
+): Promise<{ ok: true; subscriber: Subscriber } | { ok: false; message: string }> {
+  await requireAdmin();
+  const email = (input.email || '').trim().toLowerCase();
+  if (!EMAIL_RE.test(email)) return { ok: false, message: 'That email address doesn\'t look valid.' };
+
+  const supabase = createServiceClient();
+  const { data: clash } = await supabase
+    .from('subscribers')
+    .select('id')
+    .eq('email', email)
+    .neq('id', id)
+    .maybeSingle();
+  if (clash) return { ok: false, message: 'Another subscriber already uses that email.' };
+
+  const { data, error } = await supabase
+    .from('subscribers')
+    .update({ email, first_name: clean(input.firstName), last_name: clean(input.lastName) })
+    .eq('id', id)
+    .select('*')
+    .single();
+  if (error || !data) {
+    console.error('updateSubscriberByAdmin failed', error);
+    return { ok: false, message: 'Could not save those changes. Try again?' };
+  }
+  return { ok: true, subscriber: data as Subscriber };
 }
 
 export async function getSubscribersThisMonth(): Promise<number> {

@@ -7,14 +7,23 @@ import { Bold, Italic, Heading2, Heading3, List, ListOrdered, Quote, Link as Lin
 import { uploadImageFile, uploadErrorMessage } from '@/lib/upload-client';
 import { toast } from 'sonner';
 
-export function TiptapEditor({ initialHtml, onChange }: { initialHtml: string; onChange: (html: string) => void }) {
+export function TiptapEditor({
+  initialHtml,
+  onChange,
+  starterText = 'Write your story…',
+}: {
+  initialHtml: string;
+  onChange: (html: string) => void;
+  /** Real starting content, not a placeholder; pass '' to start empty. */
+  starterText?: string;
+}) {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Link.configure({ openOnClick: false }),
       ImageExt,
     ],
-    content: initialHtml || '<p>Write your story…</p>',
+    content: initialHtml || (starterText ? `<p>${starterText}</p>` : ''),
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
