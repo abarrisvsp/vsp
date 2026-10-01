@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { createServiceClient } from '@/lib/supabase';
 import {
   hashCode,
+  matchAdminLoginEmail,
   MAX_ATTEMPTS,
   REMEMBER_MAX_AGE_S,
   SHORT_MAX_AGE_S,
@@ -20,9 +21,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const email = (credentials?.email as string | undefined)?.toLowerCase();
-        const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
-        if (!email || !adminEmail || email !== adminEmail) return null;
+        const email = matchAdminLoginEmail(credentials?.email as string | undefined);
+        if (!email) return null;
 
         const remember = String(credentials?.remember) === 'true';
         const code = (credentials?.code as string | undefined)?.trim();
@@ -55,14 +55,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .from('admin_login_codes')
             .update({ used_at: new Date().toISOString() })
             .eq('id', row.id);
-          return { id: 'admin', email, name: 'Aaron', remember };
+          return { id: 'admin', email, remember };
         }
 
         // Break-glass path: env-var password, no UI. Lets us regain access if
         // the admin mailbox is ever unavailable (see SETUP.md).
         if (password && process.env.ADMIN_PASSWORD_HASH) {
           const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
-          if (valid) return { id: 'admin', email, name: 'Aaron', remember };
+          if (valid) return { id: 'admin', email, remember };
         }
 
         return null;

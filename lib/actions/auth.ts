@@ -2,19 +2,24 @@
 
 import { createServiceClient } from '@/lib/supabase';
 import { sendLoginCode } from '@/lib/email/login-code';
-import { generateCode, hashCode, CODE_TTL_MS, RESEND_COOLDOWN_MS } from '@/lib/auth-codes';
+import {
+  generateCode,
+  hashCode,
+  matchAdminLoginEmail,
+  CODE_TTL_MS,
+  RESEND_COOLDOWN_MS,
+} from '@/lib/auth-codes';
 
 /**
- * Emails a one-time sign-in code to the admin address.
+ * Emails a one-time sign-in code to a matching admin address.
  *
- * Always resolves to `{ ok: true }` regardless of whether the email matched the
+ * Always resolves to `{ ok: true }` regardless of whether the email matched an
  * admin or a send happened, so the login UI can't be used to probe addresses or
  * send state. Real failures are logged server-side.
  */
 export async function requestLoginCode(emailRaw: string): Promise<{ ok: true }> {
-  const email = (emailRaw || '').trim().toLowerCase();
-  const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
-  if (!email || !adminEmail || email !== adminEmail) return { ok: true };
+  const email = matchAdminLoginEmail(emailRaw);
+  if (!email) return { ok: true };
 
   const supabase = createServiceClient();
   const now = Date.now();
@@ -45,6 +50,7 @@ export async function requestLoginCode(emailRaw: string): Promise<{ ok: true }> 
     return { ok: true };
   }
 
-  await sendLoginCode(process.env.ADMIN_EMAIL!, code);
+  // Send to the address that actually signed in, not a fixed one.
+  await sendLoginCode(email, code);
   return { ok: true };
 }
