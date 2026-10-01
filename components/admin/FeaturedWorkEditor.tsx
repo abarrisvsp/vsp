@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { TiptapEditor } from '@/components/blog/TiptapEditor';
 import { createFeaturedWork, updateFeaturedWork } from '@/lib/actions/featured-work';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage, MAX_SOURCE_BYTES } from '@/lib/upload-client';
 import { toast } from 'sonner';
 import type { FeaturedWork } from '@/lib/types';
 
@@ -31,23 +31,22 @@ export function FeaturedWorkEditor({ initial }: { initial?: FeaturedWork }) {
   const onCoverDrop = useCallback(async (files: File[]) => {
     const file = files[0];
     if (!file) return;
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('folder', 'featured-work');
     try {
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, 'featured-work');
       setCoverUrl(publicUrl);
       setCoverPath(path);
       toast.success('Cover uploaded');
-    } catch {
-      toast.error('Upload failed');
+    } catch (err) {
+      toast.error(uploadErrorMessage(err));
     }
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: onCoverDrop,
     accept: { 'image/*': [] },
-    maxSize: 10 * 1024 * 1024,
+    onDropRejected: (rejections) =>
+      rejections.forEach((r) => toast.error(`${r.file.name}: ${r.errors[0]?.message ?? 'not accepted'}`)),
+    maxSize: MAX_SOURCE_BYTES,
     multiple: false,
   });
 

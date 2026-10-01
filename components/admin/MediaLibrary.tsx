@@ -4,7 +4,7 @@
 import { useState, useCallback, useTransition } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { deleteMedia } from '@/lib/actions/media';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage, MAX_SOURCE_BYTES } from '@/lib/upload-client';
 import { toast } from 'sonner';
 import type { MediaFile } from '@/lib/types';
 import { MediaModal } from './MediaModal';
@@ -54,28 +54,27 @@ export function MediaLibrary({ initialFiles }: Props) {
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     setUploading(true);
     for (const file of acceptedFiles) {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', category === 'All' ? 'misc' : category);
+      const folder = category === 'All' ? 'misc' : category;
+      const toastId = toast.loading(`Uploading ${file.name}…`);
       try {
-        const { publicUrl, path } = await uploadImage(fd);
+        const { publicUrl, path, size, width, height } = await uploadImageFile(file, folder);
         if (!publicUrl) throw new Error('Upload succeeded but no public URL returned');
         const newFile: MediaFile = {
           name: path.split('/').pop() ?? file.name,
           path,
           publicUrl,
-          size: file.size,
-          width: null,
-          height: null,
-          category: category === 'All' ? 'misc' : category,
+          size,
+          width: width || null,
+          height: height || null,
+          category: folder,
           createdAt: new Date().toISOString(),
           onSite: false,
           eventTags: [],
         };
         setFiles((prev) => [newFile, ...prev]);
-        toast.success(`Uploaded ${file.name}`);
-      } catch {
-        toast.error(`Failed to upload ${file.name}`);
+        toast.success(`Uploaded ${file.name}`, { id: toastId });
+      } catch (err) {
+        toast.error(`${file.name}: ${uploadErrorMessage(err)}`, { id: toastId });
       }
     }
     setUploading(false);
@@ -83,8 +82,11 @@ export function MediaLibrary({ initialFiles }: Props) {
 
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop,
+    // Rejections used to be dropped silently, so oversized files just vanished.
+    onDropRejected: (rejections) =>
+      rejections.forEach((r) => toast.error(`${r.file.name}: ${r.errors[0]?.message ?? 'not accepted'}`)),
     accept: { 'image/*': [] },
-    maxSize: 10 * 1024 * 1024,
+    maxSize: MAX_SOURCE_BYTES,
     noClick: true,
   });
 

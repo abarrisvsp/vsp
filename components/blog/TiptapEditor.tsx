@@ -4,7 +4,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import ImageExt from '@tiptap/extension-image';
 import { Bold, Italic, Heading2, Heading3, List, ListOrdered, Quote, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage } from '@/lib/upload-client';
 import { toast } from 'sonner';
 
 export function TiptapEditor({ initialHtml, onChange }: { initialHtml: string; onChange: (html: string) => void }) {
@@ -33,14 +33,13 @@ export function TiptapEditor({ initialHtml, onChange }: { initialHtml: string; o
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', 'blog');
+      const toastId = toast.loading('Uploading image…');
       try {
-        const { publicUrl } = await uploadImage(fd);
+        const { publicUrl } = await uploadImageFile(file, 'blog');
         editor!.chain().focus().setImage({ src: publicUrl }).run();
-      } catch {
-        toast.error('Image upload failed');
+        toast.success('Image added', { id: toastId });
+      } catch (err) {
+        toast.error(uploadErrorMessage(err), { id: toastId });
       }
     };
     input.click();
@@ -65,7 +64,7 @@ export function TiptapEditor({ initialHtml, onChange }: { initialHtml: string; o
         <button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={btn(editor.isActive('orderedList'))}><ListOrdered className="w-4 h-4" /></button>
         <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={btn(editor.isActive('blockquote'))}><Quote className="w-4 h-4" /></button>
         <button type="button" onClick={handleLink} className={btn(editor.isActive('link'))}><LinkIcon className="w-4 h-4" /></button>
-        <button type="button" onClick={handleImageInsert} className={btn(false)}><ImageIcon className="w-4 h-4" /></button>
+        <button type="button" onClick={handleImageInsert} className={btn(false)} title="Insert image"><ImageIcon className="w-4 h-4" /></button>
       </div>
       <EditorContent editor={editor} />
     </div>

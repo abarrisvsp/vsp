@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { TiptapEditor } from './TiptapEditor';
 import { createBlogPost, updateBlogPost, deleteBlogPost, sendTestBlogEmail } from '@/lib/actions/blog';
 import { getSubscriberCount } from '@/lib/actions/subscribers';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage, MAX_SOURCE_BYTES } from '@/lib/upload-client';
 import { toast } from 'sonner';
 import type { BlogPost } from '@/lib/types';
 
@@ -75,23 +75,23 @@ export function BlogPostEditor({ initial }: { initial?: BlogPost }) {
   const onCoverDrop = useCallback(async (files: File[]) => {
     const file = files[0];
     if (!file) return;
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('folder', 'blog/covers');
+    const toastId = toast.loading('Uploading cover…');
     try {
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, 'blog/covers');
       setCoverUrl(publicUrl);
       setCoverPath(path);
-      toast.success('Cover uploaded');
-    } catch {
-      toast.error('Upload failed');
+      toast.success('Cover uploaded', { id: toastId });
+    } catch (err) {
+      toast.error(uploadErrorMessage(err), { id: toastId });
     }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: onCoverDrop,
     accept: { 'image/*': [] },
-    maxSize: 10 * 1024 * 1024,
+    onDropRejected: (rejections) =>
+      rejections.forEach((r) => toast.error(`${r.file.name}: ${r.errors[0]?.message ?? 'not accepted'}`)),
+    maxSize: MAX_SOURCE_BYTES,
     multiple: false,
   });
 

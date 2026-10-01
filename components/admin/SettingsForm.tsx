@@ -3,7 +3,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateSiteContent } from '@/lib/actions/content';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage } from '@/lib/upload-client';
 import { toast } from 'sonner';
 
 interface Props {
@@ -34,16 +34,13 @@ export function SettingsForm({ initialValues: iv }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('folder', 'branding');
     try {
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, 'branding');
       setLogoUrl(publicUrl);
       setLogoPath(path);
       toast.success('Uploaded');
-    } catch {
-      toast.error('Upload failed');
+    } catch (err) {
+      toast.error(uploadErrorMessage(err));
     } finally {
       setIsUploading(false);
     }
@@ -53,16 +50,13 @@ export function SettingsForm({ initialValues: iv }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('folder', 'branding');
     try {
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, 'branding');
       setFaviconUrl(publicUrl);
       setFaviconPath(path);
       toast.success('Uploaded');
-    } catch {
-      toast.error('Upload failed');
+    } catch (err) {
+      toast.error(uploadErrorMessage(err));
     } finally {
       setIsUploading(false);
     }

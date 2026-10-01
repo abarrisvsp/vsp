@@ -9,7 +9,9 @@ export async function uploadImage(formData: FormData): Promise<{ publicUrl: stri
   const file = formData.get('file') as File | null;
   const folder = (formData.get('folder') as string) || 'misc';
   if (!file) throw new Error('No file provided');
-  if (file.size > 10 * 1024 * 1024) throw new Error('File too large (>10MB)');
+  // Callers downscale in the browser and check the size first (lib/upload-client.ts).
+  // This mirrors serverActions.bodySizeLimit as a backstop for any direct call.
+  if (file.size > 4 * 1024 * 1024) throw new Error('File too large (>4MB)');
 
   const ext = file.name.split('.').pop() || 'jpg';
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

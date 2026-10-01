@@ -17,6 +17,13 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Server actions cap request bodies at 1 MB by default, which rejected almost every
+    // real photo before it reached the upload handler. Images are downscaled in the
+    // browser first (lib/image-resize.ts); this is headroom, kept under Vercel's own
+    // ~4.5 MB serverless request limit, which no config can raise.
+    serverActions: { bodySizeLimit: '4mb' },
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

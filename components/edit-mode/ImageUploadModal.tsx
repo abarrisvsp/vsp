@@ -1,7 +1,7 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage, MAX_SOURCE_BYTES } from '@/lib/upload-client';
 import { toast } from 'sonner';
 
 interface ImageUploadModalProps {
@@ -26,7 +26,9 @@ export function ImageUploadModal({ open, onClose, onUploaded, folder }: ImageUpl
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/webp': ['.webp'] },
-    maxSize: 10 * 1024 * 1024,
+    onDropRejected: (rejections) =>
+      rejections.forEach((r) => toast.error(`${r.file.name}: ${r.errors[0]?.message ?? 'not accepted'}`)),
+    maxSize: MAX_SOURCE_BYTES,
     multiple: false,
   });
 
@@ -34,17 +36,14 @@ export function ImageUploadModal({ open, onClose, onUploaded, folder }: ImageUpl
     if (!file) return;
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', folder);
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, folder);
       onUploaded(publicUrl, path);
       toast.success('Image uploaded');
       reset();
       onClose();
     } catch (e: unknown) {
       console.error(e);
-      toast.error('Upload failed');
+      toast.error(uploadErrorMessage(e));
     } finally {
       setUploading(false);
     }

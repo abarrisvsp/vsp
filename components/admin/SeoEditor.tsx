@@ -3,7 +3,7 @@
 
 import { useState, useTransition } from 'react';
 import { updateSeoSettings, deleteSeoSettings } from '@/lib/actions/seo';
-import { uploadImage } from '@/lib/actions/upload';
+import { uploadImageFile, uploadErrorMessage } from '@/lib/upload-client';
 import { toast } from 'sonner';
 import type { SeoSettings } from '@/lib/types';
 
@@ -45,15 +45,12 @@ export function SeoEditor({ routes, settingsMap }: Props) {
     if (!file) return;
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('folder', 'seo/og');
-      const { publicUrl, path } = await uploadImage(fd);
+      const { publicUrl, path } = await uploadImageFile(file, 'seo/og');
       setOgUrl(publicUrl);
       setOgPath(path);
       toast.success('OG image uploaded');
-    } catch {
-      toast.error('Upload failed');
+    } catch (err) {
+      toast.error(uploadErrorMessage(err));
     } finally {
       setUploading(false);
     }
