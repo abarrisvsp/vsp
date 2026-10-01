@@ -9,47 +9,6 @@ async function requireAdmin() {
   if (!session?.user?.isAdmin) throw new Error('Unauthorized');
 }
 
-export async function subscribeEmail(
-  email: string,
-  firstName?: string,
-  lastName?: string
-): Promise<{ success: boolean; message: string }> {
-  email = (email || '').trim().toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return { success: false, message: 'Please enter a valid email.' };
-  }
-  const supabase = createServiceClient();
-  // Check if already exists
-  const { data: existing } = await supabase
-    .from('subscribers')
-    .select('id, active')
-    .eq('email', email)
-    .maybeSingle();
-  if (existing) {
-    if (existing.active) {
-      return { success: true, message: "You're already subscribed — thanks!" };
-    }
-    // Reactivate
-    await supabase
-      .from('subscribers')
-      .update({ active: true, unsubscribed_at: null })
-      .eq('id', existing.id);
-    return { success: true, message: 'Welcome back — re-subscribed.' };
-  }
-  const { error } = await supabase.from('subscribers').insert({
-    email,
-    first_name: firstName || null,
-    last_name: lastName || null,
-    active: true,
-    source: 'website_signup',
-  });
-  if (error) {
-    console.error('subscribe insert failed', error);
-    return { success: false, message: 'Something went wrong. Try again?' };
-  }
-  return { success: true, message: 'Subscribed — thank you!' };
-}
-
 export async function unsubscribeByToken(
   token: string
 ): Promise<{ success: boolean; email?: string }> {
