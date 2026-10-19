@@ -9,6 +9,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { organizationSchema, websiteSchema, personSchema } from '@/lib/seo/schema';
 import { SITE, SITE_URL } from '@/lib/seo/config';
 import { getSiteContent } from '@/lib/actions/content';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Toaster theme="dark" position="bottom-right" />
           </EditModeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
