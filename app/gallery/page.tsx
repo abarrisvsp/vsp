@@ -51,9 +51,9 @@ export default async function GalleryPage() {
   const categories = Array.from(new Set(photos.map((p) => p.category)));
 
   const stats = [
-    { value: c.gallery_stat_1_value || HERO_DEFAULTS.gallery_stat_1_value, label: c.gallery_stat_1_label || HERO_DEFAULTS.gallery_stat_1_label },
-    { value: c.gallery_stat_2_value || HERO_DEFAULTS.gallery_stat_2_value, label: c.gallery_stat_2_label || HERO_DEFAULTS.gallery_stat_2_label },
-    { value: c.gallery_stat_3_value || HERO_DEFAULTS.gallery_stat_3_value, label: c.gallery_stat_3_label || HERO_DEFAULTS.gallery_stat_3_label },
+    { value: c.gallery_stat_1_value || HERO_DEFAULTS.gallery_stat_1_value, label: c.gallery_stat_1_label || HERO_DEFAULTS.gallery_stat_1_label, valueKey: 'gallery_stat_1_value', labelKey: 'gallery_stat_1_label' },
+    { value: c.gallery_stat_2_value || HERO_DEFAULTS.gallery_stat_2_value, label: c.gallery_stat_2_label || HERO_DEFAULTS.gallery_stat_2_label, valueKey: 'gallery_stat_2_value', labelKey: 'gallery_stat_2_label' },
+    { value: c.gallery_stat_3_value || HERO_DEFAULTS.gallery_stat_3_value, label: c.gallery_stat_3_label || HERO_DEFAULTS.gallery_stat_3_label, valueKey: 'gallery_stat_3_value', labelKey: 'gallery_stat_3_label' },
   ];
 
   return (
@@ -84,7 +84,7 @@ export default async function GalleryPage() {
               className="text-ink-dim text-lg leading-relaxed max-w-2xl mt-6 mb-10"
               revalidate="/gallery"
             />
-            <MiniStats stats={stats} />
+            <MiniStats stats={stats} revalidate="/gallery" />
           </div>
         </section>
 
