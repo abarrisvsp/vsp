@@ -4,12 +4,18 @@
 // middleware) and the Node server action, so it must stay edge-safe: use the
 // Web Crypto API (globalThis.crypto), never node:crypto.
 
-/** A login code is valid for 10 minutes. */
-export const CODE_TTL_MS = 10 * 60 * 1000;
+/** A login code is valid for 5 minutes. */
+export const CODE_TTL_MS = 5 * 60 * 1000;
 /** A fresh code can't be requested more often than this (anti-spam). */
 export const RESEND_COOLDOWN_MS = 60 * 1000;
 /** Wrong-guess cap before a code is dead. */
 export const MAX_ATTEMPTS = 5;
+/** Wrong passwords allowed inside the lockout window. */
+export const PASSWORD_MAX_FAILURES = 5;
+/** How long password sign-in pauses after too many wrong tries. */
+export const PASSWORD_LOCKOUT_MS = 15 * 60 * 1000;
+/** Marker stored in admin_login_codes.code_hash for a failed password try. */
+export const PASSWORD_FAILURE_MARKER = 'password_failure';
 /** "Stay signed in" session length. */
 export const REMEMBER_MAX_AGE_S = 14 * 24 * 60 * 60; // 14 days
 /** Default session length when "stay signed in" is unchecked. */

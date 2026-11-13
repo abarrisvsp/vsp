@@ -1,11 +1,13 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
 import { createServiceClient } from '@/lib/supabase';
 import {
   hashCode,
   matchAdminLoginEmail,
   MAX_ATTEMPTS,
+  PASSWORD_FAILURE_MARKER,
+  PASSWORD_LOCKOUT_MS,
+  PASSWORD_MAX_FAILURES,
   REMEMBER_MAX_AGE_S,
   SHORT_MAX_AGE_S,
 } from '@/lib/auth-codes';
@@ -17,19 +19,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email', type: 'email' },
         code: { label: 'Code', type: 'text' },
         remember: { label: 'Remember', type: 'text' },
-        // Break-glass only — never surfaced in the UI. See SETUP.md.
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const email = matchAdminLoginEmail(credentials?.email as string | undefined);
-        if (!email) return null;
-
+        const login = ((credentials?.email as string | undefined) || '').trim();
         const remember = String(credentials?.remember) === 'true';
         const code = (credentials?.code as string | undefined)?.trim();
         const password = credentials?.password as string | undefined;
 
         // Primary path: passwordless one-time email code.
-        if (code) {
+        const email = matchAdminLoginEmail(login);
+        if (code && email) {
           const supabase = createServiceClient();
           const { data: rows } = await supabase
             .from('admin_login_codes')
@@ -58,11 +58,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return { id: 'admin', email, remember };
         }
 
-        // Break-glass path: env-var password, no UI. Lets us regain access if
-        // the admin mailbox is ever unavailable (see SETUP.md).
-        if (password && process.env.ADMIN_PASSWORD_HASH) {
-          const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
-          if (valid) return { id: 'admin', email, remember };
+        // Password path: username (or admin email) + password, both set in
+        // Vercel as ADMIN_USERNAME / ADMIN_PASSWORD. Works when email is down.
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        const adminUsername = (process.env.ADMIN_USERNAME || '').trim().toLowerCase();
+        const loginOk =
+          !!email || (!!adminUsername && login.toLowerCase() === adminUsername);
+        if (password && adminPassword && loginOk) {
+          const supabase = createServiceClient();
+          const now = Date.now();
+
+          // Lockout: too many recent wrong passwords pauses password sign-in.
+          // Failures are logged as already-used rows in admin_login_codes, so
+          // they never match an email code and get swept by the expiry cleanup.
+          const { count } = await supabase
+            .from('admin_login_codes')
+            .select('id', { count: 'exact', head: true })
+            .eq('code_hash', PASSWORD_FAILURE_MARKER)
+            .gt('created_at', new Date(now - PASSWORD_LOCKOUT_MS).toISOString());
+          if ((count ?? 0) >= PASSWORD_MAX_FAILURES) return null;
+
+          // Compare digests so the check takes the same time for any guess.
+          if ((await hashCode(password)) === (await hashCode(adminPassword))) {
+            const adminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+            return { id: 'admin', email: email || adminEmail, remember };
+          }
+
+          await supabase.from('admin_login_codes').insert({
+            code_hash: PASSWORD_FAILURE_MARKER,
+            expires_at: new Date(now + PASSWORD_LOCKOUT_MS).toISOString(),
+            used_at: new Date(now).toISOString(),
+          });
         }
 
         return null;
