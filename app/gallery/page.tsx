@@ -3,7 +3,6 @@ import { Footer } from '@/components/layout/Footer';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { GalleryUploader } from '@/components/gallery/GalleryUploader';
 import { getGalleryPhotos } from '@/lib/actions/gallery';
-import { auth } from '@/lib/auth';
 import { CtaBand } from '@/components/shared/CtaBand';
 import { MiniStats } from '@/components/shared/MiniStats';
 import { InlineRichText } from '@/components/edit-mode/InlineRichText';
@@ -11,8 +10,9 @@ import { getSiteContent } from '@/lib/actions/content';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// right away via revalidatePath, so edits still show up immediately.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/gallery').catch(() => null);
@@ -43,9 +43,8 @@ const HERO_DEFAULTS: Record<string, string> = {
 };
 
 export default async function GalleryPage() {
-  const [photos, session, c] = await Promise.all([
+  const [photos, c] = await Promise.all([
     getGalleryPhotos(),
-    auth(),
     getSiteContent(HERO_KEYS),
   ]);
   const categories = Array.from(new Set(photos.map((p) => p.category)));
@@ -95,7 +94,7 @@ export default async function GalleryPage() {
 
         <CtaBand title={<>Like what you see? <em>Tell us about your event.</em></>} />
       </main>
-      {session?.user?.isAdmin && <GalleryUploader categories={categories.length ? categories : ['general']} />}
+      <GalleryUploader categories={categories.length ? categories : ['general']} />
       <Footer />
     </>
   );

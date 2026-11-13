@@ -4,8 +4,9 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// right away via revalidatePath, so edits still show up immediately.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Portfolio | Visionary Sound Productions',
