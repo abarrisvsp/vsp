@@ -16,9 +16,10 @@ export function LoginForm() {
   // bumped a deeper page through callbackUrl (e.g. /about), respect that.
   const callbackUrl = params.get('callbackUrl') || '/admin';
 
-  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,87 @@ export function LoginForm() {
     router.refresh();
   }
 
+  async function verifyPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const result = await signIn('credentials', {
+      email,
+      password,
+      remember: String(remember),
+      redirect: false,
+    });
+    setSubmitting(false);
+    if (result?.error) {
+      setPassword('');
+      setError('Wrong email or password. After 5 wrong tries, password sign-in pauses for 15 minutes.');
+      return;
+    }
+    router.push(callbackUrl);
+    router.refresh();
+  }
+
+  const rememberBox = (
+    <label className="flex items-center gap-2 text-sm text-ink-mute select-none cursor-pointer">
+      <input
+        type="checkbox"
+        checked={remember}
+        onChange={(e) => setRemember(e.target.checked)}
+        className="accent-brand"
+      />
+      Stay signed in for 14 days
+    </label>
+  );
+
+  if (step === 'password') {
+    return (
+      <form onSubmit={verifyPassword} className="w-full max-w-sm space-y-4">
+        <div>
+          <label htmlFor="login-email" className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Email</label>
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="username"
+            required
+            autoFocus={!email}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="login-password" className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Password</label>
+          <input
+            id="login-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            autoFocus={!!email}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={inputClass}
+          />
+        </div>
+        {rememberBox}
+        {error && <p className="text-sm text-brand">{error}</p>}
+        <button type="submit" disabled={submitting} className={buttonClass}>
+          {submitting ? 'Signing in…' : 'Sign in'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setStep('email');
+            setPassword('');
+            setError(null);
+          }}
+          className="block mx-auto text-xs text-ink-mute hover:text-ink underline"
+        >
+          Email me a code instead
+        </button>
+      </form>
+    );
+  }
+
   if (step === 'email') {
     return (
       <form onSubmit={sendCode} className="w-full max-w-sm space-y-4">
@@ -68,6 +150,16 @@ export function LoginForm() {
         {error && <p className="text-sm text-brand">{error}</p>}
         <button type="submit" disabled={submitting} className={buttonClass}>
           {submitting ? 'Sending…' : 'Email me a code'}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setStep('password');
+            setError(null);
+          }}
+          className="block mx-auto text-xs text-ink-mute hover:text-ink underline"
+        >
+          Sign in with password instead
         </button>
       </form>
     );
@@ -94,15 +186,7 @@ export function LoginForm() {
           className={`${inputClass} tracking-[0.4em] text-center text-lg`}
         />
       </div>
-      <label className="flex items-center gap-2 text-sm text-ink-mute select-none cursor-pointer">
-        <input
-          type="checkbox"
-          checked={remember}
-          onChange={(e) => setRemember(e.target.checked)}
-          className="accent-brand"
-        />
-        Stay signed in for 14 days
-      </label>
+      {rememberBox}
       {error && <p className="text-sm text-brand">{error}</p>}
       <button type="submit" disabled={submitting} className={buttonClass}>
         {submitting ? 'Verifying…' : 'Sign in'}
