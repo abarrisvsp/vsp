@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcryptjs';
 import { createServiceClient } from '@/lib/supabase';
 import {
   hashCode,
@@ -23,15 +22,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const email = matchAdminLoginEmail(credentials?.email as string | undefined);
-        if (!email) return null;
-
+        const login = ((credentials?.email as string | undefined) || '').trim();
         const remember = String(credentials?.remember) === 'true';
         const code = (credentials?.code as string | undefined)?.trim();
         const password = credentials?.password as string | undefined;
 
         // Primary path: passwordless one-time email code.
-        if (code) {
+        const email = matchAdminLoginEmail(login);
+        if (code && email) {
           const supabase = createServiceClient();
           const { data: rows } = await supabase
             .from('admin_login_codes')
@@ -60,9 +58,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return { id: 'admin', email, remember };
         }
 
-        // Password path: works when the mailbox is down. The password itself
-        // lives only as a bcrypt hash in the ADMIN_PASSWORD_HASH env var.
-        if (password && process.env.ADMIN_PASSWORD_HASH) {
+        // Password path: username (or admin email) + password, both set in
+        // Vercel as ADMIN_USERNAME / ADMIN_PASSWORD. Works when email is down.
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        const adminUsername = (process.env.ADMIN_USERNAME || '').trim().toLowerCase();
+        const loginOk =
+          !!email || (!!adminUsername && login.toLowerCase() === adminUsername);
+        if (password && adminPassword && loginOk) {
           const supabase = createServiceClient();
           const now = Date.now();
 
@@ -76,8 +78,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .gt('created_at', new Date(now - PASSWORD_LOCKOUT_MS).toISOString());
           if ((count ?? 0) >= PASSWORD_MAX_FAILURES) return null;
 
-          const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
-          if (valid) return { id: 'admin', email, remember };
+          // Compare digests so the check takes the same time for any guess.
+          if ((await hashCode(password)) === (await hashCode(adminPassword))) {
+            const adminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+            return { id: 'admin', email: email || adminEmail, remember };
+          }
 
           await supabase.from('admin_login_codes').insert({
             code_hash: PASSWORD_FAILURE_MARKER,
