@@ -169,7 +169,7 @@ export function LoginForm() {
     <form onSubmit={verifyCode} className="w-full max-w-sm space-y-4">
       <p className="text-sm text-ink-mute">
         If that&rsquo;s the admin address, a 6-digit code is on its way to your inbox. It expires in
-        10 minutes.
+        5 minutes.
       </p>
       <div>
         <label className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Code</label>
