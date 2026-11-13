@@ -5,8 +5,12 @@ import { uploadImageFile, uploadErrorMessage, MAX_SOURCE_BYTES } from '@/lib/upl
 import { createGalleryPhoto } from '@/lib/actions/gallery';
 import { toast } from 'sonner';
 import { Plus } from 'lucide-react';
+import { useEditMode } from '@/components/edit-mode/EditModeProvider';
 
 export function GalleryUploader({ categories }: { categories: string[] }) {
+  // The gallery page is cached for everyone, so the admin check happens here
+  // in the browser. Uploads are still protected on the server.
+  const { isAdmin } = useEditMode();
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -42,6 +46,8 @@ export function GalleryUploader({ categories }: { categories: string[] }) {
     maxSize: MAX_SOURCE_BYTES,
     multiple: true,
   });
+
+  if (!isAdmin) return null;
 
   return (
     <>
