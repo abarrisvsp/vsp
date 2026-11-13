@@ -6,6 +6,9 @@ import {
   hashCode,
   matchAdminLoginEmail,
   MAX_ATTEMPTS,
+  PASSWORD_FAILURE_MARKER,
+  PASSWORD_LOCKOUT_MS,
+  PASSWORD_MAX_FAILURES,
   REMEMBER_MAX_AGE_S,
   SHORT_MAX_AGE_S,
 } from '@/lib/auth-codes';
@@ -17,7 +20,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: 'Email', type: 'email' },
         code: { label: 'Code', type: 'text' },
         remember: { label: 'Remember', type: 'text' },
-        // Break-glass only — never surfaced in the UI. See SETUP.md.
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
@@ -58,11 +60,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return { id: 'admin', email, remember };
         }
 
-        // Break-glass path: env-var password, no UI. Lets us regain access if
-        // the admin mailbox is ever unavailable (see SETUP.md).
+        // Password path: works when the mailbox is down. The password itself
+        // lives only as a bcrypt hash in the ADMIN_PASSWORD_HASH env var.
         if (password && process.env.ADMIN_PASSWORD_HASH) {
+          const supabase = createServiceClient();
+          const now = Date.now();
+
+          // Lockout: too many recent wrong passwords pauses password sign-in.
+          // Failures are logged as already-used rows in admin_login_codes, so
+          // they never match an email code and get swept by the expiry cleanup.
+          const { count } = await supabase
+            .from('admin_login_codes')
+            .select('id', { count: 'exact', head: true })
+            .eq('code_hash', PASSWORD_FAILURE_MARKER)
+            .gt('created_at', new Date(now - PASSWORD_LOCKOUT_MS).toISOString());
+          if ((count ?? 0) >= PASSWORD_MAX_FAILURES) return null;
+
           const valid = await bcrypt.compare(password, process.env.ADMIN_PASSWORD_HASH);
           if (valid) return { id: 'admin', email, remember };
+
+          await supabase.from('admin_login_codes').insert({
+            code_hash: PASSWORD_FAILURE_MARKER,
+            expires_at: new Date(now + PASSWORD_LOCKOUT_MS).toISOString(),
+            used_at: new Date(now).toISOString(),
+          });
         }
 
         return null;
