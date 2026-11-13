@@ -65,7 +65,7 @@ export function LoginForm() {
     setSubmitting(false);
     if (result?.error) {
       setPassword('');
-      setError('Wrong email or password. After 5 wrong tries, password sign-in pauses for 15 minutes.');
+      setError('Wrong username or password. After 5 wrong tries, password sign-in pauses for 15 minutes.');
       return;
     }
     router.push(callbackUrl);
@@ -88,10 +88,11 @@ export function LoginForm() {
     return (
       <form onSubmit={verifyPassword} className="w-full max-w-sm space-y-4">
         <div>
-          <label htmlFor="login-email" className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Email</label>
+          <label htmlFor="login-email" className="block text-xs uppercase tracking-wider text-ink-mute mb-1">Username</label>
           <input
             id="login-email"
-            type="email"
+            type="text"
+            autoCapitalize="none"
             autoComplete="username"
             required
             autoFocus={!email}
