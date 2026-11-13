@@ -8,8 +8,9 @@ import { CtaBand } from '@/components/shared/CtaBand';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// right away via revalidatePath, so edits still show up immediately.
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/about').catch(() => null);
