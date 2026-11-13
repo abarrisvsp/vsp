@@ -22,7 +22,7 @@ export async function sendLoginCode(to: string, code: string): Promise<void> {
       <p style="margin:0 0 8px;color:#b8b1a3;font-size:14px;">Your sign-in code:</p>
       <div style="font-size:40px;font-weight:600;letter-spacing:10px;color:#efe9dd;margin:0 0 24px;">${code}</div>
       <p style="margin:0;color:#7a7468;font-size:13px;line-height:1.5;">
-        Enter this code on the sign-in page. It expires in 10 minutes and can be used once.
+        Enter this code on the sign-in page. It expires in 5 minutes and can be used once.
         If you didn't request it, you can ignore this email.
       </p>
     </div>
@@ -33,7 +33,7 @@ export async function sendLoginCode(to: string, code: string): Promise<void> {
     to,
     subject: 'Your Visionary Sound Productions sign-in code',
     html,
-    text: `Your Visionary Sound Productions sign-in code is ${code}. It expires in 10 minutes and can be used once.`,
+    text: `Your Visionary Sound Productions sign-in code is ${code}. It expires in 5 minutes and can be used once.`,
   });
 
   if (error) console.error('[auth] sendLoginCode:', error);
