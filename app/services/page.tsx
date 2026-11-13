@@ -6,8 +6,9 @@ import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { CtaBand } from '@/components/shared/CtaBand';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// right away via revalidatePath, so edits still show up immediately.
+export const revalidate = 60;
 
 const HERO_KEYS = ['services_idx_eyebrow', 'services_idx_headline', 'services_idx_lede'];
 
