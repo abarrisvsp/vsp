@@ -10,9 +10,9 @@ import { getSiteContent } from '@/lib/actions/content';
 import type { Metadata } from 'next';
 import { getSeoSettings } from '@/lib/actions/seo';
 
-// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// Serve a saved copy, rebuilt at most once an hour. Admin saves refresh it
 // right away via revalidatePath, so edits still show up immediately.
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const row = await getSeoSettings('/gallery').catch(() => null);
