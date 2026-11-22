@@ -6,9 +6,9 @@ import { InlineImage } from '@/components/edit-mode/InlineImage';
 import { CtaBand } from '@/components/shared/CtaBand';
 import Link from 'next/link';
 
-// Serve a saved copy, rebuilt at most once a minute. Admin saves refresh it
+// Serve a saved copy, rebuilt at most once an hour. Admin saves refresh it
 // right away via revalidatePath, so edits still show up immediately.
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const HERO_KEYS = ['services_idx_eyebrow', 'services_idx_headline', 'services_idx_lede'];
 
